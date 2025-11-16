@@ -1,16 +1,9 @@
-# kaarya
+# kaarya.ai
 
-A new Flutter project.
+**AI-Powered Career, and Talent Management System for Colleges like Softwarica in Nepal**
 
-## Getting Started
+**Kaarya.ai** is a one-stop, AI-powered career and recruitment ecosystem designed for colleges and universities like Softwarica across Nepal. It unites everything needed by students, job seekers, recruiters, and institutions on a single fair and transparent platform. 
 
-This project is a starting point for a Flutter application.
+Students can build interactive, AI-graded resumes, take AI-based mock interviews for real-time feedback, earn gamified scores, climb leaderboards, and explore AI-generated learning resources to improve their readiness. Recruiters and companies can post jobs, match resumes to job openings, and even create their own mock interview or skill-test libraries. 
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Colleges can manage placements, monitor student readiness, and ensure hiring decisions are based on real ability rather than bias for both student and faculty recruitment. For teacher hiring,  Kaarya.ai offers AI-proctored, graded mock teaching and lecture evaluations to ensure quality and fairness. Together, these features make it a complete unbiased  solution that modernizes how Nepal’s colleges prepare, assess, and connect talent with opportunity.
