@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/theme/app_colors.dart';
 
 class MyTextFormField extends StatefulWidget {
   const MyTextFormField({
@@ -70,14 +71,11 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
           borderRadius: const BorderRadius.all(Radius.circular(10)),
         ),
         enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: Color.fromRGBO(208, 210, 212, 1)),
+          borderSide: BorderSide(color: AppColors.borderStroke),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
         focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(
-            color: Color.fromRGBO(4, 113, 182, 1.0),
-            width: 1.5,
-          ),
+          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
           borderRadius: BorderRadius.all(Radius.circular(10)),
         ),
       ),

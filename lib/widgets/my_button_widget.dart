@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/theme/app_colors.dart';
 
 enum ButtonVariant { primary, secondary }
 
@@ -31,9 +32,9 @@ class MyButton extends StatelessWidget {
   Color _getBackgroundColor() {
     switch (variant) {
       case ButtonVariant.primary:
-        return Color(0xFF0471B6);
+        return AppColors.primary;
       case ButtonVariant.secondary:
-        return Color(0xFFF5F5F5);
+        return AppColors.bgLight;
     }
   }
 
