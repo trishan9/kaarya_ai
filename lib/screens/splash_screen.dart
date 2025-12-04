@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/widgets/app_logo_widget.dart';
+import 'package:kaarya/widgets/loader_widget.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
@@ -12,15 +14,16 @@ class SplashScreen extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset('assets/images/kaarya_logo.png', width: 110),
+              AppLogoWidget(),
+
               Text(
                 "Kaarya.ai",
                 style: TextStyle(fontSize: 52, fontWeight: FontWeight.w600),
               ),
+
               SizedBox(height: 100),
-              CircularProgressIndicator(
-                color: Color.fromRGBO(4, 113, 182, 1.0),
-              ),
+
+              LoaderWidget(),
             ],
           ),
         ),
