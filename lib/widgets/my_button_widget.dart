@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/theme/app_colors.dart';
 
-enum ButtonVariant { primary, secondary }
+enum ButtonVariant { primary, secondary, text }
 
 class MyButton extends StatelessWidget {
   const MyButton({
@@ -10,12 +10,14 @@ class MyButton extends StatelessWidget {
     required this.text,
     this.variant = ButtonVariant.primary,
     this.icon,
+    this.btnWidth,
   });
 
   final VoidCallback onPressed;
   final String text;
   final ButtonVariant variant;
   final Widget? icon;
+  final double? btnWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -25,6 +27,7 @@ class MyButton extends StatelessWidget {
       icon: icon,
       backgroundColor: _getBackgroundColor(),
       textColor: _getTextColor(),
+      btnWidth: btnWidth,
     );
   }
 
@@ -35,6 +38,8 @@ class MyButton extends StatelessWidget {
         return AppColors.primary;
       case ButtonVariant.secondary:
         return AppColors.bgLight;
+      case ButtonVariant.text:
+        return Colors.transparent;
     }
   }
 
@@ -44,6 +49,8 @@ class MyButton extends StatelessWidget {
         return Colors.white;
       case ButtonVariant.secondary:
         return Colors.black;
+      case ButtonVariant.text:
+        return AppColors.primary;
     }
   }
 }
@@ -56,6 +63,7 @@ class _BaseButton extends StatelessWidget {
     required this.backgroundColor,
     required this.textColor,
     this.icon,
+    this.btnWidth,
   });
 
   final VoidCallback onPressed;
@@ -63,11 +71,12 @@ class _BaseButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textColor;
   final Widget? icon;
+  final double? btnWidth;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
+      width: btnWidth ?? double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
