@@ -1,23 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/common/my_snackbar.dart';
-import 'package:kaarya/screens/signup_screen.dart';
+import 'package:kaarya/screens/login_screen.dart';
 import 'package:kaarya/widgets/header_section_widget.dart';
 import 'package:kaarya/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/widgets/my_button_widget.dart';
 import 'package:kaarya/widgets/my_text_form_field_widget.dart';
 import 'package:kaarya/widgets/text_divider_widget.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,16 +39,28 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   children: [
                     HeadingWithSubheadingWidget(
-                      heading: "Welcome back to Kaarya!",
+                      heading: "Create Your Account",
                       subheading:
-                          "Enter your username and password to access your account",
+                          "Welcome to Kaarya! Let's get started by creating your account.",
                     ),
 
                     SizedBox(height: 36),
 
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
+                      spacing: 14,
                       children: [
+                        MyTextFormField(
+                          controller: _fullNameController,
+                          text: "Enter your full name",
+                          inputType: TextInputType.emailAddress,
+                          prefixIcon: Icon(
+                            Icons.person_outline_rounded,
+                            color: Colors.grey,
+                          ),
+                          validationErrorMessage: "Full name is required",
+                        ),
+
                         MyTextFormField(
                           controller: _emailAddressController,
                           text: "Enter your email address",
@@ -57,11 +72,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           validationErrorMessage: "Email address is required",
                         ),
 
-                        SizedBox(height: 14),
-
                         MyTextFormField(
                           controller: _passwordController,
-                          inputType: TextInputType.visiblePassword,
                           text: "Enter your password",
                           obscureText: true,
                           prefixIcon: Icon(
@@ -71,17 +83,16 @@ class _LoginScreenState extends State<LoginScreen> {
                           validationErrorMessage: "Password is required",
                         ),
 
-                        TextButton(
-                          onPressed: () {},
-                          style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF0084D1),
-                              fontWeight: FontWeight.w500,
-                            ),
+                        MyTextFormField(
+                          controller: _confirmPasswordController,
+                          text: "Confirm your password",
+                          obscureText: true,
+                          prefixIcon: Icon(
+                            Icons.lock_outline_rounded,
+                            color: Colors.grey,
                           ),
+                          validationErrorMessage:
+                              "Confirm Password is required",
                         ),
                       ],
                     ),
@@ -89,12 +100,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: 16),
 
                     MyButton(
-                      text: "Login",
+                      text: "Sign Up",
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
                           showMySnackBar(
                             context: context,
-                            message: "Login Successful",
+                            message: "Account created successfully",
                           );
                         }
                       },
@@ -114,10 +125,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             showMySnackBar(
                               context: context,
-                              message: "Login with Google Successful",
+                              message: "Signup with Google Successful",
                             );
                           },
-                          text: "Login with Google",
+                          text: "Signup with Google",
                           variant: ButtonVariant.secondary,
                           icon: Image.asset("assets/images/google_logo.png"),
                         ),
@@ -126,10 +137,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: () {
                             showMySnackBar(
                               context: context,
-                              message: "Login with GitHub Successful",
+                              message: "Signup with GitHub Successful",
                             );
                           },
-                          text: "Login with GitHub",
+                          text: "Signup with GitHub",
                           variant: ButtonVariant.secondary,
                           icon: Image.asset("assets/images/github_logo.png"),
                         ),
@@ -139,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               ),
 
-              SignupText(),
+              LoginText(),
             ],
           ),
         ),
@@ -148,8 +159,8 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 }
 
-class SignupText extends StatelessWidget {
-  const SignupText({super.key});
+class LoginText extends StatelessWidget {
+  const LoginText({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -157,12 +168,12 @@ class SignupText extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => SignupScreen()),
+          MaterialPageRoute(builder: (context) => LoginScreen()),
         );
       },
       child: RichText(
         text: TextSpan(
-          text: "Don't have an account? ",
+          text: "Already have an account? ",
           style: TextStyle(
             fontSize: 14,
             color: Colors.black,
@@ -170,7 +181,7 @@ class SignupText extends StatelessWidget {
           ),
           children: [
             TextSpan(
-              text: "Sign Up",
+              text: "Login",
               style: TextStyle(
                 color: Color(0xFF0084D1),
                 fontWeight: FontWeight.w500,

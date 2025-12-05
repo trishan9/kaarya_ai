@@ -51,6 +51,8 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       decoration: InputDecoration(
         hintText: widget.text,
 
+        contentPadding: EdgeInsets.all(10),
+
         prefixIcon: widget.prefixIcon,
 
         suffixIcon: widget.obscureText
