@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/common/my_snackbar.dart';
+import 'package:kaarya/screens/home_screen.dart';
 import 'package:kaarya/screens/signup_screen.dart';
 import 'package:kaarya/widgets/header_section_widget.dart';
 import 'package:kaarya/widgets/heading_with_subheading_widget.dart';
@@ -95,6 +96,14 @@ class _LoginScreenState extends State<LoginScreen> {
                           showMySnackBar(
                             context: context,
                             message: "Login Successful",
+                          );
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => HomeScreen(),
+                            ),
+                            (Route<dynamic> route) => false,
                           );
                         }
                       },
