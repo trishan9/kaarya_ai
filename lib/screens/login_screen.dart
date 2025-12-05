@@ -3,6 +3,7 @@ import 'package:kaarya/common/my_snackbar.dart';
 import 'package:kaarya/widgets/app_logo_widget.dart';
 import 'package:kaarya/widgets/my_button_widget.dart';
 import 'package:kaarya/widgets/my_text_form_field_widget.dart';
+import 'package:kaarya/widgets/text_divider_widget.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -19,6 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(30.0),
@@ -94,15 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     SizedBox(height: 24),
 
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 8,
-                      children: [
-                        Expanded(child: Divider()),
-                        Text("Or"),
-                        Expanded(child: Divider()),
-                      ],
-                    ),
+                    TextDividerWidget(text: "Or"),
 
                     SizedBox(height: 24),
 
@@ -111,14 +105,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       spacing: 12,
                       children: [
                         MyButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showMySnackBar(
+                              context: context,
+                              message: "Login with Google Successful",
+                            );
+                          },
                           text: "Login with Google",
                           variant: ButtonVariant.secondary,
                           icon: Image.asset("assets/images/google_logo.png"),
                         ),
 
                         MyButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            showMySnackBar(
+                              context: context,
+                              message: "Login with GitHub Successful",
+                            );
+                          },
                           text: "Login with GitHub",
                           variant: ButtonVariant.secondary,
                           icon: Image.asset("assets/images/github_logo.png"),
