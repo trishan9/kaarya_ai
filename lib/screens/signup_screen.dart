@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/common/my_snackbar.dart';
 import 'package:kaarya/screens/login_screen.dart';
+import 'package:kaarya/screens/onboarding_screen.dart';
 import 'package:kaarya/widgets/header_section_widget.dart';
 import 'package:kaarya/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/widgets/my_button_widget.dart';
@@ -106,6 +107,14 @@ class _SignupScreenState extends State<SignupScreen> {
                           showMySnackBar(
                             context: context,
                             message: "Account created successfully",
+                          );
+
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OnboardingScreen(),
+                            ),
+                            (Route<dynamic> route) => false,
                           );
                         }
                       },
