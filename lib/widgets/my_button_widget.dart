@@ -79,28 +79,13 @@ class _BaseButton extends StatelessWidget {
       width: btnWidth ?? double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          elevation: 0,
-        ),
-
+        style: ElevatedButton.styleFrom(backgroundColor: backgroundColor),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (icon != null) ...[icon!, const SizedBox(width: 10)],
 
-            Text(
-              text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
+            Text(text, style: TextStyle(color: textColor)),
           ],
         ),
       ),

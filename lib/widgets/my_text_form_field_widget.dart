@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/theme/app_colors.dart';
 
 class MyTextFormField extends StatefulWidget {
   const MyTextFormField({
@@ -50,11 +49,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
 
       decoration: InputDecoration(
         hintText: widget.text,
-
-        contentPadding: EdgeInsets.all(10),
-
         prefixIcon: widget.prefixIcon,
-
         suffixIcon: widget.obscureText
             ? IconButton(
                 icon: Icon(
@@ -68,18 +63,6 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
                 },
               )
             : null,
-
-        border: OutlineInputBorder(
-          borderRadius: const BorderRadius.all(Radius.circular(10)),
-        ),
-        enabledBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.borderStroke),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
-        focusedBorder: const OutlineInputBorder(
-          borderSide: BorderSide(color: AppColors.primary, width: 1.5),
-          borderRadius: BorderRadius.all(Radius.circular(10)),
-        ),
       ),
     );
   }
