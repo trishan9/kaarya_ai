@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/common/my_snackbar.dart';
-import 'package:kaarya/screens/home_screen.dart';
+import 'package:kaarya/screens/bottom_navigation_screen.dart';
 import 'package:kaarya/screens/signup_screen.dart';
 import 'package:kaarya/widgets/header_section_widget.dart';
 import 'package:kaarya/widgets/heading_with_subheading_widget.dart';
@@ -100,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => HomeScreen(),
+                              builder: (context) => BottomNavigationScreen(),
                             ),
                             (Route<dynamic> route) => false,
                           );
