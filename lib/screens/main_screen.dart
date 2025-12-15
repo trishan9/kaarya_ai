@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/screens/bottom_screen/overview_screen.dart';
+import 'package:kaarya/common/build_icon.dart';
+import 'package:kaarya/screens/main_screens/overview_screen.dart';
 import 'package:kaarya/theme/app_colors.dart';
 
 class MainScreen extends StatefulWidget {
@@ -47,28 +48,66 @@ class _MainScreenState extends State<MainScreen> {
             type: BottomNavigationBarType.fixed,
             items: [
               BottomNavigationBarItem(
-                activeIcon: Icon(Icons.dashboard_rounded),
-                icon: Icon(Icons.dashboard_outlined),
+                icon: buildIcon(
+                  assetPath: 'assets/icons/overview_outlined.svg',
+                  isActive: false,
+                ),
+                activeIcon: buildIcon(
+                  assetPath: 'assets/icons/overview.svg',
+                  isActive: true,
+                  width: 26,
+                  height: 26,
+                ),
                 label: "Overview",
               ),
+
               BottomNavigationBarItem(
-                activeIcon: Icon(Icons.explore),
-                icon: Icon(Icons.explore_outlined),
+                icon: buildIcon(
+                  assetPath: 'assets/icons/explore_outlined.svg',
+                  isActive: false,
+                  width: 26,
+                  height: 26,
+                ),
+                activeIcon: buildIcon(
+                  assetPath: 'assets/icons/explore.svg',
+                  isActive: true,
+                  width: 26,
+                  height: 26,
+                ),
                 label: "Explore",
               ),
+
               BottomNavigationBarItem(
-                activeIcon: Icon(Icons.work),
-                icon: Icon(Icons.work_outline_outlined),
+                icon: buildIcon(
+                  assetPath: 'assets/icons/interview_outlined.svg',
+                  isActive: false,
+                  width: 26,
+                  height: 26,
+                ),
+                activeIcon: buildIcon(
+                  assetPath: 'assets/icons/interview.svg',
+                  isActive: true,
+                  width: 26,
+                  height: 26,
+                ),
                 label: "InterviewAI",
               ),
+
               BottomNavigationBarItem(
-                activeIcon: Icon(Icons.leaderboard),
                 icon: Icon(Icons.leaderboard_outlined),
+                activeIcon: Icon(Icons.leaderboard),
                 label: "Leaderboard",
               ),
+
               BottomNavigationBarItem(
-                activeIcon: Icon(Icons.document_scanner),
-                icon: Icon(Icons.document_scanner_outlined),
+                icon: buildIcon(
+                  assetPath: 'assets/icons/resume_ai.svg',
+                  isActive: false,
+                ),
+                activeIcon: buildIcon(
+                  assetPath: 'assets/icons/resume_ai.svg',
+                  isActive: true,
+                ),
                 label: "ResumeAI",
               ),
             ],
