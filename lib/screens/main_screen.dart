@@ -6,6 +6,7 @@ import 'package:kaarya/screens/main_screens/leaderboard_screen.dart';
 import 'package:kaarya/screens/main_screens/overview_screen.dart';
 import 'package:kaarya/screens/main_screens/resume_builder_screen.dart';
 import 'package:kaarya/theme/app_colors.dart';
+import 'package:kaarya/widgets/notifications_widget.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -24,9 +25,21 @@ class _MainScreenState extends State<MainScreen> {
     const ResumeBuilderScreen(),
   ];
 
+  final List<String> _titles = [
+    "Overview",
+    "Explore Jobs & Internships",
+    "AI Interview Hub",
+    "Leaderboard",
+    "Resume Builder AI",
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text(_titles[_selectedIndex]),
+        actions: [NotificationsWidget()],
+      ),
       body: lstBottomScreens[_selectedIndex],
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,

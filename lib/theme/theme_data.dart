@@ -13,6 +13,7 @@ ThemeData getApplicationTheme() {
         fontSize: 20,
         fontWeight: FontWeight.w500,
         color: Colors.black,
+        fontFamily: "GeneralSans",
       ),
     ),
 
@@ -53,6 +54,14 @@ ThemeData getApplicationTheme() {
       unselectedIconTheme: IconThemeData(size: 24, color: Colors.grey.shade600),
       showUnselectedLabels: false,
       showSelectedLabels: false,
+    ),
+
+    drawerTheme: DrawerThemeData(backgroundColor: Colors.white, width: 300),
+
+    dividerTheme: DividerThemeData(
+      color: Colors.grey.shade300,
+      thickness: 1,
+      space: 20,
     ),
   );
 }
