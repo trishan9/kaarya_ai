@@ -2,14 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:kaarya/screens/bottom_screen/overview_screen.dart';
 import 'package:kaarya/theme/app_colors.dart';
 
-class BottomNavigationScreen extends StatefulWidget {
-  const BottomNavigationScreen({super.key});
+class MainScreen extends StatefulWidget {
+  const MainScreen({super.key});
 
   @override
-  State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
+  State<MainScreen> createState() => _MainScreenState();
 }
 
-class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
+class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreens = [
     const OverviewScreen(),
