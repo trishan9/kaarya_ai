@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/common/build_icon.dart';
+import 'package:kaarya/screens/main_screens/explore_screen.dart';
+import 'package:kaarya/screens/main_screens/interview_hub_screen.dart';
+import 'package:kaarya/screens/main_screens/leaderboard_screen.dart';
 import 'package:kaarya/screens/main_screens/overview_screen.dart';
+import 'package:kaarya/screens/main_screens/resume_builder_screen.dart';
 import 'package:kaarya/theme/app_colors.dart';
 
 class MainScreen extends StatefulWidget {
@@ -14,10 +18,10 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
   List<Widget> lstBottomScreens = [
     const OverviewScreen(),
-    const OverviewScreen(),
-    const OverviewScreen(),
-    const OverviewScreen(),
-    const OverviewScreen(),
+    const ExploreScreen(),
+    const InterviewHubScreen(),
+    const LeaderboardScreen(),
+    const ResumeBuilderScreen(),
   ];
 
   @override
@@ -90,7 +94,7 @@ class _MainScreenState extends State<MainScreen> {
                   width: 26,
                   height: 26,
                 ),
-                label: "InterviewAI",
+                label: "Interview Hub",
               ),
 
               BottomNavigationBarItem(
@@ -108,7 +112,7 @@ class _MainScreenState extends State<MainScreen> {
                   assetPath: 'assets/icons/resume_ai.svg',
                   isActive: true,
                 ),
-                label: "ResumeAI",
+                label: "Resume Builder AI",
               ),
             ],
             currentIndex: _selectedIndex,
