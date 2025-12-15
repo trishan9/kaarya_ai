@@ -39,5 +39,20 @@ ThemeData getApplicationTheme() {
         textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
       ),
     ),
+
+    bottomNavigationBarTheme: BottomNavigationBarThemeData(
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      elevation: 0,
+      selectedItemColor: AppColors.primary,
+      unselectedItemColor: Colors.grey.shade600,
+      selectedIconTheme: const IconThemeData(
+        size: 24,
+        color: AppColors.primary,
+      ),
+      unselectedIconTheme: IconThemeData(size: 24, color: Colors.grey.shade600),
+      showUnselectedLabels: false,
+      showSelectedLabels: false,
+    ),
   );
 }
