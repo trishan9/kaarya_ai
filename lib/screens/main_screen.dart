@@ -6,6 +6,7 @@ import 'package:kaarya/screens/main_screens/leaderboard_screen.dart';
 import 'package:kaarya/screens/main_screens/overview_screen.dart';
 import 'package:kaarya/screens/main_screens/resume_builder_screen.dart';
 import 'package:kaarya/theme/app_colors.dart';
+import 'package:kaarya/widgets/app_drawer_widget.dart';
 import 'package:kaarya/widgets/notifications_widget.dart';
 
 class MainScreen extends StatefulWidget {
@@ -38,8 +39,14 @@ class _MainScreenState extends State<MainScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(_titles[_selectedIndex]),
-        actions: [NotificationsWidget()],
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 14),
+            child: NotificationsWidget(),
+          ),
+        ],
       ),
+      drawer: AppDrawerWidget(),
       body: lstBottomScreens[_selectedIndex],
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,

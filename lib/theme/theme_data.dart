@@ -9,6 +9,8 @@ ThemeData getApplicationTheme() {
 
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.white,
+      leadingWidth: 60,
+      titleSpacing: 4,
       titleTextStyle: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w500,
