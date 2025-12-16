@@ -76,14 +76,25 @@ class ApplicationsSummaryWidget extends StatelessWidget {
               ),
             ],
           ),
-          // Tabs: wip
+          Row(),
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
-            spacing: 10,
+            spacing: 6,
             children: [
               Text(
                 "124",
                 style: TextStyle(fontSize: 48, fontWeight: FontWeight.w500),
+              ),
+              Transform.translate(
+                offset: const Offset(0, -15),
+                child: OverlappingAvatars(
+                  avatars: [
+                    'assets/images/github_logo.png',
+                    'assets/images/google_logo.png',
+                    'assets/images/github_logo.png',
+                  ],
+                  extraCount: 9,
+                ),
               ),
             ],
           ),
@@ -105,6 +116,59 @@ class ApplicationsSummaryWidget extends StatelessWidget {
                       " applications has been sent to the recruiters today, great work, hope the best for you!",
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OverlappingAvatars extends StatelessWidget {
+  const OverlappingAvatars({
+    super.key,
+    required this.avatars,
+    this.extraCount = 0,
+  });
+
+  final List<String> avatars;
+  final int extraCount;
+
+  @override
+  Widget build(BuildContext context) {
+    const double avatarSize = 28;
+    const double overlap = 18;
+
+    final double width = (avatars.length * overlap) + avatarSize;
+
+    return SizedBox(
+      height: avatarSize,
+      width: width,
+      child: Stack(
+        children: [
+          for (int i = 0; i < avatars.length; i++)
+            Positioned(
+              left: i * overlap,
+              child: CircleAvatar(
+                radius: avatarSize / 2,
+                backgroundColor: Colors.white,
+                backgroundImage: AssetImage(avatars[i]),
+              ),
+            ),
+
+          Positioned(
+            left: avatars.length * overlap,
+            child: CircleAvatar(
+              radius: avatarSize / 2,
+              backgroundColor: AppColors.bgSecondary,
+              child: Text(
+                '+$extraCount',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
             ),
           ),
         ],
