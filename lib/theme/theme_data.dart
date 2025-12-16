@@ -7,6 +7,15 @@ ThemeData getApplicationTheme() {
     scaffoldBackgroundColor: Colors.white,
     primarySwatch: AppColors.primarySwatch,
 
+    textTheme: TextTheme(
+      headlineLarge: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+      headlineMedium: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
+      headlineSmall: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+      titleMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+      bodyMedium: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+      bodySmall: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
+    ),
+
     appBarTheme: AppBarTheme(
       backgroundColor: Colors.white,
       leadingWidth: 60,
