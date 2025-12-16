@@ -13,6 +13,7 @@ class AppColors {
   // Backgrounds
   static const Color bgLight = Color(0xFFF5F5F5);
   static const Color bgSecondary = Color(0xFFE7F2F8);
+  static const Color bgTertiary = Color(0xFFFAFAFA);
 
   // Borders
   static const Color borderStroke = Color(0xFFD0D2D4);
