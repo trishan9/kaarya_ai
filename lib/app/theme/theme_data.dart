@@ -26,6 +26,8 @@ ThemeData getApplicationTheme() {
         color: Colors.black,
         fontFamily: "GeneralSans",
       ),
+      shadowColor: Colors.transparent,
+      surfaceTintColor: AppColors.primary,
     ),
 
     inputDecorationTheme: InputDecorationTheme(
@@ -45,10 +47,16 @@ ThemeData getApplicationTheme() {
 
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        padding: const EdgeInsets.symmetric(vertical: 14),
+        padding: const EdgeInsets.symmetric(vertical: 8),
+        backgroundColor: AppColors.primary,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        textStyle: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+          fontFamily: "GeneralSans",
+        ),
       ),
     ),
 

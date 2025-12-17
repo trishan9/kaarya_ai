@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/deadline_card_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/invitation_card_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/job_recommendation_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/summary_card_widget.dart';
 
 class OverviewScreen extends StatelessWidget {
@@ -17,6 +18,7 @@ class OverviewScreen extends StatelessWidget {
           SummaryCardWidget(),
           InvitationCardWidget(),
           DeadlineCardWidget(),
+          JobRecommendationWidget(),
         ],
       ),
     );

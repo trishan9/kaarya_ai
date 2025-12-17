@@ -85,7 +85,10 @@ class _BaseButton extends StatelessWidget {
           children: [
             if (icon != null) ...[icon!, const SizedBox(width: 10)],
 
-            Text(text, style: TextStyle(color: textColor)),
+            Text(
+              text,
+              style: TextStyle(color: textColor, fontFamily: "GeneralSans"),
+            ),
           ],
         ),
       ),
