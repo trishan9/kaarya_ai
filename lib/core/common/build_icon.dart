@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:kaarya/theme/theme_data.dart';
+import 'package:kaarya/app/theme/theme_data.dart';
 
 Widget buildIcon({
   required String assetPath,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/screens/splash_screen.dart';
-import 'package:kaarya/theme/theme_data.dart';
+import 'package:kaarya/features/splash/presentation/view/splash_screen.dart';
+import 'package:kaarya/app/theme/theme_data.dart';
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/common/build_icon.dart';
-import 'package:kaarya/screens/main_screens/explore_screen.dart';
-import 'package:kaarya/screens/main_screens/interview_hub_screen.dart';
-import 'package:kaarya/screens/main_screens/leaderboard_screen.dart';
-import 'package:kaarya/screens/main_screens/overview_screen.dart';
-import 'package:kaarya/screens/main_screens/resume_builder_screen.dart';
-import 'package:kaarya/theme/app_colors.dart';
+import 'package:kaarya/core/common/build_icon.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/explore_screen.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/interview_hub_screen.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/leaderboard_screen.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/overview_screen.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/resume_builder_screen.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/widgets/app_drawer_widget.dart';
 import 'package:kaarya/widgets/notifications_widget.dart';
 

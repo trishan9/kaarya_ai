@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/models/onboard_screen_data_model.dart';
-import 'package:kaarya/screens/login_screen.dart';
-import 'package:kaarya/theme/app_colors.dart';
+import 'package:kaarya/features/auth/presentation/view/login_screen.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/widgets/my_button_widget.dart';
 
 class OnboardingScreen extends StatefulWidget {
