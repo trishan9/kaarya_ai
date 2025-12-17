@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:kaarya/common/build_icon.dart';
 import 'package:kaarya/theme/app_colors.dart';
 
+enum ApplicationStatus { all, mock, screening, interview }
+
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
 
@@ -18,8 +20,30 @@ class OverviewScreen extends StatelessWidget {
   }
 }
 
-class ApplicationsSummaryCardWidget extends StatelessWidget {
+class ApplicationsSummaryCardWidget extends StatefulWidget {
   const ApplicationsSummaryCardWidget({super.key});
+
+  @override
+  State<ApplicationsSummaryCardWidget> createState() =>
+      _ApplicationsSummaryCardWidgetState();
+}
+
+class _ApplicationsSummaryCardWidgetState
+    extends State<ApplicationsSummaryCardWidget> {
+  ApplicationStatus selectedStatus = ApplicationStatus.all;
+
+  int get applicationsCount {
+    switch (selectedStatus) {
+      case ApplicationStatus.all:
+        return 124;
+      case ApplicationStatus.mock:
+        return 18;
+      case ApplicationStatus.screening:
+        return 42;
+      case ApplicationStatus.interview:
+        return 9;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +58,7 @@ class ApplicationsSummaryCardWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 8, 8, 16),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -78,14 +103,22 @@ class ApplicationsSummaryCardWidget extends StatelessWidget {
                 ],
               ),
             ),
-
-            Row(), // tabs : todo
+            SizedBox(height: 18),
+            ApplicationStatusFilterWidget(
+              selectedStatus: selectedStatus,
+              onChanged: (status) {
+                setState(() {
+                  selectedStatus = status;
+                });
+              },
+            ),
+            SizedBox(height: 4),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               spacing: 6,
               children: [
                 Text(
-                  "124",
+                  applicationsCount.toString(),
                   style: TextStyle(fontSize: 48, fontWeight: FontWeight.w500),
                 ),
                 Transform.translate(
@@ -126,6 +159,68 @@ class ApplicationsSummaryCardWidget extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class ApplicationStatusFilterWidget extends StatelessWidget {
+  const ApplicationStatusFilterWidget({
+    super.key,
+    required this.selectedStatus,
+    required this.onChanged,
+  });
+
+  final ApplicationStatus selectedStatus;
+  final ValueChanged<ApplicationStatus> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: ApplicationStatus.values.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 8),
+        itemBuilder: (context, index) {
+          final status = ApplicationStatus.values[index];
+          final bool isSelected = status == selectedStatus;
+
+          return ChoiceChip(
+            label: Text(
+              _labelForStatus(status),
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: isSelected ? Colors.white : AppColors.textMedium,
+              ),
+            ),
+            selected: isSelected,
+            onSelected: (_) => onChanged(status),
+            showCheckmark: false,
+            backgroundColor: Colors.white,
+            selectedColor: AppColors.primary,
+            side: BorderSide(
+              color: isSelected ? AppColors.primary : AppColors.borderStroke,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(6),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  String _labelForStatus(ApplicationStatus status) {
+    switch (status) {
+      case ApplicationStatus.all:
+        return 'All Applications';
+      case ApplicationStatus.mock:
+        return 'Mock Interviews';
+      case ApplicationStatus.screening:
+        return 'Accepted';
+      case ApplicationStatus.interview:
+        return 'Rejected';
+    }
   }
 }
 
