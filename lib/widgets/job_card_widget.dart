@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/features/dashboard/models/job_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobCardWidget extends StatelessWidget {
-  const JobCardWidget({super.key});
+  const JobCardWidget({super.key, required this.job});
+
+  final JobModel job;
 
   @override
   Widget build(BuildContext context) {
@@ -26,8 +29,8 @@ class JobCardWidget extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     SizedBox(),
-                    const Text(
-                      "3d ago",
+                    Text(
+                      job.postedAgo,
                       style: TextStyle(
                         color: AppColors.textMedium,
                         fontSize: 13,
@@ -48,7 +51,7 @@ class JobCardWidget extends StatelessWidget {
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(8),
                         child: Image.asset(
-                          "assets/images/aws_logo.png",
+                          job.logo,
                           width: 44,
                           height: 44,
                           fit: BoxFit.cover,
@@ -59,9 +62,9 @@ class JobCardWidget extends StatelessWidget {
 
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
-                          "Software Engineer",
+                          job.title,
                           style: TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
@@ -69,7 +72,7 @@ class JobCardWidget extends StatelessWidget {
                         ),
                         SizedBox(height: 2),
                         Text(
-                          "Amazon",
+                          job.company,
                           style: TextStyle(
                             color: AppColors.textMedium,
                             fontSize: 13,
@@ -83,16 +86,13 @@ class JobCardWidget extends StatelessWidget {
                 const SizedBox(height: 14),
 
                 Wrap(
-                  spacing: 4,
+                  spacing: 6,
                   runSpacing: 8,
                   children: [
-                    _chip(LucideIcons.mapPin300, "Kathmandu, Bagmati"),
-                    _chip(LucideIcons.clock300, "Full-Time"),
-                    _chip(LucideIcons.briefcase300, "Internship"),
-                    _chip(
-                      LucideIcons.badgeDollarSign300,
-                      "NPR 10,00,000 - NPR 15,00,000",
-                    ),
+                    _chip(LucideIcons.mapPin300, job.location),
+                    _chip(LucideIcons.clock300, job.jobType),
+                    _chip(LucideIcons.briefcase300, job.experience),
+                    _chip(LucideIcons.badgeDollarSign300, job.salary),
                   ],
                 ),
 
@@ -143,16 +143,16 @@ class JobCardWidget extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.bgLightGreen,
+              color: badgeBgColor(),
               borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(12),
                 bottomRight: Radius.circular(12),
               ),
             ),
-            child: const Text(
-              "Suit You Best!",
+            child: Text(
+              job.badge,
               style: TextStyle(
-                color: AppColors.success2,
+                color: badgeTextColor(),
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
@@ -161,6 +161,28 @@ class JobCardWidget extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  Color badgeBgColor() {
+    switch (job.badgeType) {
+      case "best":
+        return AppColors.bgLightGreen;
+      case "hiring":
+        return AppColors.bgLightOrange;
+      default:
+        return Colors.grey.shade200;
+    }
+  }
+
+  Color badgeTextColor() {
+    switch (job.badgeType) {
+      case "best":
+        return AppColors.success2;
+      case "hiring":
+        return AppColors.warning;
+      default:
+        return Colors.black;
+    }
   }
 
   static Widget _chip(IconData icon, String label) {
