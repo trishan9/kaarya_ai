@@ -4,6 +4,7 @@ class AppColors {
   // Brand Colors
   static const Color primary = Color(0xFF0471B6);
   static const Color success = Color(0xFF00C950);
+  static const Color success2 = Color(0xFF00A63E);
   static const Color error = Color(0xFFFB2C36);
 
   // Texts
@@ -15,6 +16,7 @@ class AppColors {
   static const Color bgLight = Color(0xFFF5F5F5);
   static const Color bgSecondary = Color(0xFFE7F2F8);
   static const Color bgTertiary = Color(0xFFFAFAFA);
+  static const Color bgLightGreen = Color(0xFFDCFCE7);
 
   // Borders
   static const Color borderStroke = Color(0xFFD0D2D4);
