@@ -1,13 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/core/common/navigation_provider.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screen.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-class AppDrawerWidget extends StatelessWidget {
-  final int selectedIndex;
+class AppDrawerWidget extends ConsumerWidget {
+  const AppDrawerWidget({super.key});
 
-  const AppDrawerWidget({super.key, this.selectedIndex = 1});
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final current = ref.watch(bottomNavProvider);
+
+    void goToBottom(AppDestination dest) {
+      ref.read(bottomNavProvider.notifier).state = dest;
+      Navigator.pop(context);
+    }
+
+    void pushPage(Widget page) {
+      Navigator.pop(context);
+      Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    }
+
     return Drawer(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -17,6 +31,7 @@ class AppDrawerWidget extends StatelessWidget {
             color: Colors.white,
             borderRadius: BorderRadius.circular(18),
           ),
+
           child: Column(
             children: [
               Padding(padding: const EdgeInsets.all(12), child: _header()),
@@ -35,48 +50,80 @@ class AppDrawerWidget extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       _sectionTitle("MAIN"),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.layoutDashboard,
                         title: "Overview",
-                        selected: true,
+                        selected: current == AppDestination.overview,
+                        onTap: () => goToBottom(AppDestination.overview),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.globe,
                         title: "Explore Jobs & Internships",
+                        selected: current == AppDestination.explore,
+                        onTap: () => goToBottom(AppDestination.explore),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.sparkles,
                         title: "Resume Builder AI",
+                        selected: current == AppDestination.resumeBuilder,
+                        onTap: () => goToBottom(AppDestination.resumeBuilder),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.mic,
                         title: "AI Interview Hub",
+                        selected: current == AppDestination.interviewHub,
+                        onTap: () => goToBottom(AppDestination.interviewHub),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.calendarCheck,
                         title: "My Interviews",
+                        onTap: () => pushPage(const MainScreen()),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: Icons.leaderboard_outlined,
                         title: "Leaderboard",
+                        selected: current == AppDestination.leaderboard,
+                        onTap: () => goToBottom(AppDestination.leaderboard),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.folder,
                         title: "My Applications",
+                        onTap: () => pushPage(const MainScreen()),
                       ),
-                      _menuItem(icon: LucideIcons.bookmark, title: "Saved"),
-                      _menuItem(icon: LucideIcons.fileText, title: "Resources"),
+
+                      _drawerItem(
+                        icon: LucideIcons.bookmark,
+                        title: "Saved",
+                        onTap: () => pushPage(const MainScreen()),
+                      ),
+
+                      _drawerItem(
+                        icon: LucideIcons.fileText,
+                        title: "Resources",
+                        onTap: () => pushPage(const MainScreen()),
+                      ),
 
                       const SizedBox(height: 16),
 
                       _sectionTitle("OTHERS"),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.newspaper,
                         title: "Blogs & Articles",
+                        onTap: () => pushPage(const MainScreen()),
                       ),
-                      _menuItem(
+
+                      _drawerItem(
                         icon: LucideIcons.headphones,
                         title: "Help Center",
+                        onTap: () => pushPage(const MainScreen()),
                       ),
 
                       const SizedBox(height: 20),
@@ -161,11 +208,12 @@ class AppDrawerWidget extends StatelessWidget {
     );
   }
 
-  Widget _menuItem({
+  Widget _drawerItem({
+    required String title,
     IconData? icon,
     Widget? customIcon,
-    required String title,
     bool selected = false,
+    required VoidCallback onTap,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -187,7 +235,7 @@ class AppDrawerWidget extends StatelessWidget {
             fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
           ),
         ),
-        onTap: () {},
+        onTap: onTap,
       ),
     );
   }

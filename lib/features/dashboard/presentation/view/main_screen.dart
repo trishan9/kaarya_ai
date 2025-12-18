@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/core/common/build_icon.dart';
+import 'package:kaarya/core/common/navigation_provider.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/explore_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/interview_hub_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/leaderboard_screen.dart';
@@ -9,24 +11,10 @@ import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/widgets/app_drawer_widget.dart';
 import 'package:kaarya/widgets/notifications_widget.dart';
 
-class MainScreen extends StatefulWidget {
+class MainScreen extends ConsumerWidget {
   const MainScreen({super.key});
 
-  @override
-  State<MainScreen> createState() => _MainScreenState();
-}
-
-class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
-  List<Widget> lstBottomScreens = [
-    const OverviewScreen(),
-    const ExploreScreen(),
-    const InterviewHubScreen(),
-    const LeaderboardScreen(),
-    const ResumeBuilderScreen(),
-  ];
-
-  final List<String> _titles = [
+  static const _titles = [
     "Overview",
     "Explore Jobs & Internships",
     "AI Interview Hub",
@@ -34,11 +22,30 @@ class _MainScreenState extends State<MainScreen> {
     "Resume Builder AI",
   ];
 
+  static const _bottomNavscreens = [
+    OverviewScreen(),
+    ExploreScreen(),
+    InterviewHubScreen(),
+    LeaderboardScreen(),
+    ResumeBuilderScreen(),
+  ];
+
+  int _indexFromDestination(AppDestination dest) {
+    return AppDestination.values.indexOf(dest);
+  }
+
+  AppDestination _destinationFromIndex(int index) {
+    return AppDestination.values[index];
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final destination = ref.watch(bottomNavProvider);
+    final selectedIndex = _indexFromDestination(destination);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[_selectedIndex]),
+        title: Text(_titles[selectedIndex]),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 14),
@@ -46,8 +53,11 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
+
       drawer: AppDrawerWidget(),
-      body: lstBottomScreens[_selectedIndex],
+
+      body: _bottomNavscreens[selectedIndex],
+
       bottomNavigationBar: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -59,7 +69,7 @@ class _MainScreenState extends State<MainScreen> {
                 return Expanded(
                   child: Container(
                     height: 3,
-                    color: _selectedIndex == index
+                    color: selectedIndex == index
                         ? AppColors.primary
                         : Colors.transparent,
                   ),
@@ -70,6 +80,11 @@ class _MainScreenState extends State<MainScreen> {
 
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
+            currentIndex: selectedIndex,
+            onTap: (i) {
+              ref.read(bottomNavProvider.notifier).state =
+                  _destinationFromIndex(i);
+            },
             items: [
               BottomNavigationBarItem(
                 icon: buildIcon(
@@ -135,12 +150,6 @@ class _MainScreenState extends State<MainScreen> {
                 label: "Resume Builder AI",
               ),
             ],
-            currentIndex: _selectedIndex,
-            onTap: (index) {
-              setState(() {
-                _selectedIndex = index;
-              });
-            },
           ),
         ],
       ),
