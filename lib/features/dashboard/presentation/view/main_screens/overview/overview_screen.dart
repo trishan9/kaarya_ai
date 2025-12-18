@@ -3,6 +3,7 @@ import 'package:kaarya/features/dashboard/presentation/view/main_screens/overvie
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/invitation_card_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/job_recommendation_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/summary_card_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/tips_banner_widget.dart';
 
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
@@ -19,6 +20,7 @@ class OverviewScreen extends StatelessWidget {
           InvitationCardWidget(),
           DeadlineCardWidget(),
           JobRecommendationWidget(),
+          TipsBannerWidget(),
         ],
       ),
     );

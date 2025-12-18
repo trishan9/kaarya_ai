@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class NotificationsWidget extends StatelessWidget {
   const NotificationsWidget({super.key});
@@ -9,12 +10,12 @@ class NotificationsWidget extends StatelessWidget {
       alignment: Alignment.center,
       children: [
         IconButton(
-          icon: const Icon(Icons.notifications_outlined, size: 28),
+          icon: const Icon(LucideIcons.bell, size: 28),
           onPressed: () {},
         ),
         Positioned(
           right: 10,
-          top: 8,
+          top: 4,
           child: Container(
             padding: const EdgeInsets.all(2),
             decoration: const BoxDecoration(
