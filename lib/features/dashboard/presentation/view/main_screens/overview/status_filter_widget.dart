@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/job_recommendation_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/summary_card_widget.dart';
 
-class JobFilterWidget extends StatelessWidget {
-  const JobFilterWidget({
+class StatusFilterWidget extends StatelessWidget {
+  const StatusFilterWidget({
     super.key,
-    required this.selectedFilter,
+    required this.selectedStatus,
     required this.onChanged,
   });
 
-  final JobFilter selectedFilter;
-  final ValueChanged<JobFilter> onChanged;
+  final ApplicationStatus selectedStatus;
+  final ValueChanged<ApplicationStatus> onChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -18,15 +18,15 @@ class JobFilterWidget extends StatelessWidget {
       height: 40,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: JobFilter.values.length,
+        itemCount: ApplicationStatus.values.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
-          final filter = JobFilter.values[index];
-          final bool isSelected = filter == selectedFilter;
+          final status = ApplicationStatus.values[index];
+          final bool isSelected = status == selectedStatus;
 
           return ChoiceChip(
             label: Text(
-              _labelForFilter(filter),
+              _labelForStatus(status),
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
@@ -34,7 +34,7 @@ class JobFilterWidget extends StatelessWidget {
               ),
             ),
             selected: isSelected,
-            onSelected: (_) => onChanged(filter),
+            onSelected: (_) => onChanged(status),
             showCheckmark: false,
             backgroundColor: Colors.white,
             selectedColor: AppColors.primary,
@@ -51,18 +51,16 @@ class JobFilterWidget extends StatelessWidget {
     );
   }
 
-  String _labelForFilter(JobFilter filter) {
-    switch (filter) {
-      case JobFilter.forYou:
-        return 'For You';
-      case JobFilter.trending:
-        return 'Trending Jobs';
-      case JobFilter.newThisWeek:
-        return 'New This Week';
-      case JobFilter.urgent:
-        return 'Urgent Hiring';
-      case JobFilter.remote:
-        return 'Remote Opportunities';
+  String _labelForStatus(ApplicationStatus status) {
+    switch (status) {
+      case ApplicationStatus.all:
+        return 'All Applications';
+      case ApplicationStatus.mock:
+        return 'Mock Interviews';
+      case ApplicationStatus.screening:
+        return 'Accepted';
+      case ApplicationStatus.interview:
+        return 'Rejected';
     }
   }
 }

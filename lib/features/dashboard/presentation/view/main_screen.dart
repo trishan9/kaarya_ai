@@ -5,7 +5,7 @@ import 'package:kaarya/core/common/navigation_provider.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/explore_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/interview_hub_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/leaderboard_screen.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/overview_screen.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/view/main_screens/resume_builder_screen.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/widgets/app_drawer_widget.dart';

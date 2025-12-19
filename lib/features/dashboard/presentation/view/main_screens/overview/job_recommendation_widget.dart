@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/features/dashboard/models/job_model.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/widgets/job_filter_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/job_filter_widget.dart';
 import 'package:kaarya/widgets/job_card_widget.dart';
 
 enum JobFilter { forYou, trending, newThisWeek, urgent, remote }
