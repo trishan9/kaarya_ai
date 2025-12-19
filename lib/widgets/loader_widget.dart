@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/theme/app_colors.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 
 class LoaderWidget extends StatelessWidget {
   const LoaderWidget({super.key});

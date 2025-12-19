@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/screens/login_screen.dart';
+import 'package:kaarya/features/auth/presentation/view/login_screen.dart';
 import 'package:kaarya/widgets/app_logo_widget.dart';
 import 'package:kaarya/widgets/loader_widget.dart';
 
@@ -31,7 +31,6 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: Column(

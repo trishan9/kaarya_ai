@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/theme/app_colors.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 
 enum ButtonVariant { primary, secondary, text }
 
@@ -79,15 +79,7 @@ class _BaseButton extends StatelessWidget {
       width: btnWidth ?? double.infinity,
       child: ElevatedButton(
         onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          elevation: 0,
-        ),
-
+        style: ElevatedButton.styleFrom(backgroundColor: backgroundColor),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -95,11 +87,7 @@ class _BaseButton extends StatelessWidget {
 
             Text(
               text,
-              style: TextStyle(
-                color: textColor,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: textColor, fontFamily: "GeneralSans"),
             ),
           ],
         ),
