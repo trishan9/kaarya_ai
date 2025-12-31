@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
+import 'package:kaarya/features/auth/presentation/state/auth_state.dart';
+import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
@@ -9,17 +12,28 @@ import 'package:kaarya/core/widgets/text_divider_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/signup_text_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _handleLogin() async {
+    if (_formKey.currentState!.validate()) {
+      await ref
+          .read(authViewModelProvider.notifier)
+          .loginUser(
+            email: _emailAddressController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+    }
+  }
 
   Future<void> _handleGoogleLogin() async {
     SnackbarUtils.showSuccess(context, "Login with Google Successful");
@@ -31,6 +45,16 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authViewModelProvider);
+
+    ref.listen<AuthState>(authViewModelProvider, (previous, next) {
+      if (next.status == AuthStatus.authenticated) {
+        AppRoutes.pushReplacement(context, const DashboardPage());
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        SnackbarUtils.showError(context, next.errorMessage!);
+      }
+    });
+
     return Scaffold(
       body: SafeArea(
         child: Padding(
@@ -99,19 +123,8 @@ class _LoginPageState extends State<LoginPage> {
 
                     MyButton(
                       text: "Login",
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          SnackbarUtils.showSuccess(
-                            context,
-                            "Login Successful",
-                          );
-
-                          AppRoutes.pushReplacement(
-                            context,
-                            const DashboardPage(),
-                          );
-                        }
-                      },
+                      onPressed: _handleLogin,
+                      isLoading: authState.status == AuthStatus.loading,
                     ),
 
                     SizedBox(height: 24),

@@ -28,6 +28,14 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   Future<void> _handleSignup() async {
     if (_formKey.currentState!.validate()) {
+      if (_passwordController.text.trim() !=
+          _confirmPasswordController.text.trim()) {
+        return SnackbarUtils.showError(
+          context,
+          "Password and Confirm Password must be same!",
+        );
+      }
+
       ref
           .read(authViewModelProvider.notifier)
           .registerUser(
