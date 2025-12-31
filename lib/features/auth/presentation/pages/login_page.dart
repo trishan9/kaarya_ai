@@ -43,6 +43,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     SnackbarUtils.showSuccess(context, "Login with GitHub Successful");
   }
 
+  Future<void> _handleForgotPassword() async {
+    SnackbarUtils.showInfo(context, "Coming soon!");
+  }
+
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
@@ -105,7 +109,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         ),
 
                         TextButton(
-                          onPressed: () {},
+                          onPressed: _handleForgotPassword,
                           style: TextButton.styleFrom(padding: EdgeInsets.zero),
                           child: Text(
                             "Forgot Password?",

@@ -4,6 +4,7 @@ import 'package:kaarya/app/app.dart';
 import 'package:kaarya/core/services/hive/hive_service.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await HiveService().init();
   runApp(const ProviderScope(child: MyApp()));
 }

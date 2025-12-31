@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/utils/navigation_provider.dart';
+import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -14,12 +16,16 @@ class AppDrawerWidget extends ConsumerWidget {
 
     void goToBottom(AppDestination dest) {
       ref.read(bottomNavProvider.notifier).state = dest;
-      Navigator.pop(context);
+      AppRoutes.pop(context);
     }
 
     void pushPage(Widget page) {
-      Navigator.pop(context);
-      Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+      AppRoutes.pop(context);
+      AppRoutes.push(context, page);
+    }
+
+    Future<void> _handleLogout() async {
+      AppRoutes.pushAndRemoveUntil(context, const LoginPage());
     }
 
     return Drawer(
@@ -144,7 +150,7 @@ class AppDrawerWidget extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.error,
                         ),
-                        onPressed: () {},
+                        onPressed: _handleLogout,
                         label: Text(
                           "Logout",
                           style: TextStyle(
@@ -152,6 +158,7 @@ class AppDrawerWidget extends ConsumerWidget {
                             fontWeight: FontWeight.w500,
                           ),
                         ),
+
                         icon: Icon(LucideIcons.logOut, color: Colors.white),
                       ),
                     ),
