@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/core/utils/my_snackbar.dart';
 import 'package:kaarya/features/auth/presentation/pages/signup_page.dart';
 import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
@@ -97,12 +98,9 @@ class _LoginPageState extends State<LoginPage> {
                             message: "Login Successful",
                           );
 
-                          Navigator.pushAndRemoveUntil(
+                          AppRoutes.pushReplacement(
                             context,
-                            MaterialPageRoute(
-                              builder: (context) => DashboardPage(),
-                            ),
-                            (Route<dynamic> route) => false,
+                            const DashboardPage(),
                           );
                         }
                       },

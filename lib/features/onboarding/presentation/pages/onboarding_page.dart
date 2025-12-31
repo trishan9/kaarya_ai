@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
 import 'package:kaarya/features/onboarding/data/models/onboarding_data_model.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
+import 'package:kaarya/features/onboarding/presentation/widgets/onboarding_progress_widget.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key});
@@ -140,11 +142,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                     btnWidth: 180,
                     onPressed: () {
                       if (currentIndex == onboardingPages.length - 1) {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage()),
-                          (Route<dynamic> route) => false,
-                        );
+                        AppRoutes.pushReplacement(context, const LoginPage());
                       } else {
                         _controller.nextPage(
                           duration: const Duration(milliseconds: 300),
@@ -163,52 +161,6 @@ class _OnboardingPageState extends State<OnboardingPage> {
             const SizedBox(height: 30),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class OnboardingProgress extends StatelessWidget {
-  final int index;
-  const OnboardingProgress({super.key, required this.index});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: List.generate(4, (i) {
-          final bool isActive = i == index;
-
-          if (isActive) {
-            return AnimatedSwitcher(
-              duration: const Duration(milliseconds: 300),
-              transitionBuilder: (child, anim) =>
-                  ScaleTransition(scale: anim, child: child),
-
-              child: Container(
-                key: ValueKey("bar_$i"),
-                height: 8,
-                width: 80,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(50),
-                ),
-              ),
-            );
-          }
-
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 4),
-            height: 8,
-            width: 8,
-            decoration: BoxDecoration(
-              color: Color(0xFFD1E4F2),
-              shape: BoxShape.circle,
-            ),
-          );
-        }),
       ),
     );
   }

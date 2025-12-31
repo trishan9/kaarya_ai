@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/core/utils/my_snackbar.dart';
 import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
-import 'package:kaarya/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
@@ -108,13 +108,7 @@ class _SignupPageState extends State<SignupPage> {
                             message: "Account created successfully",
                           );
 
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => OnboardingPage(),
-                            ),
-                            (Route<dynamic> route) => false,
-                          );
+                          AppRoutes.pop(context);
                         }
                       },
                     ),
