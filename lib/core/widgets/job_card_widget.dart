@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
-import 'package:kaarya/features/dashboard/models/job_model.dart';
+import 'package:kaarya/features/dashboard/data/models/job_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobCardWidget extends StatelessWidget {

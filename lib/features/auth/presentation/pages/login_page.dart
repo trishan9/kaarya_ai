@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/core/utils/my_snackbar.dart';
-import 'package:kaarya/features/auth/presentation/pages/signup_screen.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screen.dart';
+import 'package:kaarya/features/auth/presentation/pages/signup_page.dart';
 import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
 import 'package:kaarya/core/widgets/text_divider_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -100,7 +100,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => MainScreen(),
+                              builder: (context) => DashboardPage(),
                             ),
                             (Route<dynamic> route) => false,
                           );

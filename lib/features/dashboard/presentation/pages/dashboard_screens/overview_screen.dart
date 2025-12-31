@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/deadline_card_widget.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/invitation_card_widget.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/job_recommendation_widget.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/summary_card_widget.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/interview_readiness_chart_widget.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/tips_banner_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/deadline_card_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/invitation_card_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/job_recommendation_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/summary_card_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/interview_readiness_chart_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/tips_banner_widget.dart';
 
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});

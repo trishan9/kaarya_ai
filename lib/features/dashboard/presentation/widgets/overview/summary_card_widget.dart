@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/overlapping_avatars_widget.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/status_filter_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/overlapping_avatars_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/status_filter_widget.dart';
 
 enum ApplicationStatus { all, mock, screening, interview }
 

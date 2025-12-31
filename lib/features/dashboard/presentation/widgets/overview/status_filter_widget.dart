@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
-import 'package:kaarya/features/dashboard/presentation/view/main_screens/overview/summary_card_widget.dart';
+import 'package:kaarya/features/dashboard/presentation/widgets/overview/summary_card_widget.dart';
 
 class StatusFilterWidget extends StatelessWidget {
   const StatusFilterWidget({
