@@ -53,9 +53,7 @@ class HiveService {
 
   Future<void> logoutUser() async {}
 
-  AuthHiveModel? getCurrentUser(String authId) {
-    return _authBox.get(authId);
-  }
+  AuthHiveModel? getCurrentUser() {}
 
   AuthHiveModel? getUserById(String authId) {
     return _authBox.get(authId);
