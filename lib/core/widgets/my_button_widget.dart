@@ -11,6 +11,7 @@ class MyButton extends StatelessWidget {
     this.variant = ButtonVariant.primary,
     this.icon,
     this.btnWidth,
+    this.isLoading = false,
   });
 
   final VoidCallback onPressed;
@@ -18,6 +19,7 @@ class MyButton extends StatelessWidget {
   final ButtonVariant variant;
   final Widget? icon;
   final double? btnWidth;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -28,6 +30,7 @@ class MyButton extends StatelessWidget {
       backgroundColor: _getBackgroundColor(),
       textColor: _getTextColor(),
       btnWidth: btnWidth,
+      isLoading: isLoading,
     );
   }
 
@@ -64,6 +67,7 @@ class _BaseButton extends StatelessWidget {
     required this.textColor,
     this.icon,
     this.btnWidth,
+    this.isLoading = false,
   });
 
   final VoidCallback onPressed;
@@ -72,25 +76,38 @@ class _BaseButton extends StatelessWidget {
   final Color textColor;
   final Widget? icon;
   final double? btnWidth;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: btnWidth ?? double.infinity,
       child: ElevatedButton(
-        onPressed: onPressed,
+        onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(backgroundColor: backgroundColor),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[icon!, const SizedBox(width: 10)],
+        child: isLoading
+            ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
+              )
+            : Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (icon != null) ...[icon!, const SizedBox(width: 10)],
 
-            Text(
-              text,
-              style: TextStyle(color: textColor, fontFamily: "GeneralSans"),
-            ),
-          ],
-        ),
+                  Text(
+                    text,
+                    style: TextStyle(
+                      color: textColor,
+                      fontFamily: "GeneralSans",
+                    ),
+                  ),
+                ],
+              ),
       ),
     );
   }

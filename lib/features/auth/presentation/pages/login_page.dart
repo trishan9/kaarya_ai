@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
-import 'package:kaarya/core/utils/my_snackbar.dart';
-import 'package:kaarya/features/auth/presentation/pages/signup_page.dart';
+import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
 import 'package:kaarya/core/widgets/text_divider_widget.dart';
+import 'package:kaarya/features/auth/presentation/widgets/signup_text_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
 
 class LoginPage extends StatefulWidget {
@@ -20,6 +20,14 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  Future<void> _handleGoogleLogin() async {
+    SnackbarUtils.showSuccess(context, "Login with Google Successful");
+  }
+
+  Future<void> _handleGithubLogin() async {
+    SnackbarUtils.showSuccess(context, "Login with GitHub Successful");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,9 +101,9 @@ class _LoginPageState extends State<LoginPage> {
                       text: "Login",
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          showMySnackBar(
-                            context: context,
-                            message: "Login Successful",
+                          SnackbarUtils.showSuccess(
+                            context,
+                            "Login Successful",
                           );
 
                           AppRoutes.pushReplacement(
@@ -117,24 +125,14 @@ class _LoginPageState extends State<LoginPage> {
                       spacing: 12,
                       children: [
                         MyButton(
-                          onPressed: () {
-                            showMySnackBar(
-                              context: context,
-                              message: "Login with Google Successful",
-                            );
-                          },
+                          onPressed: _handleGoogleLogin,
                           text: "Login with Google",
                           variant: ButtonVariant.secondary,
                           icon: Image.asset("assets/images/google_logo.png"),
                         ),
 
                         MyButton(
-                          onPressed: () {
-                            showMySnackBar(
-                              context: context,
-                              message: "Login with GitHub Successful",
-                            );
-                          },
+                          onPressed: _handleGithubLogin,
                           text: "Login with GitHub",
                           variant: ButtonVariant.secondary,
                           icon: Image.asset("assets/images/github_logo.png"),
@@ -148,41 +146,6 @@ class _LoginPageState extends State<LoginPage> {
               SignupText(),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class SignupText extends StatelessWidget {
-  const SignupText({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => SignupPage()),
-        );
-      },
-      child: RichText(
-        text: TextSpan(
-          text: "Don't have an account? ",
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.black,
-            fontFamily: "GeneralSans",
-          ),
-          children: [
-            TextSpan(
-              text: "Sign Up",
-              style: TextStyle(
-                color: Color(0xFF0084D1),
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
         ),
       ),
     );
