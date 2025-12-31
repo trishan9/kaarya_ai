@@ -24,10 +24,6 @@ class AppDrawerWidget extends ConsumerWidget {
       AppRoutes.push(context, page);
     }
 
-    Future<void> _handleLogout() async {
-      AppRoutes.pushAndRemoveUntil(context, const LoginPage());
-    }
-
     return Drawer(
       elevation: 0,
       backgroundColor: Colors.white,
@@ -150,7 +146,7 @@ class AppDrawerWidget extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.error,
                         ),
-                        onPressed: _handleLogout,
+                        onPressed: () => _showLogoutDialog(context),
                         label: Text(
                           "Logout",
                           style: TextStyle(
@@ -172,111 +168,143 @@ class AppDrawerWidget extends ConsumerWidget {
     );
   }
 
-  Widget _header() {
-    return Row(
-      children: [
-        Image.asset("assets/images/kaarya_logo.png", width: 38),
-        SizedBox(width: 10),
-        Text(
-          "Kaarya",
-          style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
-        ),
-      ],
-    );
-  }
+  void _showLogoutDialog(BuildContext context) {
+    Future<void> handleLogout() async {
+      AppRoutes.pop(context);
+      AppRoutes.pushAndRemoveUntil(context, const LoginPage());
+    }
 
-  Widget _searchBar() {
-    return TextField(
-      decoration: InputDecoration(
-        hintText: "Quick search...",
-        prefixIcon: const Icon(LucideIcons.search, size: 18),
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 10),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    );
-  }
-
-  Widget _sectionTitle(String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 12,
-          color: Colors.grey,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _drawerItem({
-    required String title,
-    IconData? icon,
-    Widget? customIcon,
-    bool selected = false,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: selected ? AppColors.primary : Colors.transparent,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      padding: EdgeInsets.all(0),
-      child: ListTile(
-        dense: true,
-        visualDensity: VisualDensity.compact,
-        leading:
-            customIcon ??
-            Icon(icon, size: 20, color: selected ? Colors.white : Colors.black),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontSize: 14,
-            color: selected ? Colors.white : Colors.black,
-            fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text('Logout', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => AppRoutes.pop(context),
+            child: Text('Cancel', style: TextStyle(color: Colors.black)),
           ),
-        ),
-        onTap: onTap,
-      ),
-    );
-  }
-
-  Widget _profileCard() {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: AppColors.borderStroke2,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(child: Image.asset("assets/images/profile.png")),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text(
-                  "Trishan Wagle",
-                  style: TextStyle(fontWeight: FontWeight.w500),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  "@trishan_wagle9",
-                  style: TextStyle(fontSize: 13, color: AppColors.textMedium),
-                ),
-              ],
+          TextButton(
+            onPressed: handleLogout,
+            child: Text(
+              'Logout',
+              style: TextStyle(
+                color: AppColors.error,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
-          const Icon(Icons.keyboard_arrow_up),
         ],
       ),
     );
   }
+}
+
+Widget _header() {
+  return Row(
+    children: [
+      Image.asset("assets/images/kaarya_logo.png", width: 38),
+      SizedBox(width: 10),
+      Text(
+        "Kaarya",
+        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600),
+      ),
+    ],
+  );
+}
+
+Widget _searchBar() {
+  return TextField(
+    decoration: InputDecoration(
+      hintText: "Quick search...",
+      prefixIcon: const Icon(LucideIcons.search, size: 18),
+      filled: true,
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(vertical: 10),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide.none,
+      ),
+    ),
+  );
+}
+
+Widget _sectionTitle(String title) {
+  return Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8),
+    child: Text(
+      title,
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.grey,
+        fontWeight: FontWeight.w600,
+      ),
+    ),
+  );
+}
+
+Widget _drawerItem({
+  required String title,
+  IconData? icon,
+  Widget? customIcon,
+  bool selected = false,
+  required VoidCallback onTap,
+}) {
+  return Container(
+    decoration: BoxDecoration(
+      color: selected ? AppColors.primary : Colors.transparent,
+      borderRadius: BorderRadius.circular(6),
+    ),
+    padding: EdgeInsets.all(0),
+    child: ListTile(
+      dense: true,
+      visualDensity: VisualDensity.compact,
+      leading:
+          customIcon ??
+          Icon(icon, size: 20, color: selected ? Colors.white : Colors.black),
+      title: Text(
+        title,
+        style: TextStyle(
+          fontSize: 14,
+          color: selected ? Colors.white : Colors.black,
+          fontWeight: selected ? FontWeight.w500 : FontWeight.w400,
+        ),
+      ),
+      onTap: onTap,
+    ),
+  );
+}
+
+Widget _profileCard() {
+  return Container(
+    padding: const EdgeInsets.all(10),
+    decoration: BoxDecoration(
+      color: AppColors.borderStroke2,
+      borderRadius: BorderRadius.circular(12),
+    ),
+    child: Row(
+      children: [
+        ClipRRect(child: Image.asset("assets/images/profile.png")),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Text(
+                "Trishan Wagle",
+                style: TextStyle(fontWeight: FontWeight.w500),
+              ),
+              SizedBox(height: 2),
+              Text(
+                "@trishan_wagle9",
+                style: TextStyle(fontSize: 13, color: AppColors.textMedium),
+              ),
+            ],
+          ),
+        ),
+        const Icon(Icons.keyboard_arrow_up),
+      ],
+    ),
+  );
 }
