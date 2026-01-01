@@ -52,13 +52,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     final authState = ref.watch(authViewModelProvider);
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
-      if (next.status != previous?.status) {
-        if (next.status == AuthStatus.authenticated) {
-          AppRoutes.pushReplacement(context, const DashboardPage());
-        } else if (next.status == AuthStatus.error &&
-            next.errorMessage != null) {
-          SnackbarUtils.showError(context, next.errorMessage!);
-        }
+      if (next.status == previous?.status) return;
+
+      if (next.status == AuthStatus.authenticated) {
+        ref.read(authViewModelProvider.notifier).resetState();
+        AppRoutes.pushReplacement(context, const DashboardPage());
+      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        ref.read(authViewModelProvider.notifier).resetState();
+        SnackbarUtils.showError(context, next.errorMessage!);
       }
     });
 

@@ -114,6 +114,10 @@ class AuthViewModel extends Notifier<AuthState> {
     );
   }
 
+  void resetState() {
+    state = const AuthState(status: AuthStatus.initial, errorMessage: null);
+  }
+
   void clearError() {
     state = state.copyWith(errorMessage: null);
   }
