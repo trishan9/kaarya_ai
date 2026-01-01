@@ -60,18 +60,21 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     final authState = ref.watch(authViewModelProvider);
 
     ref.listen<AuthState>(authViewModelProvider, (previous, next) {
-      if (next.status == AuthStatus.registered) {
-        SnackbarUtils.showSuccess(
-          context,
-          next.errorMessage ??
-              "Account created successfully, Proceed to login!",
-        );
-        AppRoutes.pop(context);
-      } else if (next.status == AuthStatus.error && next.errorMessage != null) {
-        SnackbarUtils.showError(
-          context,
-          next.errorMessage ?? "Failed to create account, Please try again!",
-        );
+      if (next.status != previous?.status) {
+        if (next.status == AuthStatus.registered) {
+          SnackbarUtils.showSuccess(
+            context,
+            next.errorMessage ??
+                "Account created successfully, Proceed to login!",
+          );
+          AppRoutes.pop(context);
+        } else if (next.status == AuthStatus.error &&
+            next.errorMessage != null) {
+          SnackbarUtils.showError(
+            context,
+            next.errorMessage ?? "Failed to create account, Please try again!",
+          );
+        }
       }
     });
 
