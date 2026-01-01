@@ -61,6 +61,8 @@ class AuthViewModel extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
+    await Future.delayed(Duration(seconds: 2));
+
     final result = await _loginUseCase(
       LoginUseCaseParams(email: email, password: password),
     );
