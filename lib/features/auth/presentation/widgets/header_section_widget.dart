@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kaarya/widgets/app_logo_widget.dart';
+import 'package:kaarya/core/widgets/app_logo_widget.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({super.key});
