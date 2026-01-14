@@ -24,11 +24,11 @@ class NetworkInfo implements INetworkInfo {
       return false;
     }
 
-    return await _isConnectedToInternet();
+    return await _isActuallyConnectedToInternet();
   }
 }
 
-Future<bool> _isConnectedToInternet() async {
+Future<bool> _isActuallyConnectedToInternet() async {
   try {
     final result = await InternetAddress.lookup('google.com');
     return result.isNotEmpty && result[0].rawAddress.isNotEmpty;
