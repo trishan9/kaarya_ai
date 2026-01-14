@@ -29,17 +29,9 @@ class AuthRepository implements IAuthRepository {
       }
 
       final authModel = AuthHiveModel.fromEntity(user);
-      final result = await _authDataSource.registerUser(authModel);
+      await _authDataSource.registerUser(authModel);
 
-      if (result) {
-        return const Right(true);
-      }
-
-      return Left(
-        LocalDatabaseFailure(
-          message: "Failed to create your account, Please try again!",
-        ),
-      );
+      return const Right(true);
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
     }
