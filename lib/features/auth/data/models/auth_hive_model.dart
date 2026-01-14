@@ -16,17 +16,11 @@ class AuthHiveModel extends HiveObject {
   @HiveField(2)
   final String email;
 
-  @HiveField(3)
-  final String? phoneNumber;
-
   @HiveField(4)
   final String username;
 
   @HiveField(5)
   final String? password;
-
-  @HiveField(6)
-  final String? batchId;
 
   @HiveField(7)
   final String? profilePicture;
@@ -35,10 +29,8 @@ class AuthHiveModel extends HiveObject {
     String? authId,
     required this.fullName,
     required this.email,
-    this.phoneNumber,
     required this.username,
     this.password,
-    this.batchId,
     this.profilePicture,
   }) : authId = authId ?? const Uuid().v4();
 
