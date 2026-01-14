@@ -86,8 +86,26 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         return null;
       }
 
-      // return _hiveService.getUserById(userId);
-    } catch (e) {
+      final response = await _apiClient.get(ApiEndpoints.userById(userId));
+
+      if (response.data['success'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>;
+        final currentUser = AuthApiModel.fromJson(data);
+
+        await _userSessionService.saveUserSession(
+          userId: currentUser.id!,
+          email: currentUser.email,
+          name: currentUser.name,
+          role: currentUser.role,
+          provider: currentUser.provider,
+          photo: currentUser.photo,
+        );
+
+        return currentUser;
+      }
+
+      return null;
+    } catch (_) {
       return null;
     }
   }
