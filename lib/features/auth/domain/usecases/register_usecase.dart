@@ -8,20 +8,18 @@ import 'package:kaarya/features/auth/domain/entities/auth_entity.dart';
 import 'package:kaarya/features/auth/domain/repositories/auth_repository.dart';
 
 class RegisterUseCaseParams extends Equatable {
-  final String fullName;
+  final String name;
   final String email;
-  final String username;
   final String password;
 
   const RegisterUseCaseParams({
-    required this.fullName,
+    required this.name,
     required this.email,
-    required this.username,
     required this.password,
   });
 
   @override
-  List<Object?> get props => [fullName, email, username, password];
+  List<Object?> get props => [name, email, password];
 }
 
 final registerUseCaseProvider = Provider<RegisterUseCase>((ref) {
@@ -39,9 +37,8 @@ class RegisterUseCase
   @override
   Future<Either<Failure, bool>> call(RegisterUseCaseParams params) {
     final authEntity = AuthEntity(
-      fullName: params.fullName,
+      name: params.name,
       email: params.email,
-      username: params.username,
       password: params.password,
     );
 
