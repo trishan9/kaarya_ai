@@ -11,54 +11,61 @@ class AuthHiveModel extends HiveObject {
   final String? authId;
 
   @HiveField(1)
-  final String fullName;
+  final String? name;
 
   @HiveField(2)
-  final String email;
+  final String? email;
+
+  @HiveField(3)
+  final String? provider;
 
   @HiveField(4)
-  final String username;
+  final String? socialId;
 
   @HiveField(5)
+  final String? role;
+
+  @HiveField(6)
   final String? password;
 
   @HiveField(7)
-  final String? profilePicture;
+  final String? photo;
 
   AuthHiveModel({
     String? authId,
-    required this.fullName,
-    required this.email,
-    required this.username,
+    this.name,
+    this.email,
+    this.provider,
+    this.role,
+    this.socialId,
     this.password,
-    this.profilePicture,
+    this.photo,
   }) : authId = authId ?? const Uuid().v4();
 
-  // To Entity
   AuthEntity toEntity({AuthEntity? auth}) {
     return AuthEntity(
       authId: authId,
-      fullName: fullName,
+      name: name,
       email: email,
-      username: username,
-      password: password,
-      profilePicture: profilePicture,
+      provider: provider,
+      socialId: socialId,
+      role: role,
+      profilePicture: photo,
     );
   }
 
-  // From Entity
   factory AuthHiveModel.fromEntity(AuthEntity entity) {
     return AuthHiveModel(
-      authId: entity.authId,
-      fullName: entity.fullName,
+      authId: entity.authId!,
+      name: entity.name,
       email: entity.email,
-      username: entity.username,
-      password: entity.password,
-      profilePicture: entity.profilePicture,
+      provider: entity.provider,
+      socialId: entity.socialId,
+      role: entity.role,
+      photo: entity.profilePicture,
     );
   }
 
-  // To Entity List
   static List<AuthEntity> toEntityList(List<AuthHiveModel> models) {
     return models.map((model) => model.toEntity()).toList();
   }
