@@ -40,8 +40,8 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, bool>> registerUser(AuthEntity user) async {
     if (await _networkInfo.isConnected) {
       try {
-        final apiModel = AuthApiModel.fromEntity(user);
-        await _authRemoteDataSource.registerUser(apiModel);
+        final userModel = AuthApiModel.fromEntity(user);
+        await _authRemoteDataSource.registerUser(userModel);
 
         return Right(true);
       } on DioException catch (e) {
@@ -66,8 +66,8 @@ class AuthRepository implements IAuthRepository {
           );
         }
 
-        final authModel = AuthHiveModel.fromEntity(user);
-        await _authLocalDataSource.registerUser(authModel);
+        final userModel = AuthHiveModel.fromEntity(user);
+        await _authLocalDataSource.registerUser(userModel);
 
         return const Right(true);
       } catch (e) {
@@ -83,9 +83,13 @@ class AuthRepository implements IAuthRepository {
   ) async {
     if (await _networkInfo.isConnected) {
       try {
-        final apiModel = await _authRemoteDataSource.loginUser(email, password);
-        if (apiModel != null) {
-          final entity = apiModel.toEntity();
+        final userModel = await _authRemoteDataSource.loginUser(
+          email,
+          password,
+        );
+
+        if (userModel != null) {
+          final entity = userModel.toEntity();
           return Right(entity);
         }
 
@@ -124,33 +128,78 @@ class AuthRepository implements IAuthRepository {
 
   @override
   Future<Either<Failure, AuthEntity>> getCurrentUser() async {
-    try {
-      final user = await _authLocalDataSource.getCurrentUser();
+    if (await _networkInfo.isConnected) {
+      try {
+        final userModel = await _authRemoteDataSource.getCurrentUser();
 
-      if (user != null) {
-        final userEntity = user.toEntity();
-        return Right(userEntity);
+        if (userModel != null) {
+          final userEntity = userModel.toEntity();
+          return Right(userEntity);
+        }
+
+        return const Left(
+          ApiFailure(message: "No any user is logged in currently!"),
+        );
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? "Failed to get current user!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
       }
+    } else {
+      try {
+        final user = await _authLocalDataSource.getCurrentUser();
 
-      return const Left(
-        LocalDatabaseFailure(message: "No any user is logged in currently!"),
-      );
-    } catch (e) {
-      return Left(LocalDatabaseFailure(message: e.toString()));
+        if (user != null) {
+          final userEntity = user.toEntity();
+          return Right(userEntity);
+        }
+
+        return const Left(
+          LocalDatabaseFailure(message: "No any user is logged in currently!"),
+        );
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
     }
   }
 
   @override
   Future<Either<Failure, bool>> logoutUser() async {
-    try {
-      final loggedOut = await _authLocalDataSource.logoutUser();
-      if (loggedOut) {
-        return const Right(true);
-      }
+    if (await _networkInfo.isConnected) {
+      try {
+        final loggedOut = await _authRemoteDataSource.logoutUser();
+        if (loggedOut) {
+          return const Right(true);
+        }
 
-      return const Left(LocalDatabaseFailure(message: "Unable to logout!"));
-    } catch (e) {
-      return Left(LocalDatabaseFailure(message: e.toString()));
+        return const Left(ApiFailure(message: "Failed to logout user!"));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? "Failed to logout user!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      try {
+        final loggedOut = await _authLocalDataSource.logoutUser();
+        if (loggedOut) {
+          return const Right(true);
+        }
+
+        return const Left(LocalDatabaseFailure(message: "Unable to logout!"));
+      } catch (e) {
+        return Left(LocalDatabaseFailure(message: e.toString()));
+      }
     }
   }
 }
