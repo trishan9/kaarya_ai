@@ -25,9 +25,8 @@ class AuthViewModel extends Notifier<AuthState> {
   }
 
   Future<void> registerUser({
-    required String fullName,
+    required String name,
     required String email,
-    required String username,
     required String password,
   }) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
@@ -35,12 +34,7 @@ class AuthViewModel extends Notifier<AuthState> {
     await Future.delayed(Duration(seconds: 2));
 
     final result = await _registerUseCase(
-      RegisterUseCaseParams(
-        fullName: fullName,
-        email: email,
-        username: username,
-        password: password,
-      ),
+      RegisterUseCaseParams(name: name, email: email, password: password),
     );
 
     result.fold(
