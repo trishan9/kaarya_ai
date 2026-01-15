@@ -26,7 +26,10 @@ class AuthApiModel {
 
     if (name != null) data['name'] = name;
     if (email != null) data['email'] = email;
-    if (password != null) data['password'] = password;
+    if (password != null) {
+      data['password'] = password;
+      data['confirmPassword'] = password;
+    }
     if (provider != null) data['provider'] = provider;
     if (socialId != null) data['socialId'] = socialId;
     if (photo != null) data['photo'] = photo;
@@ -36,7 +39,7 @@ class AuthApiModel {
 
   factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     return AuthApiModel(
-      id: json['_id'],
+      id: json['id'],
       name: json['name'],
       email: json['email'],
       provider: json['provider'],
