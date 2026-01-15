@@ -21,6 +21,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   Widget build(BuildContext context) {
     final current = ref.watch(bottomNavProvider);
     final userSessionService = ref.watch(userSessionServiceProvider);
+    final userName = userSessionService.getCurrentUserFullName() ?? 'User';
+    final userEmail = userSessionService.getCurrentUserEmail() ?? '';
+    final userProfilePicture =
+        userSessionService.getCurrentUserProfilePicture() ?? '';
 
     void goToBottom(AppDestination dest) {
       ref.read(bottomNavProvider.notifier).state = dest;
@@ -146,7 +150,61 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                 padding: const EdgeInsets.all(12),
                 child: Column(
                   children: [
-                    _profileCard(),
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: AppColors.borderStroke2,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          userProfilePicture.isNotEmpty
+                              ? ClipRRect(
+                                  child: Image.network(userProfilePicture),
+                                )
+                              : ClipRRect(
+                                  child: CircleAvatar(
+                                    radius: 24,
+                                    backgroundColor: Colors.white,
+                                    child: Text(
+                                      userName[0].toUpperCase() +
+                                          userName
+                                              .split(" ")[1][0]
+                                              .toUpperCase(),
+
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  userName,
+                                  style: TextStyle(fontWeight: FontWeight.w500),
+                                ),
+                                SizedBox(height: 2),
+                                Text(
+                                  userEmail,
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.textMedium,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.keyboard_arrow_up),
+                        ],
+                      ),
+                    ),
                     const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
@@ -284,39 +342,6 @@ Widget _drawerItem({
         ),
       ),
       onTap: onTap,
-    ),
-  );
-}
-
-Widget _profileCard() {
-  return Container(
-    padding: const EdgeInsets.all(10),
-    decoration: BoxDecoration(
-      color: AppColors.borderStroke2,
-      borderRadius: BorderRadius.circular(12),
-    ),
-    child: Row(
-      children: [
-        ClipRRect(child: Image.asset("assets/images/profile.png")),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                "Trishan Wagle",
-                style: TextStyle(fontWeight: FontWeight.w500),
-              ),
-              SizedBox(height: 2),
-              Text(
-                "@trishan_wagle9",
-                style: TextStyle(fontSize: 13, color: AppColors.textMedium),
-              ),
-            ],
-          ),
-        ),
-        const Icon(Icons.keyboard_arrow_up),
-      ],
     ),
   );
 }
