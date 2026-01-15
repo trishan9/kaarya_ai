@@ -18,13 +18,13 @@ class AuthHiveModelAdapter extends TypeAdapter<AuthHiveModel> {
     };
     return AuthHiveModel(
       authId: fields[0] as String?,
-      fullName: fields[1] as String,
+      name: fields[1] as String,
       email: fields[2] as String,
-      phoneNumber: fields[3] as String?,
-      username: fields[4] as String,
-      password: fields[5] as String?,
-      batchId: fields[6] as String?,
-      profilePicture: fields[7] as String?,
+      provider: fields[3] as String?,
+      role: fields[5] as String?,
+      socialId: fields[4] as String?,
+      password: fields[6] as String?,
+      photo: fields[7] as String?,
     );
   }
 
@@ -35,19 +35,19 @@ class AuthHiveModelAdapter extends TypeAdapter<AuthHiveModel> {
       ..writeByte(0)
       ..write(obj.authId)
       ..writeByte(1)
-      ..write(obj.fullName)
+      ..write(obj.name)
       ..writeByte(2)
       ..write(obj.email)
       ..writeByte(3)
-      ..write(obj.phoneNumber)
+      ..write(obj.provider)
       ..writeByte(4)
-      ..write(obj.username)
+      ..write(obj.socialId)
       ..writeByte(5)
-      ..write(obj.password)
+      ..write(obj.role)
       ..writeByte(6)
-      ..write(obj.batchId)
+      ..write(obj.password)
       ..writeByte(7)
-      ..write(obj.profilePicture);
+      ..write(obj.photo);
   }
 
   @override

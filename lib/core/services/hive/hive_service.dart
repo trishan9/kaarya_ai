@@ -51,10 +51,6 @@ class HiveService {
     }
   }
 
-  Future<void> logoutUser() async {}
-
-  AuthHiveModel? getCurrentUser() {}
-
   AuthHiveModel? getUserById(String authId) {
     return _authBox.get(authId);
   }
@@ -77,11 +73,5 @@ class HiveService {
 
   Future<void> deleteUser(String authId) async {
     await _authBox.delete(authId);
-  }
-
-  bool doesEmailExist(String email) {
-    final users = _authBox.values.where((user) => user.email == email);
-    bool emailExists = users.isNotEmpty;
-    return emailExists;
   }
 }
