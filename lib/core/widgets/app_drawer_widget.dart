@@ -7,6 +7,7 @@ import 'package:kaarya/core/utils/navigation_provider.dart';
 import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
 import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:kaarya/features/settings/presentation/pages/settings_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppDrawerWidget extends ConsumerStatefulWidget {
@@ -135,9 +136,9 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                       ),
 
                       _drawerItem(
-                        icon: LucideIcons.headphones,
-                        title: "Help Center",
-                        onTap: () => pushPage(const DashboardPage()),
+                        icon: LucideIcons.settings,
+                        title: "Settings",
+                        onTap: () => pushPage(const SettingsPage()),
                       ),
 
                       const SizedBox(height: 20),
