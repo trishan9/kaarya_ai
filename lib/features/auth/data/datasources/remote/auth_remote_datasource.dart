@@ -123,4 +123,10 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       return null;
     }
   }
+
+  @override
+  Future<AuthApiModel> updateProfile(AuthApiModel user) {
+    // TODO: implement updateUser
+    throw UnimplementedError();
+  }
 }

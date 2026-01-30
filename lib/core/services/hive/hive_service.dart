@@ -63,12 +63,12 @@ class HiveService {
     }
   }
 
-  Future<bool> updateUser(AuthHiveModel user) async {
+  Future<AuthHiveModel?> updateUser(AuthHiveModel user) async {
     if (_authBox.containsKey(user.authId)) {
       await _authBox.put(user.authId, user);
-      return true;
+      return _authBox.values.firstWhere((u) => u.authId == user.authId);
     }
-    return false;
+    return null;
   }
 
   Future<void> deleteUser(String authId) async {

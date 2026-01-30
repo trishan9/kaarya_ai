@@ -9,7 +9,7 @@ abstract interface class IAuthLocalDataSource {
 
   Future<AuthHiveModel?> getUserById(String authId);
   Future<AuthHiveModel?> getUserByEmail(String email);
-  Future<bool> updateUser(AuthHiveModel user);
+  Future<AuthHiveModel?> updateProfile(AuthHiveModel user);
   Future<bool> deleteUser(String authId);
 }
 
@@ -18,4 +18,6 @@ abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel?> loginUser(String email, String password);
   Future<AuthApiModel?> getCurrentUser();
   Future<bool> logoutUser();
+
+  Future<AuthApiModel?> updateProfile(AuthApiModel user);
 }

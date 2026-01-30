@@ -98,11 +98,11 @@ class AuthLocalDatasource implements IAuthLocalDataSource {
   }
 
   @override
-  Future<bool> updateUser(AuthHiveModel user) async {
+  Future<AuthHiveModel?> updateProfile(AuthHiveModel user) async {
     try {
       return await _hiveService.updateUser(user);
     } catch (e) {
-      return false;
+      return null;
     }
   }
 
