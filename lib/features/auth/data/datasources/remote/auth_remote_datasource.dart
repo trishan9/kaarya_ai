@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/core/api/api_client.dart';
@@ -125,8 +127,59 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   }
 
   @override
-  Future<AuthApiModel> updateProfile(AuthApiModel user) {
-    // TODO: implement updateUser
-    throw UnimplementedError();
+  Future<AuthApiModel?> updateProfile(
+    String? name,
+    String? email,
+    File? photo,
+  ) async {
+    if (!_userSessionService.isLoggedIn()) {
+      return null;
+    }
+
+    final token = await _tokenService.getToken();
+
+    final Map<String, dynamic> data = {};
+    if (name != null) {
+      data["name"] = name;
+    }
+    if (email != null) {
+      data["email"] = email;
+    }
+    if (photo != null) {
+      data["photo"] = await MultipartFile.fromFile(photo.path);
+    }
+
+    if (data.isEmpty) {
+      return getCurrentUser();
+    }
+
+    final formData = FormData.fromMap(data);
+
+    final response = await _apiClient.put(
+      ApiEndpoints.updateProfile,
+      data: formData,
+      options: Options(
+        headers: {"Authorization": "Bearer $token"},
+        contentType: "multipart/form-data",
+      ),
+    );
+
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      final user = AuthApiModel.fromJson(data['user']);
+
+      await _userSessionService.saveUserSession(
+        userId: user.id!,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+        provider: user.provider,
+        photo: user.photo,
+      );
+
+      return user;
+    }
+
+    return null;
   }
 }

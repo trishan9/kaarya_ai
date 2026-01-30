@@ -212,7 +212,29 @@ class AuthRepository implements IAuthRepository {
     File? photo,
   ) async {
     if (await _networkInfo.isConnected) {
-      throw UnimplementedError();
+      try {
+        final userModel = await _authRemoteDataSource.updateProfile(
+          name,
+          email,
+          photo,
+        );
+
+        if (userModel != null) {
+          final userEntity = userModel.toEntity();
+          return Right(userEntity);
+        }
+
+        return const Left(ApiFailure(message: "Failed to update profile!"));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? "Failed to update profile!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
     } else {
       return Left(
         NetworkFailure(

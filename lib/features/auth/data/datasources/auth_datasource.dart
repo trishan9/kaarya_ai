@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:kaarya/features/auth/data/models/auth_api_model.dart';
 import 'package:kaarya/features/auth/data/models/auth_hive_model.dart';
 
@@ -18,5 +20,5 @@ abstract interface class IAuthRemoteDataSource {
   Future<AuthApiModel?> getCurrentUser();
   Future<bool> logoutUser();
 
-  Future<AuthApiModel?> updateProfile(AuthApiModel user);
+  Future<AuthApiModel?> updateProfile(String? name, String? email, File? photo);
 }
