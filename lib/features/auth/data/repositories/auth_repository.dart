@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -204,28 +206,20 @@ class AuthRepository implements IAuthRepository {
   }
 
   @override
-  Future<Either<Failure, AuthEntity>> updateProfile(AuthEntity user) async {
+  Future<Either<Failure, AuthEntity>> updateProfile(
+    String? name,
+    String? email,
+    File? photo,
+  ) async {
     if (await _networkInfo.isConnected) {
       throw UnimplementedError();
     } else {
-      try {
-        final userPayloadModel = AuthHiveModel.fromEntity(user);
-
-        final userModel = await _authLocalDataSource.updateProfile(
-          userPayloadModel,
-        );
-
-        if (userModel != null) {
-          final entity = userModel.toEntity();
-          return Right(entity);
-        }
-
-        return const Left(
-          LocalDatabaseFailure(message: "Unable to update profile!"),
-        );
-      } catch (e) {
-        return Left(LocalDatabaseFailure(message: e.toString()));
-      }
+      return Left(
+        NetworkFailure(
+          message:
+              "You need to be connected to internet, to perform this action!",
+        ),
+      );
     }
   }
 }

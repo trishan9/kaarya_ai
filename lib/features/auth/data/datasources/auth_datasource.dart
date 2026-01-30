@@ -9,7 +9,6 @@ abstract interface class IAuthLocalDataSource {
 
   Future<AuthHiveModel?> getUserById(String authId);
   Future<AuthHiveModel?> getUserByEmail(String email);
-  Future<AuthHiveModel?> updateProfile(AuthHiveModel user);
   Future<bool> deleteUser(String authId);
 }
 
