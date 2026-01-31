@@ -161,7 +161,11 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                         children: [
                           userProfilePicture.isNotEmpty
                               ? ClipRRect(
-                                  child: Image.network(userProfilePicture),
+                                  child: CircleAvatar(
+                                    backgroundImage: NetworkImage(
+                                      userProfilePicture,
+                                    ),
+                                  ),
                                 )
                               : ClipRRect(
                                   child: CircleAvatar(

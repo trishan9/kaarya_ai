@@ -129,7 +129,7 @@ class AuthViewModel extends Notifier<AuthState> {
         errorMessage: failure.message,
       ),
       (success) => state = state.copyWith(
-        status: AuthStatus.registered,
+        status: AuthStatus.updated,
         errorMessage: null,
       ),
     );
