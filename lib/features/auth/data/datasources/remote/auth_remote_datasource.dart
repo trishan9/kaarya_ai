@@ -155,8 +155,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
     final formData = FormData.fromMap(data);
 
-    print(token);
-
     final response = await _apiClient.put(
       ApiEndpoints.updateProfile,
       data: formData,
