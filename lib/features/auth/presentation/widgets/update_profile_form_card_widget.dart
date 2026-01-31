@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class UpdateProfileFormCard extends StatelessWidget {
   const UpdateProfileFormCard({
@@ -7,11 +9,13 @@ class UpdateProfileFormCard extends StatelessWidget {
     required this.formKey,
     required this.fullNameController,
     required this.emailAddressController,
+    required this.profileImageUrl,
   });
 
   final GlobalKey<FormState> formKey;
   final TextEditingController fullNameController;
   final TextEditingController emailAddressController;
+  final String profileImageUrl;
 
   @override
   Widget build(BuildContext context) {
@@ -52,6 +56,62 @@ class UpdateProfileFormCard extends StatelessWidget {
                       ),
 
                       SizedBox(height: 6),
+
+                      LayoutBuilder(
+                        builder: (context, constraints) {
+                          final isCompact = constraints.maxWidth < 520;
+                          final hasPhoto = profileImageUrl.isNotEmpty;
+
+                          if (!hasPhoto) {
+                            return SizedBox(
+                              height: 120,
+                              width: double.infinity,
+                              child: _UploadPanel(),
+                            );
+                          }
+
+                          final imageWidget = SizedBox(
+                            width: isCompact ? double.infinity : 160,
+                            height: 120,
+                            child: Stack(
+                              children: [
+                                _ProfileImagePreview(imageUrl: profileImageUrl),
+                                Positioned(
+                                  right: 8,
+                                  bottom: 8,
+                                  child: _DeleteAvatarButton(onPressed: () {}),
+                                ),
+                              ],
+                            ),
+                          );
+
+                          final uploadWidget = SizedBox(
+                            height: 120,
+                            width: double.infinity,
+                            child: _UploadPanel(),
+                          );
+
+                          return Flex(
+                            direction: isCompact
+                                ? Axis.vertical
+                                : Axis.horizontal,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              imageWidget,
+                              SizedBox(
+                                width: isCompact ? 0 : 14,
+                                height: isCompact ? 12 : 0,
+                              ),
+                              if (isCompact)
+                                uploadWidget
+                              else
+                                Expanded(child: uploadWidget),
+                            ],
+                          );
+                        },
+                      ),
+
+                      SizedBox(height: 14),
 
                       Text(
                         "Full Name",
@@ -169,6 +229,124 @@ class UpdateProfileFormCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+class _UploadPanel extends StatelessWidget {
+  const _UploadPanel();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 120,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: Colors.grey.shade300),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(LucideIcons.cloudUpload, size: 28, color: AppColors.primary),
+          SizedBox(height: 8),
+          Text(
+            "Drag and drop your file, or",
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade700),
+          ),
+          Text(
+            "choose here",
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          SizedBox(height: 6),
+          Text(
+            "Support: JPEG, JPG, PNG - max 5MB",
+            textAlign: TextAlign.center,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+              color: Colors.grey.shade500,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileImagePreview extends StatelessWidget {
+  const _ProfileImagePreview({required this.imageUrl});
+
+  final String imageUrl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 10,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: Image.network(
+          imageUrl,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return SizedBox.shrink();
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class _DeleteAvatarButton extends StatelessWidget {
+  const _DeleteAvatarButton({required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        shape: BoxShape.circle,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(Icons.delete_outline, size: 18),
+        onPressed: onPressed,
+        visualDensity: VisualDensity.compact,
+        splashRadius: 18,
       ),
     );
   }

@@ -92,6 +92,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               formKey: formKey,
               fullNameController: fullNameController,
               emailAddressController: emailAddressController,
+              profileImageUrl: userProfilePicture,
             ),
 
             MyButton(
