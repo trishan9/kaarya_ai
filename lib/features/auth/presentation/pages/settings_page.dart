@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
@@ -21,6 +23,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   final formKey = GlobalKey<FormState>();
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailAddressController = TextEditingController();
+  File? _selectedProfilePhoto;
 
   Future<void> _handleUpdateProfile() async {
     if (formKey.currentState!.validate()) {
@@ -29,6 +32,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           .updateProfile(
             name: fullNameController.text.trim(),
             email: emailAddressController.text.trim(),
+            photo: _selectedProfilePhoto,
           );
     }
   }
@@ -93,6 +97,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               fullNameController: fullNameController,
               emailAddressController: emailAddressController,
               profileImageUrl: userProfilePicture,
+              onPhotoChanged: (photo) {
+                setState(() {
+                  _selectedProfilePhoto = photo;
+                });
+              },
             ),
 
             MyButton(

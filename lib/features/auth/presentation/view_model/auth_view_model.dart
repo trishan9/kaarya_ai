@@ -1,4 +1,5 @@
-import 'package:flutter_cache_manager/file.dart';
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:kaarya/features/auth/domain/usecases/login_usecase.dart';
