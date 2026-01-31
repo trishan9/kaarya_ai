@@ -24,6 +24,30 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
   final TextEditingController fullNameController = TextEditingController();
   final TextEditingController emailAddressController = TextEditingController();
   File? _selectedProfilePhoto;
+  bool _didPrefill = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefillUserDetails();
+  }
+
+  void _prefillUserDetails() {
+    if (_didPrefill) return;
+    final userSessionService = ref.read(userSessionServiceProvider);
+    fullNameController.text =
+        userSessionService.getCurrentUserFullName() ?? 'User';
+    emailAddressController.text =
+        userSessionService.getCurrentUserEmail() ?? '';
+    _didPrefill = true;
+  }
+
+  @override
+  void dispose() {
+    fullNameController.dispose();
+    emailAddressController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleUpdateProfile() async {
     if (formKey.currentState!.validate()) {
@@ -68,9 +92,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final userEmail = userSessionService.getCurrentUserEmail() ?? '';
     final userProfilePicture =
         userSessionService.getCurrentUserProfilePicture() ?? '';
-
-    fullNameController.text = userName;
-    emailAddressController.text = userEmail;
 
     return Scaffold(
       appBar: AppBar(title: Text("Settings")),
