@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -200,6 +202,46 @@ class AuthRepository implements IAuthRepository {
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> updateProfile(
+    String? name,
+    String? email,
+    File? photo,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final userModel = await _authRemoteDataSource.updateProfile(
+          name,
+          email,
+          photo,
+        );
+
+        if (userModel != null) {
+          final userEntity = userModel.toEntity();
+          return Right(userEntity);
+        }
+
+        return const Left(ApiFailure(message: "Failed to update profile!"));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? "Failed to update profile!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return Left(
+        NetworkFailure(
+          message:
+              "You need to be connected to internet, to perform this action!",
+        ),
+      );
     }
   }
 }
