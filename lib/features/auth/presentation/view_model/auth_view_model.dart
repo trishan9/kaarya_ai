@@ -36,8 +36,6 @@ class AuthViewModel extends Notifier<AuthState> {
   }) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
-    await Future.delayed(Duration(seconds: 2));
-
     final result = await _registerUseCase(
       RegisterUseCaseParams(name: name, email: email, password: password),
     );
@@ -59,8 +57,6 @@ class AuthViewModel extends Notifier<AuthState> {
     required String password,
   }) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
-
-    await Future.delayed(Duration(seconds: 2));
 
     final result = await _loginUseCase(
       LoginUseCaseParams(email: email, password: password),
@@ -117,8 +113,6 @@ class AuthViewModel extends Notifier<AuthState> {
 
   Future<void> updateProfile({String? name, String? email, File? photo}) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
-
-    await Future.delayed(Duration(seconds: 2));
 
     final result = await _updateProfileUsecase(
       UpdateProfileUsecaseParams(name: name, email: email, photo: photo),
