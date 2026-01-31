@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
+import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
@@ -56,6 +57,15 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         ref.read(authViewModelProvider.notifier).resetState();
       }
     });
+
+    final userSessionService = ref.watch(userSessionServiceProvider);
+    final userName = userSessionService.getCurrentUserFullName() ?? 'User';
+    final userEmail = userSessionService.getCurrentUserEmail() ?? '';
+    final userProfilePicture =
+        userSessionService.getCurrentUserProfilePicture() ?? '';
+
+    fullNameController.text = userName;
+    emailAddressController.text = userEmail;
 
     return Scaffold(
       appBar: AppBar(title: Text("Settings")),
@@ -159,7 +169,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               SizedBox(height: 6),
 
                               MyTextFormField(
-                                controller: emailAddressController,
                                 text: "9841XXXXXX",
                                 inputType: TextInputType.text,
                                 optional: true,
@@ -178,7 +187,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               SizedBox(height: 6),
 
                               MyTextFormField(
-                                controller: emailAddressController,
                                 text:
                                     "Kathmandu-24, Dillibazar, Kathmandu, Nepal",
                                 inputType: TextInputType.text,
@@ -198,7 +206,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               SizedBox(height: 6),
 
                               MyTextFormField(
-                                controller: emailAddressController,
                                 text: "Experienced Flutter Developer",
                                 inputType: TextInputType.text,
                                 optional: true,
@@ -217,7 +224,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                               SizedBox(height: 6),
 
                               MyTextFormField(
-                                controller: emailAddressController,
                                 text: "https://github.com/trishan9",
                                 inputType: TextInputType.text,
                                 optional: true,

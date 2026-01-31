@@ -155,6 +155,8 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
     final formData = FormData.fromMap(data);
 
+    print(token);
+
     final response = await _apiClient.put(
       ApiEndpoints.updateProfile,
       data: formData,
@@ -166,7 +168,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
     if (response.data['success'] == true) {
       final data = response.data['data'] as Map<String, dynamic>;
-      final user = AuthApiModel.fromJson(data['user']);
+      final user = AuthApiModel.fromJson(data);
 
       await _userSessionService.saveUserSession(
         userId: user.id!,

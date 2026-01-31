@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class MyTextFormField extends StatefulWidget {
   const MyTextFormField({
     super.key,
-    required this.controller,
+    this.controller,
     required this.text,
     this.inputType = TextInputType.text,
     this.validationErrorMessage = "Please enter some value",
@@ -14,7 +14,7 @@ class MyTextFormField extends StatefulWidget {
     this.optional = false,
   });
 
-  final TextEditingController controller;
+  final TextEditingController? controller;
   final String text;
   final TextInputType inputType;
   final String validationErrorMessage;
