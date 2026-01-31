@@ -47,6 +47,29 @@ class ProfileOverviewCard extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SizedBox(
+                            width: isCompact ? double.infinity : 150,
+                            height: isCompact ? 300 : 300,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child: userProfilePicture.isNotEmpty
+                                  ? Image.network(
+                                      userProfilePicture,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                            return _ProfileImageFallback();
+                                          },
+                                    )
+                                  : _ProfileImageFallback(),
+                            ),
+                          ),
+
+                          SizedBox(
+                            width: isCompact ? 0 : 16,
+                            height: isCompact ? 16 : 0,
+                          ),
+
                           Text(
                             userName,
                             style: Theme.of(context).textTheme.titleLarge
@@ -111,28 +134,6 @@ class ProfileOverviewCard extends StatelessWidget {
                             ],
                           ),
                         ],
-                      ),
-                    ),
-
-                    SizedBox(
-                      width: isCompact ? 0 : 16,
-                      height: isCompact ? 16 : 0,
-                    ),
-
-                    SizedBox(
-                      width: isCompact ? double.infinity : 150,
-                      height: isCompact ? 300 : 300,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(14),
-                        child: userProfilePicture.isNotEmpty
-                            ? Image.network(
-                                userProfilePicture,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return _ProfileImageFallback();
-                                },
-                              )
-                            : _ProfileImageFallback(),
                       ),
                     ),
                   ],
