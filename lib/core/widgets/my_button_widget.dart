@@ -103,7 +103,6 @@ class _BaseButton extends StatelessWidget {
                     text,
                     style: TextStyle(
                       color: textColor,
-                      fontFamily: "GeneralSans",
                     ),
                   ),
                 ],

@@ -1,208 +1,354 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
-import 'package:kaarya/features/dashboard/data/models/job_model.dart';
+import 'package:kaarya/features/jobs/presentation/pages/apply_to_job_page.dart';
+import 'package:kaarya/features/jobs/presentation/pages/job_detail_page.dart';
+import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobCardWidget extends StatelessWidget {
-  const JobCardWidget({super.key, required this.job});
+  const JobCardWidget({
+    super.key,
+    required this.job,
+    this.onTap,
+    this.onBookmark,
+  });
 
-  final JobModel job;
+  final JobEntity job;
+  final VoidCallback? onTap;
+  final VoidCallback? onBookmark;
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: [
-        Card(
-          color: AppColors.bgTertiary,
-          elevation: 0,
-          margin: const EdgeInsets.all(0),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: BorderSide(color: Colors.grey.shade300),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: const Color(0xFFF0F0F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(6),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
           ),
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Tappable body area — opens job detail
+          InkWell(
+            onTap: onTap ??
+                () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (_) =>
+                            JobDetailPage(jobId: job.id, jobTitle: job.title),
+                      ),
+                    ),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      _badge(),
+                      const Spacer(),
+                      Text(
+                        _relativeTime(job.createdAt),
+                        style: const TextStyle(
+                          color: AppColors.textMedium,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      _companyAvatar(),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              job.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: AppColors.textDark,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              job.companyName,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppColors.textLight,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final full = constraints.maxWidth;
+                      final half = (full - 6) / 2;
+                      return Wrap(
+                        spacing: 6,
+                        runSpacing: 6,
+                        children: [
+                          _chip(LucideIcons.mapPin, job.location, maxW: full),
+                          _chip(LucideIcons.clock, job.employmentType, maxW: half),
+                          _chip(LucideIcons.building2, _formatWorkMode(job.workMode), maxW: half),
+                          _chip(LucideIcons.banknote, job.salaryRange, maxW: full),
+                        ],
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
+
+          // Bottom action row — NOT inside the card's InkWell
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+            child: Row(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(),
-                    Text(
-                      job.postedAgo,
-                      style: TextStyle(
-                        color: AppColors.textMedium,
-                        fontSize: 13,
+                Expanded(
+                  child: SizedBox(
+                    height: 40,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        if (job.hasApplied) {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => JobDetailPage(
+                                jobId: job.id, jobTitle: job.title),
+                          ));
+                        } else {
+                          Navigator.of(context).push(MaterialPageRoute(
+                            builder: (_) => ApplyToJobPage(
+                              jobId: job.id,
+                              jobTitle: job.title,
+                              companyName: job.companyName,
+                              companyLogo: job.companyLogo,
+                            ),
+                          ));
+                        }
+                      },
+                      child: Text(
+                        job.hasApplied ? 'View Application' : 'Apply',
+                        style: const TextStyle(fontSize: 13),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-
-                const SizedBox(height: 14),
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 44,
-                      width: 44,
-                      decoration: const BoxDecoration(shape: BoxShape.circle),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.asset(
-                          job.logo,
-                          width: 44,
-                          height: 44,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          job.title,
-                          style: TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          job.company,
-                          style: TextStyle(
-                            color: AppColors.textMedium,
-                            fontSize: 13,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 14),
-
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 8,
-                  children: [
-                    _chip(LucideIcons.mapPin300, job.location),
-                    _chip(LucideIcons.clock300, job.jobType),
-                    _chip(LucideIcons.briefcase300, job.experience),
-                    _chip(LucideIcons.badgeDollarSign300, job.salary),
-                  ],
-                ),
-
-                const SizedBox(height: 10),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () {},
-                        child: Text(
-                          "Apply",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 15,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Container(
+                const SizedBox(width: 8),
+                Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: onBookmark,
+                    borderRadius: BorderRadius.circular(6),
+                    child: Container(
                       height: 40,
-                      width: 45,
+                      width: 40,
                       decoration: BoxDecoration(
-                        border: Border.all(color: AppColors.primary, width: 1),
-                        borderRadius: BorderRadius.circular(8),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: const Color(0xFFE5E7EB)),
                       ),
-                      child: IconButton(
-                        onPressed: () {},
-                        icon: Icon(
-                          LucideIcons.bookmark300,
-                          color: AppColors.primary,
-                          size: 24,
-                        ),
+                      child: Icon(
+                        job.isSaved
+                            ? LucideIcons.bookmarkCheck
+                            : LucideIcons.bookmark,
+                        color: job.isSaved
+                            ? AppColors.primary
+                            : AppColors.textLight,
+                        size: 18,
                       ),
                     ),
-                  ],
+                  ),
                 ),
               ],
             ),
           ),
-        ),
-
-        Positioned(
-          top: 1,
-          left: 1,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: badgeBgColor(),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
-            ),
-            child: Text(
-              job.badge,
-              style: TextStyle(
-                color: badgeTextColor(),
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Color badgeBgColor() {
-    switch (job.badgeType) {
-      case "best":
-        return AppColors.bgLightGreen;
-      case "hiring":
-        return AppColors.bgLightOrange;
-      default:
-        return Colors.grey.shade200;
-    }
-  }
-
-  Color badgeTextColor() {
-    switch (job.badgeType) {
-      case "best":
-        return AppColors.success2;
-      case "hiring":
-        return AppColors.warning;
-      default:
-        return Colors.black;
-    }
-  }
-
-  static Widget _chip(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF2F2F2),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 14, color: Colors.black),
-          const SizedBox(width: 6),
-          Text(
-            label,
-            style: const TextStyle(fontSize: 12, color: Colors.black),
-          ),
         ],
       ),
     );
+  }
+
+  Widget _badge() {
+    final label = _badgeLabel();
+    final kind = _badgeKind();
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: _badgeBg(kind),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        label,
+        style: TextStyle(
+          color: _badgeText(kind),
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  Widget _companyAvatar() {
+    final logo = job.companyLogo;
+    if (logo != null && logo.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          logo,
+          width: 38,
+          height: 38,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _fallbackAvatar(),
+        ),
+      );
+    }
+    return _fallbackAvatar();
+  }
+
+  Widget _fallbackAvatar() {
+    final initial = job.companyName.isEmpty ? 'K' : job.companyName[0];
+    return Container(
+      width: 38,
+      height: 38,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.bgSecondary,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Text(
+        initial.toUpperCase(),
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 16,
+          color: AppColors.primary,
+        ),
+      ),
+    );
+  }
+
+  static Widget _chip(IconData icon, String label, {required double maxW}) {
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: maxW),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8F9FA),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: AppColors.textLight),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textLight,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  String _badgeLabel() {
+    if (job.hasApplied) return 'Applied';
+    if (job.status == 'draft') return 'Draft';
+    if (job.status == 'closed') return 'Closed';
+    if (_isClosingSoon(job.deadline)) return 'Closing Soon';
+    return 'Suit You Best!';
+  }
+
+  String _badgeKind() {
+    if (job.hasApplied) return 'applied';
+    if (job.status == 'draft') return 'draft';
+    if (job.status == 'closed') return 'closed';
+    if (_isClosingSoon(job.deadline)) return 'urgent';
+    return 'open';
+  }
+
+  Color _badgeBg(String kind) {
+    switch (kind) {
+      case 'applied':
+        return AppColors.bgSecondary;
+      case 'urgent':
+        return const Color(0xFFFFF7ED);
+      case 'draft':
+        return const Color(0xFFF4F4F5);
+      case 'closed':
+        return const Color(0xFFFFF1F2);
+      default:
+        return const Color(0xFFECFDF3);
+    }
+  }
+
+  Color _badgeText(String kind) {
+    switch (kind) {
+      case 'applied':
+        return AppColors.primary;
+      case 'urgent':
+        return AppColors.warning;
+      case 'draft':
+        return AppColors.textDark;
+      case 'closed':
+        return AppColors.error;
+      default:
+        return const Color(0xFF059669);
+    }
+  }
+
+  bool _isClosingSoon(String deadline) {
+    final parsed = DateTime.tryParse(deadline);
+    if (parsed == null) return false;
+    final diff = parsed.difference(DateTime.now()).inDays;
+    return diff >= 0 && diff <= 3;
+  }
+
+  String _relativeTime(String createdAt) {
+    final parsed = DateTime.tryParse(createdAt);
+    if (parsed == null) return 'just now';
+    final diff = DateTime.now().difference(parsed);
+    if (diff.inMinutes < 1) return 'just now';
+    if (diff.inHours < 1) return '${diff.inMinutes}m ago';
+    if (diff.inDays < 1) return '${diff.inHours}h ago';
+    if (diff.inDays < 30) return '${diff.inDays}d ago';
+    final months = (diff.inDays / 30).floor();
+    if (months < 12) return '${months}mo ago';
+    return '${(months / 12).floor()}y ago';
+  }
+
+  String _formatWorkMode(String workMode) {
+    if (workMode.trim().isEmpty) return 'Onsite';
+    return workMode
+        .replaceAll('_', ' ')
+        .toLowerCase()
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+        .join('-');
   }
 }
