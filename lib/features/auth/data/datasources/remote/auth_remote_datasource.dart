@@ -8,6 +8,7 @@ import 'package:kaarya/core/services/storage/token_service.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/features/auth/data/datasources/auth_datasource.dart';
 import 'package:kaarya/features/auth/data/models/auth_api_model.dart';
+import 'package:kaarya/features/auth/data/models/linked_account_api_model.dart';
 
 final authRemoteDataSourceProvider = Provider<IAuthRemoteDataSource>((ref) {
   return AuthRemoteDatasource(
@@ -39,8 +40,20 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
     if (response.data['success'] == true) {
       final data = response.data['data'] as Map<String, dynamic>;
+      final token = _extractAccessToken(data);
+      if (token == null || token.isEmpty) {
+        await _userSessionService.clearSession();
+        await _tokenService.removeToken();
+        throw DioException(
+          requestOptions: response.requestOptions,
+          response: response,
+          message: 'Login succeeded but access token is missing.',
+        );
+      }
+
       final user = AuthApiModel.fromJson(data['user']);
 
+      await _tokenService.saveToken(token);
       await _userSessionService.saveUserSession(
         userId: user.id!,
         email: user.email,
@@ -49,9 +62,6 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         provider: user.provider,
         photo: user.photo,
       );
-
-      final token = response.data['data']['accessToken'];
-      await _tokenService.saveToken(token);
 
       return user;
     }
@@ -99,6 +109,11 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       }
 
       final token = await _tokenService.getToken();
+      if (token == null || token.trim().isEmpty) {
+        await _userSessionService.clearSession();
+        await _tokenService.removeToken();
+        return null;
+      }
       final response = await _apiClient.get(
         ApiEndpoints.me,
         options: Options(headers: {"Authorization": "Bearer $token"}),
@@ -137,6 +152,11 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
 
     final token = await _tokenService.getToken();
+    if (token == null || token.trim().isEmpty) {
+      await _userSessionService.clearSession();
+      await _tokenService.removeToken();
+      return null;
+    }
 
     final Map<String, dynamic> data = {};
     if (name != null) {
@@ -178,6 +198,104 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
       );
 
       return user;
+    }
+
+    return null;
+  }
+
+  @override
+  Future<bool> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.changePassword,
+      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+    );
+    return response.data['success'] == true;
+  }
+
+  @override
+  Future<bool> requestPasswordReset(String email) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.requestPasswordReset,
+      data: {'email': email},
+    );
+    return response.data['success'] == true;
+  }
+
+  @override
+  Future<String> verifyPasswordResetOtp(String email, String otp) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.verifyPasswordResetOtp,
+      data: {'email': email, 'otp': otp},
+    );
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>;
+      return data['token'] as String? ?? '';
+    }
+    return '';
+  }
+
+  @override
+  Future<bool> confirmPasswordReset(String token, String password) async {
+    final response = await _apiClient.post(
+      ApiEndpoints.confirmPasswordReset,
+      data: {'token': token, 'password': password},
+    );
+    return response.data['success'] == true;
+  }
+
+  @override
+  Future<List<LinkedAccountApiModel>> getLinkedAccounts() async {
+    final response = await _apiClient.get(ApiEndpoints.linkedAccounts);
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as List<dynamic>? ?? [];
+      return LinkedAccountApiModel.fromApiList(data);
+    }
+    return [];
+  }
+
+  @override
+  Future<bool> unlinkOAuth(String provider) async {
+    final response = await _apiClient.delete(
+      ApiEndpoints.oauthUnlink(provider),
+    );
+    return response.data['success'] == true;
+  }
+
+  @override
+  Future<String> uploadCertification(String filePath) async {
+    final formData = FormData.fromMap({
+      'file': await MultipartFile.fromFile(filePath),
+    });
+    final response = await _apiClient.post(
+      ApiEndpoints.uploadCertification,
+      data: formData,
+      options: Options(contentType: 'multipart/form-data'),
+    );
+    if (response.data['success'] == true) {
+      final data = response.data['data'] as Map<String, dynamic>?;
+      return data?['url'] as String? ?? '';
+    }
+    return '';
+  }
+
+  String? _extractAccessToken(Map<String, dynamic> data) {
+    final candidates = <dynamic>[
+      data['accessToken'],
+      data['token'],
+      data['jwt'],
+      data['access_token'],
+      (data['tokens'] is Map<String, dynamic>)
+          ? (data['tokens'] as Map<String, dynamic>)['accessToken']
+          : null,
+    ];
+
+    for (final candidate in candidates) {
+      if (candidate is String && candidate.trim().isNotEmpty) {
+        return candidate.trim();
+      }
     }
 
     return null;
