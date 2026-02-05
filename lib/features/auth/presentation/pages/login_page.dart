@@ -11,6 +11,7 @@ import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
 import 'package:kaarya/core/widgets/text_divider_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/signup_text_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -55,6 +56,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (next.status == previous?.status) return;
 
       if (next.status == AuthStatus.authenticated) {
+        ref.read(dashboardViewModelProvider.notifier).resetState();
         ref.read(authViewModelProvider.notifier).resetState();
         AppRoutes.pushReplacement(context, const DashboardPage());
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
@@ -65,107 +67,121 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              HeaderSection(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom -
+                  48,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                HeaderSection(),
 
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    HeadingWithSubheadingWidget(
-                      heading: "Welcome back to Kaarya!",
-                      subheading:
-                          "Enter your username and password to access your account",
-                    ),
+                const SizedBox(height: 20),
 
-                    SizedBox(height: 36),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      HeadingWithSubheadingWidget(
+                        heading: "Welcome back to Kaarya!",
+                        subheading:
+                            "Enter your username and password to access your account",
+                      ),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        MyTextFormField(
-                          controller: _emailAddressController,
-                          text: "Enter your email address",
-                          inputType: TextInputType.emailAddress,
-                          prefixIcon: Icon(
-                            Icons.mail_outline_rounded,
-                            color: Colors.grey,
+                      const SizedBox(height: 36),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          MyTextFormField(
+                            controller: _emailAddressController,
+                            text: "Enter your email address",
+                            inputType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(
+                              Icons.mail_outline_rounded,
+                              color: Colors.grey,
+                            ),
+                            validationErrorMessage: "Email address is required",
                           ),
-                          validationErrorMessage: "Email address is required",
-                        ),
 
-                        SizedBox(height: 14),
+                          const SizedBox(height: 14),
 
-                        MyTextFormField(
-                          controller: _passwordController,
-                          inputType: TextInputType.visiblePassword,
-                          text: "Enter your password",
-                          obscureText: true,
-                          prefixIcon: Icon(
-                            Icons.lock_outline_rounded,
-                            color: Colors.grey,
+                          MyTextFormField(
+                            controller: _passwordController,
+                            inputType: TextInputType.visiblePassword,
+                            text: "Enter your password",
+                            obscureText: true,
+                            prefixIcon: const Icon(
+                              Icons.lock_outline_rounded,
+                              color: Colors.grey,
+                            ),
+                            validationErrorMessage: "Password is required",
                           ),
-                          validationErrorMessage: "Password is required",
-                        ),
 
-                        TextButton(
-                          onPressed: _handleForgotPassword,
-                          style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                          child: Text(
-                            "Forgot Password?",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF0084D1),
-                              fontWeight: FontWeight.w500,
+                          TextButton(
+                            onPressed: _handleForgotPassword,
+                            style: TextButton.styleFrom(
+                              padding: EdgeInsets.zero,
+                            ),
+                            child: const Text(
+                              "Forgot Password?",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Color(0xFF0084D1),
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    MyButton(
-                      text: "Login",
-                      onPressed: _handleLogin,
-                      isLoading: authState.status == AuthStatus.loading,
-                    ),
+                      MyButton(
+                        text: "Login",
+                        onPressed: _handleLogin,
+                        isLoading: authState.status == AuthStatus.loading,
+                      ),
 
-                    SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    TextDividerWidget(text: "Or"),
+                      TextDividerWidget(text: "Or"),
 
-                    SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Social logins
-                    Column(
-                      spacing: 12,
-                      children: [
-                        MyButton(
-                          onPressed: _handleGoogleLogin,
-                          text: "Login with Google",
-                          variant: ButtonVariant.secondary,
-                          icon: Image.asset("assets/images/google_logo.png"),
-                        ),
+                      Column(
+                        spacing: 12,
+                        children: [
+                          MyButton(
+                            onPressed: _handleGoogleLogin,
+                            text: "Login with Google",
+                            variant: ButtonVariant.secondary,
+                            icon: Image.asset("assets/images/google_logo.png"),
+                          ),
 
-                        MyButton(
-                          onPressed: _handleGithubLogin,
-                          text: "Login with GitHub",
-                          variant: ButtonVariant.secondary,
-                          icon: Image.asset("assets/images/github_logo.png"),
-                        ),
-                      ],
-                    ),
-                  ],
+                          MyButton(
+                            onPressed: _handleGithubLogin,
+                            text: "Login with GitHub",
+                            variant: ButtonVariant.secondary,
+                            icon: Image.asset("assets/images/github_logo.png"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              SignupText(),
-            ],
+                const SizedBox(height: 20),
+
+                SignupText(),
+              ],
+            ),
           ),
         ),
       ),
