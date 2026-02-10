@@ -22,29 +22,32 @@ class JobFilterWidget extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final filter = JobFilter.values[index];
-          final bool isSelected = filter == selectedFilter;
+          final selected = filter == selectedFilter;
 
           return ChoiceChip(
             label: Text(
               _labelForFilter(filter),
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textMedium,
+                color: selected ? Colors.white : AppColors.textDark,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
-            selected: isSelected,
-            onSelected: (_) => onChanged(filter),
+            selected: selected,
             showCheckmark: false,
-            backgroundColor: Colors.white,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+            labelPadding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             selectedColor: AppColors.primary,
+            backgroundColor: Colors.white,
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.borderStroke,
+              color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(6),
             ),
-            padding: EdgeInsets.all(1),
+            onSelected: (_) => onChanged(filter),
           );
         },
       ),
