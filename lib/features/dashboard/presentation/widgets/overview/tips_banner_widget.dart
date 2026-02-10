@@ -11,7 +11,7 @@ class TipsBannerWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF00629F),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Stack(
         children: [
@@ -23,7 +23,7 @@ class TipsBannerWidget extends StatelessWidget {
               width: 36,
               decoration: BoxDecoration(
                 color: Colors.white.withAlpha(30),
-                borderRadius: BorderRadius.circular(8),
+                borderRadius: BorderRadius.circular(6),
               ),
               child: const Icon(
                 LucideIcons.arrowUpRight300,
@@ -31,14 +31,12 @@ class TipsBannerWidget extends StatelessWidget {
               ),
             ),
           ),
-
-          Column(
+          const Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               SizedBox(height: 90),
-
               Text(
-                "We’ve got some tips\nonly for you!",
+                "We've got some tips\nonly for you!",
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -46,9 +44,7 @@ class TipsBannerWidget extends StatelessWidget {
                   height: 1.25,
                 ),
               ),
-
               SizedBox(height: 6),
-
               Text(
                 "Check our latest information for tips and tricks for your career!",
                 style: TextStyle(color: Colors.white, fontSize: 14),
