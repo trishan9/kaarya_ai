@@ -5,6 +5,7 @@ import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/widgets/app_logo_widget.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
+import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:kaarya/features/onboarding/presentation/pages/onboarding_page.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
@@ -24,6 +25,7 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     final isLoggedIn = userSessionService.isLoggedIn();
 
     if (isLoggedIn) {
+      ref.read(dashboardViewModelProvider.notifier).resetState();
       AppRoutes.pushReplacement(context, const DashboardPage());
     } else {
       AppRoutes.pushReplacement(context, const OnboardingPage());
