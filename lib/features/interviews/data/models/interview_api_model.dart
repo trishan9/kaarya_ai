@@ -205,10 +205,26 @@ class InterviewsSectionApiModel {
 class InterviewSessionStartApiModel {
   final String sessionId;
   final String? interviewId;
+  final String? vapiWebToken;
+  final String? vapiAssistantId;
+  final Map<String, dynamic>? vapiAssistantConfig;
+  final String? vapiWorkflowId;
+  final Map<String, dynamic>? vapiVariableValues;
+  final String? interviewTitle;
+  final String? interviewRole;
+  final List<Map<String, dynamic>> questions;
 
   const InterviewSessionStartApiModel({
     required this.sessionId,
     required this.interviewId,
+    this.vapiWebToken,
+    this.vapiAssistantId,
+    this.vapiAssistantConfig,
+    this.vapiWorkflowId,
+    this.vapiVariableValues,
+    this.interviewTitle,
+    this.interviewRole,
+    this.questions = const [],
   });
 
   factory InterviewSessionStartApiModel.fromResponseData(
@@ -216,9 +232,26 @@ class InterviewSessionStartApiModel {
   ) {
     final session = jsonAsMap(data['session']) ?? const <String, dynamic>{};
     final interview = jsonAsMap(data['interview']) ?? const <String, dynamic>{};
+    final vapi = jsonAsMap(data['vapi']) ?? const <String, dynamic>{};
+
+    // Parse questions from interview
+    final rawQuestions = jsonAsList(interview['questions']);
+    final questions = rawQuestions
+        .whereType<Map>()
+        .map((q) => jsonCastMap(q))
+        .toList();
+
     return InterviewSessionStartApiModel(
       sessionId: jsonString(session['id']),
       interviewId: jsonNullableString(interview['id']),
+      vapiWebToken: jsonNullableString(vapi['webToken']),
+      vapiAssistantId: jsonNullableString(vapi['assistantId']),
+      vapiAssistantConfig: jsonAsMap(vapi['assistant']),
+      vapiWorkflowId: jsonNullableString(vapi['workflowId']),
+      vapiVariableValues: jsonAsMap(vapi['variableValues']),
+      interviewTitle: jsonNullableString(interview['title']),
+      interviewRole: jsonNullableString(interview['role']),
+      questions: questions,
     );
   }
 
@@ -226,6 +259,14 @@ class InterviewSessionStartApiModel {
     return InterviewSessionStartEntity(
       sessionId: sessionId,
       interviewId: interviewId,
+      vapiWebToken: vapiWebToken,
+      vapiAssistantId: vapiAssistantId,
+      vapiAssistantConfig: vapiAssistantConfig,
+      vapiWorkflowId: vapiWorkflowId,
+      vapiVariableValues: vapiVariableValues,
+      interviewTitle: interviewTitle,
+      interviewRole: interviewRole,
+      questions: questions,
     );
   }
 }
@@ -289,6 +330,11 @@ class InterviewFeedbackApiModel {
   final double? totalScore;
   final String? finalAssessment;
   final List<InterviewCategoryScoreApiModel> categoryScores;
+  final List<String> strengths;
+  final List<String> areasForImprovement;
+  final String? interviewId;
+  final String? interviewLevel;
+  final int? durationSeconds;
 
   const InterviewFeedbackApiModel({
     required this.sessionId,
@@ -296,6 +342,11 @@ class InterviewFeedbackApiModel {
     required this.totalScore,
     required this.finalAssessment,
     required this.categoryScores,
+    this.strengths = const [],
+    this.areasForImprovement = const [],
+    this.interviewId,
+    this.interviewLevel,
+    this.durationSeconds,
   });
 
   factory InterviewFeedbackApiModel.fromResponseData(
@@ -314,6 +365,13 @@ class InterviewFeedbackApiModel {
       categoryScores: InterviewCategoryScoreApiModel.fromApiList(
         evaluation['categoryScores'],
       ),
+      strengths: jsonStringList(evaluation['strengths']),
+      areasForImprovement: jsonStringList(evaluation['areasForImprovement']),
+      interviewId: jsonNullableString(interview['id']),
+      interviewLevel: jsonNullableString(interview['level']),
+      durationSeconds: session['durationSeconds'] != null
+          ? jsonInt(session['durationSeconds'])
+          : null,
     );
   }
 
@@ -324,6 +382,11 @@ class InterviewFeedbackApiModel {
       totalScore: totalScore,
       finalAssessment: finalAssessment,
       categoryScores: categoryScores.map((item) => item.toEntity()).toList(),
+      strengths: strengths,
+      areasForImprovement: areasForImprovement,
+      interviewId: interviewId,
+      interviewLevel: interviewLevel,
+      durationSeconds: durationSeconds,
     );
   }
 }
@@ -341,9 +404,11 @@ class InterviewCategoryScoreApiModel {
 
   factory InterviewCategoryScoreApiModel.fromJson(Map<String, dynamic> json) {
     return InterviewCategoryScoreApiModel(
-      category: jsonString(json['category']),
+      category: jsonString(
+        json['name'] ?? json['category'],
+      ),
       score: jsonDouble(json['score']),
-      feedback: jsonNullableString(json['feedback']),
+      feedback: jsonNullableString(json['comment'] ?? json['feedback']),
     );
   }
 
