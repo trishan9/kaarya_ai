@@ -234,7 +234,7 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     final response = await _apiClient.get(ApiEndpoints.interviewById(id));
     final data = _extractDataMap(response);
     final interview = _asMap(data['interview']) ?? data;
-    return InterviewApiModel.fromJson(interview);
+    return InterviewApiModel.fromApiResponse(interview);
   }
 
   @override
@@ -276,7 +276,7 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final interview = _asMap(data['interview']) ?? data;
-    return InterviewApiModel.fromJson(interview);
+    return InterviewApiModel.fromApiResponse(interview);
   }
 
   @override
@@ -290,7 +290,7 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     );
     final responseData = _extractDataMap(response);
     final interview = _asMap(responseData['interview']) ?? responseData;
-    return InterviewApiModel.fromJson(interview);
+    return InterviewApiModel.fromApiResponse(interview);
   }
 
   @override
@@ -323,11 +323,13 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     required String interviewId,
     required String sessionId,
     required String status,
-    String? transcript,
+    List<Map<String, dynamic>>? transcript,
     String? recordingUrl,
     int? durationSeconds,
+    String? vapiCallId,
+    bool generateEvaluation = true,
   }) async {
-    final response = await _apiClient.post(
+    final response = await _apiClient.patch(
       ApiEndpoints.completeInterviewSession(interviewId, sessionId),
       data: {
         'status': status,
@@ -336,6 +338,9 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
         if (recordingUrl != null && recordingUrl.isNotEmpty)
           'recordingUrl': recordingUrl,
         if (durationSeconds != null) 'durationSeconds': durationSeconds,
+        if (vapiCallId != null && vapiCallId.isNotEmpty)
+          'vapiCallId': vapiCallId,
+        'generateEvaluation': generateEvaluation,
       },
     );
     final body = response.data;
