@@ -43,9 +43,11 @@ abstract interface class IInterviewRemoteDataSource {
     required String interviewId,
     required String sessionId,
     required String status,
-    String? transcript,
+    List<Map<String, dynamic>>? transcript,
     String? recordingUrl,
     int? durationSeconds,
+    String? vapiCallId,
+    bool generateEvaluation = true,
   });
 
   Future<List<InterviewSessionApiModel>> listMySessions(String interviewId);

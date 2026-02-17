@@ -220,9 +220,11 @@ class InterviewRepository implements IInterviewRepository {
     required String interviewId,
     required String sessionId,
     required String status,
-    String? transcript,
+    List<Map<String, dynamic>>? transcript,
     String? recordingUrl,
     int? durationSeconds,
+    String? vapiCallId,
+    bool generateEvaluation = true,
   }) async {
     if (!await _networkInfo.isConnected) {
       return const Left(NetworkFailure(message: 'No internet connection'));
@@ -235,6 +237,8 @@ class InterviewRepository implements IInterviewRepository {
         transcript: transcript,
         recordingUrl: recordingUrl,
         durationSeconds: durationSeconds,
+        vapiCallId: vapiCallId,
+        generateEvaluation: generateEvaluation,
       );
       return Right(ok);
     } on DioException catch (e) {
