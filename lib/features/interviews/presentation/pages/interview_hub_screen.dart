@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/interviews/domain/entities/interview_entity.dart';
-import 'package:kaarya/features/interviews/domain/entities/interview_feedback_entity.dart';
 import 'package:kaarya/features/interviews/domain/entities/interview_section_entity.dart';
+import 'package:kaarya/features/interviews/presentation/pages/interview_detail_page.dart';
+import 'package:kaarya/features/interviews/presentation/pages/interview_feedback_page.dart';
 import 'package:kaarya/features/dashboard/presentation/state/dashboard_state.dart';
 import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -483,6 +485,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                                 height: 14,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
+                                  color: Colors.white,
                                 ),
                               ),
                             )
@@ -519,78 +522,28 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
     if (failure != null) _snack(failure.message);
   }
 
-  Future<void> _onRetake(InterviewEntity row) async {
-    setState(() => _actionIds.add(row.id));
-    final (session, failure) = await ref
-        .read(dashboardViewModelProvider.notifier)
-        .startInterviewSession(row.id);
-    if (!mounted) return;
-    setState(() => _actionIds.remove(row.id));
-    if (failure != null) return _snack(failure.message);
-    if (session == null || session.sessionId.isEmpty) {
-      return _snack("Failed to create interview session.");
-    }
-    _snack("Interview session started. Session ID: ${session.sessionId}");
-    await ref
-        .read(dashboardViewModelProvider.notifier)
-        .loadInterviews(forceRefresh: true);
+  void _onRetake(InterviewEntity row) {
+    AppRoutes.push(
+      context,
+      InterviewDetailPage(interview: row),
+    );
   }
 
-  Future<void> _onAction(InterviewEntity row) async {
-    setState(() => _actionIds.add(row.id));
+  void _onAction(InterviewEntity row) {
     if (row.hasAttempted && row.myLatestSessionId != null) {
-      final (feedback, failure) = await ref
-          .read(dashboardViewModelProvider.notifier)
-          .getInterviewFeedback(row.myLatestSessionId!);
-      if (!mounted) return;
-      setState(() => _actionIds.remove(row.id));
-      if (failure != null) return _snack(failure.message);
-      if (feedback == null) return _snack("No feedback found.");
-      return _showFeedback(feedback);
-    }
-
-    final (session, failure) = await ref
-        .read(dashboardViewModelProvider.notifier)
-        .startInterviewSession(row.id);
-    if (!mounted) return;
-    setState(() => _actionIds.remove(row.id));
-    if (failure != null) return _snack(failure.message);
-    if (session == null || session.sessionId.isEmpty) {
-      return _snack("Failed to create interview session.");
-    }
-    _snack("Interview session started. Session ID: ${session.sessionId}");
-    await ref
-        .read(dashboardViewModelProvider.notifier)
-        .loadInterviews(forceRefresh: true);
-  }
-
-  void _showFeedback(InterviewFeedbackEntity feedback) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text("Interview Feedback"),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(feedback.interviewTitle),
-            const SizedBox(height: 8),
-            Text(
-              feedback.totalScore == null
-                  ? "Score: Not available"
-                  : "Score: ${feedback.totalScore!.toStringAsFixed(1)}/100",
-            ),
-            const SizedBox(height: 6),
-            Text(feedback.finalAssessment ?? "Assessment unavailable."),
-          ],
+      AppRoutes.push(
+        context,
+        InterviewFeedbackPage(
+          sessionId: row.myLatestSessionId!,
+          interviewId: row.id,
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Close"),
-          ),
-        ],
-      ),
+      );
+      return;
+    }
+
+    AppRoutes.push(
+      context,
+      InterviewDetailPage(interview: row),
     );
   }
 
