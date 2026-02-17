@@ -4,13 +4,44 @@ class InterviewSessionStartEntity extends Equatable {
   final String sessionId;
   final String? interviewId;
 
+  // VAPI config returned by the backend
+  final String? vapiWebToken;
+  final String? vapiAssistantId;
+  final Map<String, dynamic>? vapiAssistantConfig;
+  final String? vapiWorkflowId;
+  final Map<String, dynamic>? vapiVariableValues;
+
+  // Interview details for the take-interview flow
+  final String? interviewTitle;
+  final String? interviewRole;
+  final List<Map<String, dynamic>> questions;
+
   const InterviewSessionStartEntity({
     required this.sessionId,
     required this.interviewId,
+    this.vapiWebToken,
+    this.vapiAssistantId,
+    this.vapiAssistantConfig,
+    this.vapiWorkflowId,
+    this.vapiVariableValues,
+    this.interviewTitle,
+    this.interviewRole,
+    this.questions = const [],
   });
 
   @override
-  List<Object?> get props => [sessionId, interviewId];
+  List<Object?> get props => [
+    sessionId,
+    interviewId,
+    vapiWebToken,
+    vapiAssistantId,
+    vapiAssistantConfig,
+    vapiWorkflowId,
+    vapiVariableValues,
+    interviewTitle,
+    interviewRole,
+    questions,
+  ];
 }
 
 class InterviewSessionEntity extends Equatable {
