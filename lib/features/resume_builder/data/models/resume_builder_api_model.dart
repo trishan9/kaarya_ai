@@ -38,34 +38,52 @@ class ResumeDraftApiModel {
   });
 
   factory ResumeDraftApiModel.fromApiResponse(Map<String, dynamic> json) {
+    // The backend may return sections data under 'sections', 'content', or at the top level
     final sections = jsonAsMap(json['sections']) ?? const <String, dynamic>{};
+    final content = jsonAsMap(json['content']) ?? const <String, dynamic>{};
+    // Also check personalInfo inside content (web schema)
+    final personalInfoRaw =
+        jsonAsMap(json['personalInfo']) ??
+        jsonAsMap(content['personalInfo']) ??
+        const <String, dynamic>{};
     return ResumeDraftApiModel(
       id: jsonString(json['_id'] ?? json['id']),
       title: jsonString(json['title']),
-      template: jsonString(json['template'], fallback: 'default'),
-      personalInfo: ResumePersonalInfoApiModel.fromJson(
-        jsonAsMap(json['personalInfo']) ?? const <String, dynamic>{},
+      template: jsonString(
+        json['template'] ?? json['templateId'],
+        fallback: 'default',
       ),
+      personalInfo: ResumePersonalInfoApiModel.fromApiResponse(personalInfoRaw),
       education: jsonAsList(
-        sections['education'] ?? json['education'],
-      ).map((e) => ResumeEducationApiModel.fromJson(e)).toList(),
+        sections['education'] ??
+            content['education'] ??
+            json['education'],
+      ).map((e) => ResumeEducationApiModel.fromApiResponse(jsonCastMap(e))).toList(),
       experience: jsonAsList(
-        sections['experience'] ?? json['experience'],
-      ).map((e) => ResumeExperienceApiModel.fromJson(e)).toList(),
+        sections['experience'] ??
+            content['experience'] ??
+            json['experience'],
+      ).map((e) => ResumeExperienceApiModel.fromApiResponse(jsonCastMap(e))).toList(),
       skills: jsonAsList(
-        sections['skills'] ?? json['skills'],
-      ).map((e) => ResumeSkillApiModel.fromJson(e)).toList(),
+        sections['skills'] ?? content['skills'] ?? json['skills'],
+      ).map((e) => ResumeSkillApiModel.fromDynamic(e)).toList(),
       projects: jsonAsList(
-        sections['projects'] ?? json['projects'],
-      ).map((e) => ResumeProjectApiModel.fromJson(e)).toList(),
+        sections['projects'] ?? content['projects'] ?? json['projects'],
+      ).map((e) => ResumeProjectApiModel.fromApiResponse(jsonCastMap(e))).toList(),
       certifications: jsonAsList(
-        sections['certifications'] ?? json['certifications'],
-      ).map((e) => ResumeCertificationApiModel.fromJson(e)).toList(),
+        sections['certifications'] ??
+            content['certifications'] ??
+            json['certifications'],
+      ).map((e) => ResumeCertificationApiModel.fromApiResponse(jsonCastMap(e))).toList(),
       achievements: jsonAsList(
-        sections['achievements'] ?? json['achievements'],
-      ).map((e) => ResumeAchievementApiModel.fromJson(e)).toList(),
+        sections['achievements'] ??
+            content['achievements'] ??
+            json['achievements'],
+      ).map((e) => ResumeAchievementApiModel.fromApiResponse(jsonCastMap(e))).toList(),
       professionalSummary: jsonString(
-        sections['professionalSummary'] ?? json['professionalSummary'],
+        sections['professionalSummary'] ??
+            content['professionalSummary'] ??
+            json['professionalSummary'],
       ),
       createdAt: jsonString(json['createdAt']),
       updatedAt: jsonString(json['updatedAt']),
@@ -128,6 +146,44 @@ class ResumePersonalInfoApiModel {
     this.portfolioUrl,
   });
 
+  factory ResumePersonalInfoApiModel.fromApiResponse(Map<String, dynamic> json) {
+    // Handle both old schema (name, location, linkedinUrl) and
+    // web schema (firstName+lastName, city+country, linkedin)
+    final name = jsonString(json['name']).isNotEmpty
+        ? jsonString(json['name'])
+        : [
+              jsonNullableString(json['firstName']) ?? '',
+              jsonNullableString(json['lastName']) ?? '',
+            ]
+                .where((s) => s.isNotEmpty)
+                .join(' ')
+                .trim();
+    final location = jsonString(json['location']).isNotEmpty
+        ? jsonString(json['location'])
+        : [
+              jsonNullableString(json['city']) ?? '',
+              jsonNullableString(json['country']) ?? '',
+            ]
+                .where((s) => s.isNotEmpty)
+                .join(', ')
+                .trim();
+    return ResumePersonalInfoApiModel(
+      name: name,
+      email: jsonString(json['email']),
+      phone: jsonString(json['phone']),
+      location: location,
+      linkedinUrl:
+          jsonNullableString(json['linkedinUrl']) ??
+          jsonNullableString(json['linkedin']),
+      githubUrl:
+          jsonNullableString(json['githubUrl']) ??
+          jsonNullableString(json['github']),
+      portfolioUrl:
+          jsonNullableString(json['portfolioUrl']) ??
+          jsonNullableString(json['portfolio']),
+    );
+  }
+
   factory ResumePersonalInfoApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumePersonalInfoApiModelFromJson(json);
 
@@ -165,6 +221,29 @@ class ResumeEducationApiModel {
     this.gpa,
     this.description,
   });
+
+  factory ResumeEducationApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ResumeEducationApiModel(
+      // Handle both "institution" (old) and "school" (web schema)
+      institution:
+          jsonString(json['institution']).isNotEmpty
+              ? jsonString(json['institution'])
+              : jsonString(json['school']),
+      degree: jsonString(json['degree']),
+      // Handle both "fieldOfStudy" (old) and "major" (web schema)
+      fieldOfStudy:
+          jsonString(json['fieldOfStudy']).isNotEmpty
+              ? jsonString(json['fieldOfStudy'])
+              : jsonString(json['major']),
+      startDate: jsonString(json['startDate']),
+      endDate: jsonString(json['endDate']),
+      gpa: jsonNullableString(json['gpa']),
+      // Handle both "description" (old) and "coursework" (web schema)
+      description:
+          jsonNullableString(json['description']) ??
+          jsonNullableString(json['coursework']),
+    );
+  }
 
   factory ResumeEducationApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumeEducationApiModelFromJson(json);
@@ -204,6 +283,28 @@ class ResumeExperienceApiModel {
     required this.bullets,
   });
 
+  factory ResumeExperienceApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ResumeExperienceApiModel(
+      company: jsonString(json['company']),
+      // Handle both "jobTitle" (old) and "position" (web schema)
+      jobTitle:
+          jsonString(json['jobTitle']).isNotEmpty
+              ? jsonString(json['jobTitle'])
+              : jsonString(json['position']),
+      startDate: jsonString(json['startDate']),
+      endDate: jsonString(json['endDate']),
+      // Handle both "isCurrent" (old) and "currentlyWorking" (web schema)
+      isCurrent:
+          jsonBool(json['isCurrent']) || jsonBool(json['currentlyWorking']),
+      description: jsonNullableString(json['description']),
+      // Handle both "bullets" (old) and "bulletPoints" (web schema)
+      bullets:
+          jsonStringList(json['bullets']).isNotEmpty
+              ? jsonStringList(json['bullets'])
+              : jsonStringList(json['bulletPoints']),
+    );
+  }
+
   factory ResumeExperienceApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumeExperienceApiModelFromJson(json);
 
@@ -234,6 +335,25 @@ class ResumeSkillApiModel {
     this.proficiency,
   });
 
+  factory ResumeSkillApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ResumeSkillApiModel(
+      name: jsonString(json['name']),
+      category: jsonNullableString(json['category']),
+      proficiency: jsonNullableString(json['proficiency']),
+    );
+  }
+
+  /// Handles both string (web schema: skills as string[]) and map formats.
+  static ResumeSkillApiModel fromDynamic(dynamic value) {
+    if (value is String && value.isNotEmpty) {
+      return ResumeSkillApiModel(name: value);
+    }
+    if (value is Map) {
+      return ResumeSkillApiModel.fromApiResponse(jsonCastMap(value));
+    }
+    return const ResumeSkillApiModel(name: '');
+  }
+
   factory ResumeSkillApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumeSkillApiModelFromJson(json);
 
@@ -261,6 +381,15 @@ class ResumeProjectApiModel {
     this.url,
     required this.technologies,
   });
+
+  factory ResumeProjectApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ResumeProjectApiModel(
+      name: jsonString(json['name']),
+      description: jsonNullableString(json['description']),
+      url: jsonNullableString(json['url']),
+      technologies: jsonStringList(json['technologies']),
+    );
+  }
 
   factory ResumeProjectApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumeProjectApiModelFromJson(json);
@@ -293,6 +422,16 @@ class ResumeCertificationApiModel {
     this.credentialUrl,
   });
 
+  factory ResumeCertificationApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ResumeCertificationApiModel(
+      name: jsonString(json['name']),
+      issuer: jsonString(json['issuer']),
+      issueDate: jsonNullableString(json['issueDate']),
+      expiryDate: jsonNullableString(json['expiryDate']),
+      credentialUrl: jsonNullableString(json['credentialUrl']),
+    );
+  }
+
   factory ResumeCertificationApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumeCertificationApiModelFromJson(json);
 
@@ -321,6 +460,14 @@ class ResumeAchievementApiModel {
     this.date,
   });
 
+  factory ResumeAchievementApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ResumeAchievementApiModel(
+      title: jsonString(json['title']),
+      description: jsonNullableString(json['description']),
+      date: jsonNullableString(json['date']),
+    );
+  }
+
   factory ResumeAchievementApiModel.fromJson(Map<String, dynamic> json) =>
       _$ResumeAchievementApiModelFromJson(json);
 
@@ -335,43 +482,103 @@ class ResumeAchievementApiModel {
   }
 }
 
-@JsonSerializable()
+// ─── ATS Scan Models ──────────────────────────────────────────────────────────
+// Not annotated with @JsonSerializable — uses manual fromApiResponse only.
+
+class AtsScanTipApiModel {
+  final String type;
+  final String tip;
+  final String? explanation;
+
+  const AtsScanTipApiModel({
+    required this.type,
+    required this.tip,
+    this.explanation,
+  });
+
+  factory AtsScanTipApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return AtsScanTipApiModel(
+      type: jsonString(json['type']),
+      tip: jsonString(json['tip']),
+      explanation: jsonNullableString(json['explanation']),
+    );
+  }
+
+  AtsScanTipEntity toEntity() =>
+      AtsScanTipEntity(type: type, tip: tip, explanation: explanation);
+}
+
+class AtsScanCategoryApiModel {
+  final double score;
+  final List<AtsScanTipApiModel> tips;
+
+  const AtsScanCategoryApiModel({required this.score, required this.tips});
+
+  factory AtsScanCategoryApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return AtsScanCategoryApiModel(
+      score: jsonDouble(json['score']),
+      tips: jsonAsList(json['tips'])
+          .map((t) => AtsScanTipApiModel.fromApiResponse(jsonCastMap(t)))
+          .toList(),
+    );
+  }
+
+  AtsScanCategoryEntity toEntity() => AtsScanCategoryEntity(
+    score: score,
+    tips: tips.map((t) => t.toEntity()).toList(),
+  );
+}
+
 class AtsScanResultApiModel {
   final double overallScore;
-  final double atsScore;
-  final double toneStyleScore;
-  final double contentScore;
-  final double structureScore;
-  final double skillsScore;
-  final List<String> suggestions;
-  final List<String> improvements;
+  final String? documentType;
+  final String? classificationReason;
+  final AtsScanCategoryApiModel? ats;
+  final AtsScanCategoryApiModel? toneAndStyle;
+  final AtsScanCategoryApiModel? content;
+  final AtsScanCategoryApiModel? structure;
+  final AtsScanCategoryApiModel? skills;
 
   const AtsScanResultApiModel({
     required this.overallScore,
-    required this.atsScore,
-    required this.toneStyleScore,
-    required this.contentScore,
-    required this.structureScore,
-    required this.skillsScore,
-    required this.suggestions,
-    required this.improvements,
+    this.documentType,
+    this.classificationReason,
+    this.ats,
+    this.toneAndStyle,
+    this.content,
+    this.structure,
+    this.skills,
   });
 
-  factory AtsScanResultApiModel.fromJson(Map<String, dynamic> json) =>
-      _$AtsScanResultApiModelFromJson(json);
+  factory AtsScanResultApiModel.fromApiResponse(Map<String, dynamic> json) {
+    AtsScanCategoryApiModel? parseCategory(dynamic value) {
+      final map = value is Map ? jsonCastMap(value) : null;
+      if (map == null) return null;
+      return AtsScanCategoryApiModel.fromApiResponse(map);
+    }
 
-  Map<String, dynamic> toJson() => _$AtsScanResultApiModelToJson(this);
+    return AtsScanResultApiModel(
+      overallScore: jsonDouble(json['overallScore']),
+      documentType: jsonNullableString(json['documentType']),
+      classificationReason: jsonNullableString(json['classificationReason']),
+      ats: parseCategory(json['ATS']),
+      toneAndStyle: parseCategory(json['toneAndStyle']),
+      content: parseCategory(json['content']),
+      structure: parseCategory(json['structure']),
+      skills: parseCategory(json['skills']),
+    );
+  }
 
   AtsScanResultEntity toEntity() {
     return AtsScanResultEntity(
       overallScore: overallScore,
-      atsScore: atsScore,
-      toneStyleScore: toneStyleScore,
-      contentScore: contentScore,
-      structureScore: structureScore,
-      skillsScore: skillsScore,
-      suggestions: suggestions,
-      improvements: improvements,
+      documentType: documentType,
+      classificationReason: classificationReason,
+      ats: ats?.toEntity(),
+      toneAndStyle: toneAndStyle?.toEntity(),
+      content: content?.toEntity(),
+      structure: structure?.toEntity(),
+      skills: skills?.toEntity(),
     );
   }
 }
