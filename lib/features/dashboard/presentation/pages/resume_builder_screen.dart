@@ -1,57 +1,223 @@
-import 'package:flutter/material.dart';
-import 'package:kaarya/app/theme/app_colors.dart';
-import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'dart:io';
+import 'dart:math' as math;
 
-class ResumeBuilderScreen extends StatelessWidget {
+import 'package:dio/dio.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/features/resume_builder/domain/entities/ats_scan_result_entity.dart';
+import 'package:kaarya/features/resume_builder/domain/entities/resume_draft_entity.dart';
+import 'package:kaarya/features/resume_builder/presentation/pages/resume_editor_page.dart';
+import 'package:kaarya/features/resume_builder/presentation/state/resume_builder_state.dart';
+import 'package:kaarya/features/resume_builder/presentation/view_model/resume_builder_view_model.dart';
+import 'package:kaarya/core/utils/snackbar_utils.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+class ResumeBuilderScreen extends ConsumerStatefulWidget {
   const ResumeBuilderScreen({super.key});
 
   @override
+  ConsumerState<ResumeBuilderScreen> createState() =>
+      _ResumeBuilderScreenState();
+}
+
+class _ResumeBuilderScreenState extends ConsumerState<ResumeBuilderScreen>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(resumeBuilderViewModelProvider.notifier).loadDrafts();
+    });
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return ListView(
-      physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+    return Column(
       children: [
-        _buildHero(),
-        const SizedBox(height: 28),
-        _buildFeatureCard(
-          icon: LucideIcons.sparkles,
-          color: AppColors.primary,
-          title: 'AI-Powered Resume',
-          description:
-              'Generate a professional, ATS-optimized resume tailored to your target role using AI.',
+        Container(
+          color: Colors.white,
+          child: TabBar(
+            controller: _tabController,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.textLight,
+            indicatorColor: AppColors.primary,
+            indicatorWeight: 2,
+            labelStyle: const TextStyle(
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+            unselectedLabelStyle: const TextStyle(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+            ),
+            tabs: const [
+              Tab(text: 'AI Builder'),
+              Tab(text: 'ATS Scanner'),
+            ],
+          ),
         ),
-        const SizedBox(height: 14),
-        _buildFeatureCard(
-          icon: LucideIcons.fileCheck,
-          color: const Color(0xFF059669),
-          title: 'ATS Score Checker',
-          description:
-              'Upload your resume and instantly see how well it performs against ATS systems.',
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [
+              _AiBuilderTab(
+                onSwitchToAts: () => _tabController.animateTo(1),
+              ),
+              const _AtsScannerTab(),
+            ],
+          ),
         ),
-        const SizedBox(height: 14),
-        _buildFeatureCard(
-          icon: LucideIcons.pencilLine,
-          color: const Color(0xFFD97706),
-          title: 'Smart Suggestions',
-          description:
-              'Get section-by-section feedback and improvement tips powered by AI analysis.',
+      ],
+    );
+  }
+}
+
+// ─── AI Builder Tab ───────────────────────────────────────────────────────────
+
+class _AiBuilderTab extends ConsumerStatefulWidget {
+  final VoidCallback onSwitchToAts;
+
+  const _AiBuilderTab({required this.onSwitchToAts});
+
+  @override
+  ConsumerState<_AiBuilderTab> createState() => _AiBuilderTabState();
+}
+
+class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
+  final _searchCtrl = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(resumeBuilderViewModelProvider);
+    final vm = ref.read(resumeBuilderViewModelProvider.notifier);
+    final drafts = state.draftsListData?.drafts ?? [];
+    final filtered = _searchQuery.isEmpty
+        ? drafts
+        : drafts
+            .where(
+              (d) =>
+                  d.title.toLowerCase().contains(_searchQuery.toLowerCase()),
+            )
+            .toList();
+
+    return Stack(
+      children: [
+        ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 100),
+          children: [
+            _buildHero(context),
+            const SizedBox(height: 20),
+            if (drafts.isNotEmpty) ...[
+              Container(
+                height: 44,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppColors.borderStroke),
+                ),
+                child: TextField(
+                  controller: _searchCtrl,
+                  onChanged: (v) => setState(() => _searchQuery = v),
+                  decoration: const InputDecoration(
+                    hintText: 'Search resumes...',
+                    prefixIcon: Icon(
+                      LucideIcons.search,
+                      size: 18,
+                      color: AppColors.textLight,
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                    hintStyle: TextStyle(
+                      color: AppColors.textLight,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (state.draftsListStatus == ResumeBuilderLoadStatus.loading)
+              const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(40),
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              )
+            else if (state.draftsListStatus == ResumeBuilderLoadStatus.error)
+              _buildError(
+                state.draftsListErrorMessage,
+                () => vm.loadDrafts(forceRefresh: true),
+              )
+            else if (filtered.isEmpty && _searchQuery.isNotEmpty)
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(32),
+                  child: Text(
+                    'No resumes match "$_searchQuery"',
+                    style: const TextStyle(
+                      color: AppColors.textMedium,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              )
+            else if (drafts.isEmpty)
+              _buildEmptyState(context)
+            else
+              ...filtered.map(
+                (d) => Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: _DraftCard(
+                    draft: d,
+                    onEdit: () => _openEditor(context, draftId: d.id),
+                    onDelete: () => _confirmDelete(context, ref, d),
+                    onGeneratePdf: () => _generatePdf(context, ref, d.id),
+                    onSaveAsResume: () => _saveAsResume(context, ref, d.id),
+                  ),
+                ),
+              ),
+          ],
         ),
-        const SizedBox(height: 14),
-        _buildFeatureCard(
-          icon: LucideIcons.layoutTemplate,
-          color: const Color(0xFF7C3AED),
-          title: 'Beautiful Templates',
-          description:
-              'Choose from modern, recruiter-approved templates designed to stand out.',
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: FloatingActionButton.extended(
+            onPressed: () => _openEditor(context),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            icon: const Icon(LucideIcons.plus, size: 20),
+            label: const Text(
+              'New Resume',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+          ),
         ),
-        const SizedBox(height: 32),
-        _buildEmptyState(),
-        const SizedBox(height: 40),
       ],
     );
   }
 
-  Widget _buildHero() {
+  Widget _buildHero(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -60,7 +226,7 @@ class ResumeBuilderScreen extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Stack(
         children: [
