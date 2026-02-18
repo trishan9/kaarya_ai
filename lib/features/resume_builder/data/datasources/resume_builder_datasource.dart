@@ -74,8 +74,13 @@ class ResumeDraftsListApiResponse {
 
   factory ResumeDraftsListApiResponse.fromJson(Map<String, dynamic> json) {
     return ResumeDraftsListApiResponse(
-      drafts: ResumeDraftApiModel.fromApiList(json['drafts']),
-      totalCount: json['totalCount'] is int ? json['totalCount'] as int : 0,
+      drafts: ResumeDraftApiModel.fromApiList(json['items'] ?? json['drafts']),
+      totalCount:
+          json['total'] is int
+              ? json['total'] as int
+              : json['totalCount'] is int
+              ? json['totalCount'] as int
+              : 0,
       page: json['page'] is int ? json['page'] as int : 1,
       size: json['size'] is int ? json['size'] as int : 20,
     );
