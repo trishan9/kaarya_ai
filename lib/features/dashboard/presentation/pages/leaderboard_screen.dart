@@ -168,13 +168,19 @@ class _HeroBanner extends StatelessWidget {
               const SizedBox(height: 18),
               Row(
                 children: [
-                  _statBox('Total Entries', '${data?.totalEntries ?? '—'}'),
+                  _StatBox(
+                    label: 'Total',
+                    value: data != null ? '${data!.totalEntries}' : '—',
+                  ),
                   const SizedBox(width: 10),
-                  _statBox('Your Rank', currentUser?.rank ?? '—'),
+                  _StatBox(
+                    label: 'Your Rank',
+                    value: me?.rank.isNotEmpty == true ? '#${me!.rank}' : '—',
+                  ),
                   const SizedBox(width: 10),
-                  _statBox(
-                    'Your XP',
-                    currentUser != null ? '${currentUser.xp}' : '—',
+                  _StatBox(
+                    label: 'Your K-Rank',
+                    value: me != null && me.kRank > 0 ? '${me.kRank}' : '—',
                   ),
                 ],
               ),
@@ -184,11 +190,18 @@ class _HeroBanner extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _statBox(String label, String value) {
+class _StatBox extends StatelessWidget {
+  final String label;
+  final String value;
+  const _StatBox({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 10),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
           color: Colors.white.withAlpha(30),
           borderRadius: BorderRadius.circular(10),
