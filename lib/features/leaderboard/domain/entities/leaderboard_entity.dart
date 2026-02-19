@@ -6,6 +6,8 @@ class LeaderboardEntryEntity extends Equatable {
   final String name;
   final String? photo;
   final int xp;
+  final int score;
+  final int kRank;
   final String level;
   final String? college;
   final bool isCurrentUser;
@@ -16,13 +18,15 @@ class LeaderboardEntryEntity extends Equatable {
     required this.name,
     this.photo,
     required this.xp,
+    this.score = 0,
+    this.kRank = 0,
     required this.level,
     this.college,
     required this.isCurrentUser,
   });
 
   @override
-  List<Object?> get props => [rank, userId, xp];
+  List<Object?> get props => [rank, userId, xp, score, kRank];
 }
 
 class LeaderboardEntity extends Equatable {
