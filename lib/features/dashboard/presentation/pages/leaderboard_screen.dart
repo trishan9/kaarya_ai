@@ -124,7 +124,7 @@ class _HeroBanner extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Stack(
         children: [
@@ -140,32 +140,26 @@ class _HeroBanner extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
-            bottom: -20,
-            left: -20,
-            child: Container(
-              width: 70,
-              height: 70,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withAlpha(10),
-              ),
-            ),
-          ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Leaderboard',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                ),
+              Row(
+                children: [
+                  const Icon(LucideIcons.trophy, size: 18, color: _gold),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Leaderboard',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 4),
               Text(
-                'Compete with peers and climb the ranks',
+                'Compete with peers and climb the K-Rank',
                 style: TextStyle(
                   color: Colors.white.withAlpha(180),
                   fontSize: 13,
