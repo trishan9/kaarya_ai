@@ -1,10 +1,25 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/leaderboard/domain/entities/leaderboard_entity.dart';
-import 'package:kaarya/features/dashboard/presentation/state/dashboard_state.dart';
-import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
+import 'package:kaarya/features/leaderboard/presentation/view_model/leaderboard_view_model.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+// ─── Palette ──────────────────────────────────────────────────────────────────
+const _rankColors = [
+  Color(0xFF38BDF8), // #1 Champion   – sky-400
+  Color(0xFFA5B4FC), // #2 Runner-up  – indigo-300
+  Color(0xFF6EE7B7), // #3 3rd Place  – emerald-300
+];
+const _youBadge = Color(0xFF4F46E5);
+const _gold = Color(0xFFFFD700);
+const _silver = Color(0xFFC0C0C0);
+const _bronze = Color(0xFFCD7F32);
+
+// ─── Screen ───────────────────────────────────────────────────────────────────
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
@@ -16,56 +31,91 @@ class LeaderboardScreen extends ConsumerStatefulWidget {
 class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
   String _scope = 'global';
 
-  static const _gold = Color(0xFFFFD700);
-  static const _silver = Color(0xFFC0C0C0);
-  static const _bronze = Color(0xFFCD7F32);
-
   @override
   void initState() {
     super.initState();
     Future.microtask(
       () => ref
-          .read(dashboardViewModelProvider.notifier)
+          .read(leaderboardViewModelProvider.notifier)
           .loadLeaderboard(scope: _scope),
     );
   }
 
+  Future<void> _refresh() =>
+      ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+            scope: _scope,
+          );
+
+  void _switchScope(String scope) {
+    if (_scope == scope) return;
+    setState(() => _scope = scope);
+    ref
+        .read(leaderboardViewModelProvider.notifier)
+        .loadLeaderboard(scope: scope);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(dashboardViewModelProvider);
-    final data = state.leaderboardData;
-    final status = state.leaderboardStatus;
+    final state = ref.watch(leaderboardViewModelProvider);
+    final data = state.leaderboard;
+    final isLoading = state.isLoading;
+
+    final pageEntries = data?.entries ?? [];
+    final top3 = pageEntries.length >= 3
+        ? pageEntries.take(3).toList()
+        : <LeaderboardEntryEntity>[];
+    final rest = pageEntries.length > 3
+        ? pageEntries.skip(3).toList()
+        : (top3.length == 3 ? <LeaderboardEntryEntity>[] : pageEntries);
 
     return RefreshIndicator(
-      onRefresh: () => ref
-          .read(dashboardViewModelProvider.notifier)
-          .loadLeaderboard(scope: _scope, forceRefresh: true),
+      color: AppColors.primary,
+      onRefresh: _refresh,
       child: ListView(
         physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
         children: [
-          _buildHeroBanner(data),
+          _HeroBanner(data: data),
           const SizedBox(height: 16),
-          _buildScopeToggle(),
+          _ScopeToggle(scope: _scope, onChanged: _switchScope),
           const SizedBox(height: 20),
-          if (status == DashboardLoadStatus.loading && data == null)
+          if (isLoading && data == null)
             const SizedBox(height: 300, child: LoaderWidget())
-          else if (status == DashboardLoadStatus.error && data == null)
-            _buildErrorState(state)
+          else if (state.error != null && data == null)
+            _ErrorState(message: state.error, onRetry: _refresh)
           else if (data != null) ...[
-            if (data.entries.length >= 3)
-              _buildPodium(data.entries.take(3).toList()),
-            const SizedBox(height: 20),
-            _buildRankedTable(data.entries),
+            if (top3.length == 3) ...[
+              _PodiumSection(
+                top3: top3,
+                currentUserId: data.currentUserEntry?.userId,
+              ),
+              const SizedBox(height: 20),
+            ],
+            if (rest.isNotEmpty) ...[
+              _RankingTable(
+                entries: rest,
+                currentUserId: data.currentUserEntry?.userId,
+                showFromRank: top3.length == 3 ? 4 : 1,
+              ),
+              const SizedBox(height: 20),
+            ],
+            const _KRankGuideCard(),
           ],
         ],
       ),
     );
   }
+}
 
-  Widget _buildHeroBanner(LeaderboardEntity? data) {
-    final currentUser = data?.currentUserEntry;
+// ─── Hero Banner ─────────────────────────────────────────────────────────────
 
+class _HeroBanner extends StatelessWidget {
+  final LeaderboardEntity? data;
+  const _HeroBanner({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
+    final me = data?.currentUserEntry;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
