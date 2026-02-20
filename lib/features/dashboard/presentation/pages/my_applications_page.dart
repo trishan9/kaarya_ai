@@ -322,29 +322,55 @@ class _HeroBanner extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Track Your Job Applications',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  'Monitor every stage of your applications, from screening to interview and final decision.',
-                  style: TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-                const SizedBox(height: 14),
                 Row(
                   children: [
-                    _statBox('Submissions', '${data?.totalSubmissions ?? 0}'),
+                    const Icon(LucideIcons.briefcase,
+                        size: 16, color: Colors.white),
                     const SizedBox(width: 8),
-                    _statBox('In Progress', '${data?.inProgressCount ?? 0}'),
+                    const Text(
+                      'Track Your Applications',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Monitor every stage from screening to final decision.',
+                  style: TextStyle(
+                    color: Colors.white.withAlpha(180),
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    _StatBox(
+                      icon: LucideIcons.send,
+                      label: 'Total',
+                      value: '${data?.totalSubmissions ?? 0}',
+                    ),
                     const SizedBox(width: 8),
-                    _statBox('Interview', '${data?.interviewCount ?? 0}'),
+                    _StatBox(
+                      icon: LucideIcons.loader,
+                      label: 'In Progress',
+                      value: '${data?.inProgressCount ?? 0}',
+                    ),
                     const SizedBox(width: 8),
-                    _statBox('Accepted', '${data?.acceptedCount ?? 0}'),
+                    _StatBox(
+                      icon: LucideIcons.userRound,
+                      label: 'Interview',
+                      value: '${data?.interviewCount ?? 0}',
+                    ),
+                    const SizedBox(width: 8),
+                    _StatBox(
+                      icon: LucideIcons.circleCheck,
+                      label: 'Accepted',
+                      value: '${data?.acceptedCount ?? 0}',
+                    ),
                   ],
                 ),
               ],
@@ -354,34 +380,49 @@ class _HeroBanner extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _statBox(String label, String value) {
+class _StatBox extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  const _StatBox({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Expanded(
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
         decoration: BoxDecoration(
-          color: Colors.white.withAlpha(30),
+          color: Colors.white.withAlpha(25),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: Colors.white.withAlpha(40)),
+          border: Border.all(color: Colors.white.withAlpha(35)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              label,
-              style: const TextStyle(
-                color: Colors.white60,
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 2),
+            Icon(icon, size: 13, color: Colors.white.withAlpha(180)),
+            const SizedBox(height: 4),
             Text(
               value,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 22,
+                fontSize: 18,
                 fontWeight: FontWeight.w700,
+                height: 1,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                color: Colors.white.withAlpha(153),
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ],
@@ -389,112 +430,122 @@ class _HeroBanner extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _buildTabs() {
+// ─── Tab Bar ──────────────────────────────────────────────────────────────────
+
+class _TabBar extends StatelessWidget {
+  final List<String> tabs;
+  final int selected;
+  final List<int> counts;
+  final ValueChanged<int> onSelected;
+  const _TabBar({
+    required this.tabs,
+    required this.selected,
+    required this.counts,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: 38,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
-        itemCount: _tabs.length,
-        itemBuilder: (context, index) {
-          final selected = _selectedTab == index;
+        itemCount: tabs.length,
+        itemBuilder: (context, i) {
+          final isSelected = selected == i;
+          final count = counts[i];
           return Padding(
             padding: const EdgeInsets.only(right: 8),
-            child: ChoiceChip(
-              label: Text(
-                _tabs[index],
-                style: TextStyle(
-                  fontSize: 13,
-                  color: selected ? Colors.white : AppColors.textDark,
-                  fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+            child: GestureDetector(
+              onTap: () => onSelected(i),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: isSelected
+                        ? AppColors.primary
+                        : AppColors.borderStroke,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      tabs[i],
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w500,
+                        color: isSelected
+                            ? Colors.white
+                            : AppColors.textMedium,
+                      ),
+                    ),
+                    if (count > 0) ...[
+                      const SizedBox(width: 5),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 6, vertical: 1),
+                        decoration: BoxDecoration(
+                          color: isSelected
+                              ? Colors.white.withAlpha(50)
+                              : AppColors.bgSecondary,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Text(
+                          '$count',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.primary,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
-              selected: selected,
-              showCheckmark: false,
-              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-              visualDensity: VisualDensity.compact,
-              labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              selectedColor: AppColors.primary,
-              backgroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(6),
-              ),
-              side: BorderSide(
-                color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
-              ),
-              onSelected: (_) => setState(() => _selectedTab = index),
             ),
           );
         },
       ),
     );
   }
+}
 
-  List<ApplicationEntity> _filtered(List<ApplicationEntity> apps) {
-    if (_selectedTab == 0) return apps;
-    final statusMap = {
-      1: ['reviewing', 'shortlisted'],
-      2: ['interview_scheduled', 'interview'],
-      3: ['accepted', 'offered'],
-      4: ['rejected'],
-    };
-    final statuses = statusMap[_selectedTab] ?? [];
-    return apps.where((a) => statuses.contains(a.status)).toList();
-  }
+// ─── Application Card ─────────────────────────────────────────────────────────
 
-  List<Widget> _buildList(List<ApplicationEntity> apps) {
-    if (apps.isEmpty) {
-      return [
-        Padding(
-          padding: const EdgeInsets.only(top: 40),
-          child: Center(
-            child: Column(
-              children: [
-                Container(
-                  width: 72,
-                  height: 72,
-                  decoration: const BoxDecoration(
-                    color: AppColors.bgSecondary,
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    LucideIcons.briefcase,
-                    size: 32,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  'No applications found',
-                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 8),
-                const Text(
-                  'Applications in this category will appear here.',
-                  style: TextStyle(fontSize: 14, color: AppColors.textMedium),
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ];
-    }
-    return apps.map((app) => _applicationCard(app)).toList();
-  }
+class _ApplicationCard extends StatelessWidget {
+  final ApplicationEntity app;
+  final VoidCallback onTrack;
+  final VoidCallback onViewJob;
+  const _ApplicationCard({
+    required this.app,
+    required this.onTrack,
+    required this.onViewJob,
+  });
 
-  Widget _applicationCard(ApplicationEntity app) {
+  @override
+  Widget build(BuildContext context) {
+    final style = _statusStyle(app.status);
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.borderStroke2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(8),
+            color: Colors.black.withAlpha(6),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
