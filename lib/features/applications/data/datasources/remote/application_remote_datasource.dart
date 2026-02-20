@@ -52,9 +52,9 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
 
     final data = _extractRawData(response);
     if (data is Map<String, dynamic>) {
-      final innerData = data['data'];
-      if (innerData is List) {
-        return ApplicationApiModel.fromApiList(innerData);
+      final list = data['applications'] ?? data['data'] ?? data['items'] ?? data['rows'];
+      if (list is List) {
+        return ApplicationApiModel.fromApiList(list);
       }
     }
 
