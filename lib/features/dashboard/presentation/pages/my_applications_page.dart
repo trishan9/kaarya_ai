@@ -554,175 +554,162 @@ class _ApplicationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              _companyAvatar(app),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
+          // Top: color accent strip based on status
+          Container(
+            height: 3,
+            decoration: BoxDecoration(
+              color: style.border,
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12)),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Row 1: Logo + Title/Badge row + Company
+                Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      app.jobTitle,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                      ),
-                    ),
-                    Text(
-                      '${app.companyName}  ·  ${app.location}',
-                      style: const TextStyle(
-                        color: AppColors.textMedium,
-                        fontSize: 13,
+                    _CompanyAvatar(
+                        name: app.companyName,
+                        logoUrl: app.companyLogo),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Title row with right-aligned badge
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  app.jobTitle,
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textDark,
+                                    height: 1.2,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              // Status badge — after Expanded title, safe
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: style.bg,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: style.border),
+                                ),
+                                child: Text(
+                                  style.label,
+                                  style: TextStyle(
+                                    color: style.color,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            app.companyName,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textMedium,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ],
                 ),
-              ),
-              _statusBadge(app.status),
-            ],
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            children: [
-              _pill(LucideIcons.calendar300, _formatDate(app.appliedAt)),
-              _pill(LucideIcons.briefcase300, app.employmentType),
-              _pill(LucideIcons.mapPin300, app.workMode),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            app.salaryRange,
-            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-          ),
-          const SizedBox(height: 10),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => JobDetailPage(
-                        jobId: app.jobId,
-                        jobTitle: app.jobTitle,
+                const SizedBox(height: 10),
+                // Row 2: meta pills
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 6,
+                  children: [
+                    _Pill(
+                        icon: LucideIcons.mapPin,
+                        text: app.location),
+                    _Pill(
+                        icon: LucideIcons.briefcase,
+                        text: app.employmentType),
+                    _Pill(
+                        icon: LucideIcons.monitor,
+                        text: app.workMode),
+                    _Pill(
+                        icon: LucideIcons.calendar,
+                        text: _fmtDate(app.appliedAt)),
+                    if (app.salaryRange.isNotEmpty &&
+                        app.salaryRange != '—')
+                      _Pill(
+                          icon: LucideIcons.indianRupee,
+                          text: app.salaryRange),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                const Divider(height: 1, color: Color(0xFFF5F5F5)),
+                const SizedBox(height: 10),
+                // Row 3: Action buttons
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onTrack,
+                        icon: const Icon(LucideIcons.gitBranch, size: 14),
+                        label: const Text('Track'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: const BorderSide(
+                              color: AppColors.primary),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10),
+                          textStyle: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFE5E7EB)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(6),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: onViewJob,
+                        icon: const Icon(LucideIcons.externalLink,
+                            size: 14),
+                        label: const Text('View Job'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.textDark,
+                          side: const BorderSide(
+                              color: Color(0xFFCBD5E1)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 10),
+                          textStyle: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  child: const Text('View Job'),
+                  ],
                 ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _companyAvatar(ApplicationEntity app) {
-    if (app.companyLogo != null && app.companyLogo!.isNotEmpty) {
-      return ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.network(
-          app.companyLogo!,
-          width: 40,
-          height: 40,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _fallback(app.companyName),
-        ),
-      );
-    }
-    return _fallback(app.companyName);
-  }
-
-  Widget _fallback(String name) {
-    return Container(
-      width: 40,
-      height: 40,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Text(
-        name.isNotEmpty ? name[0].toUpperCase() : 'C',
-        style: const TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    );
-  }
-
-  Widget _statusBadge(String status) {
-    final (label, color, bg) = _statusStyle(status);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-      ),
-    );
-  }
-
-  (String, Color, Color) _statusStyle(String status) {
-    switch (status) {
-      case 'applied':
-        return (
-          'Waiting for Approval',
-          AppColors.warning,
-          AppColors.bgLightOrange,
-        );
-      case 'reviewing':
-        return ('Reviewing', AppColors.primary, AppColors.bgSecondary);
-      case 'shortlisted':
-        return ('Shortlisted', const Color(0xFF059669), AppColors.bgLightGreen);
-      case 'interview_scheduled':
-      case 'interview':
-        return ('Interview Invited', AppColors.primary, AppColors.bgSecondary);
-      case 'accepted':
-      case 'offered':
-        return ('Accepted', AppColors.success, AppColors.bgLightGreen);
-      case 'rejected':
-        return ('Rejected', AppColors.error, const Color(0xFFFFF1F2));
-      default:
-        return ('Applied', AppColors.textMedium, AppColors.bgTertiary);
-    }
-  }
-
-  Widget _pill(IconData icon, String text) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 13, color: AppColors.textLight),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: AppColors.textLight,
+              ],
             ),
           ),
         ],
@@ -730,10 +717,10 @@ class _ApplicationCard extends StatelessWidget {
     );
   }
 
-  String _formatDate(String date) {
+  String _fmtDate(String date) {
     final d = DateTime.tryParse(date)?.toLocal();
-    if (d == null) return '-';
-    final months = [
+    if (d == null) return '—';
+    const m = [
       '',
       'Jan',
       'Feb',
@@ -746,11 +733,652 @@ class _ApplicationCard extends StatelessWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec',
+      'Dec'
     ];
-    return '${months[d.month]} ${d.day}, ${d.year}';
+    return '${m[d.month]} ${d.day}, ${d.year}';
   }
 }
+
+// ─── Company Avatar ───────────────────────────────────────────────────────────
+
+class _CompanyAvatar extends StatelessWidget {
+  final String name;
+  final String? logoUrl;
+  const _CompanyAvatar({required this.name, this.logoUrl});
+
+  @override
+  Widget build(BuildContext context) {
+    if (logoUrl != null && logoUrl!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(10),
+        child: Image.network(
+          logoUrl!,
+          width: 44,
+          height: 44,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _fallback(),
+        ),
+      );
+    }
+    return _fallback();
+  }
+
+  Widget _fallback() {
+    final initials = name.trim().isNotEmpty
+        ? name.trim().split(' ').take(2).map((w) => w[0].toUpperCase()).join()
+        : 'C';
+    return Container(
+      width: 44,
+      height: 44,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        initials,
+        style: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.w700,
+          fontSize: 15,
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Pill ─────────────────────────────────────────────────────────────────────
+
+class _Pill extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  const _Pill({required this.icon, required this.text});
+
+  @override
+  Widget build(BuildContext context) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 170),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: AppColors.bgLight,
+          borderRadius: BorderRadius.circular(6),
+          border: Border.all(color: AppColors.borderStroke),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 11, color: AppColors.textLight),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                text,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: AppColors.textMedium,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Tracking Bottom Sheet ────────────────────────────────────────────────────
+
+class _TrackingSheet extends StatelessWidget {
+  final ApplicationEntity app;
+  const _TrackingSheet({required this.app});
+
+  @override
+  Widget build(BuildContext context) {
+    final style = _statusStyle(app.status);
+    final currentStep = _currentStepIndex(app.status);
+    final isNegative = _isTerminalNegative(app.status);
+
+    return DraggableScrollableSheet(
+      initialChildSize: 0.75,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            children: [
+              // Drag handle
+              const SizedBox(height: 12),
+              Center(
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.borderStroke2,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Header
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    _CompanyAvatar(
+                        name: app.companyName,
+                        logoUrl: app.companyLogo),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            app.jobTitle,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.textDark,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            app.companyName,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: AppColors.textMedium,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Status badge
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: style.bg,
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: style.border),
+                      ),
+                      child: Text(
+                        style.label,
+                        style: TextStyle(
+                          color: style.color,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 11,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Divider(height: 1, color: AppColors.borderStroke),
+              // Scrollable body
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
+                  children: [
+                    // Section header
+                    Row(
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            color: AppColors.bgSecondary,
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                          child: const Icon(LucideIcons.gitBranch,
+                              size: 14, color: AppColors.primary),
+                        ),
+                        const SizedBox(width: 10),
+                        const Text(
+                          'Application Timeline',
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    const Padding(
+                      padding: EdgeInsets.only(left: 38),
+                      child: Text(
+                        'Your progress through the hiring pipeline',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textLight,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    // Timeline
+                    _Timeline(
+                      steps: _timelineSteps,
+                      currentStep: currentStep,
+                      isNegative: isNegative,
+                      appliedAt: app.appliedAt,
+                      updatedAt: app.updatedAt,
+                      nextStep: app.nextStep,
+                    ),
+                    const SizedBox(height: 24),
+                    // Info card
+                    _InfoCard(app: app, style: style),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ─── Timeline Widget ──────────────────────────────────────────────────────────
+
+class _Timeline extends StatelessWidget {
+  final List<({IconData icon, String label, String desc})> steps;
+  final int currentStep;
+  final bool isNegative;
+  final String appliedAt;
+  final String updatedAt;
+  final String? nextStep;
+
+  const _Timeline({
+    required this.steps,
+    required this.currentStep,
+    required this.isNegative,
+    required this.appliedAt,
+    required this.updatedAt,
+    this.nextStep,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: List.generate(steps.length, (i) {
+        final step = steps[i];
+        final isLast = i == steps.length - 1;
+
+        // Determine state
+        final isReached = i <= currentStep;
+        final isCurrent = i == currentStep;
+        final isRejectedStep = isCurrent && isNegative;
+
+        // Colors
+        final Color circleColor;
+        final Color circleBg;
+        final Color connectorColor;
+        final Color textColor;
+        final IconData stepIcon;
+
+        if (isRejectedStep) {
+          circleColor = const Color(0xFFD84A3A);
+          circleBg = const Color(0xFFFFF6F5);
+          connectorColor = AppColors.borderStroke;
+          textColor = const Color(0xFFD84A3A);
+          stepIcon = LucideIcons.x;
+        } else if (isCurrent) {
+          circleColor = AppColors.primary;
+          circleBg = const Color(0xFFEFF8FF);
+          connectorColor = AppColors.borderStroke;
+          textColor = AppColors.primary;
+          stepIcon = step.icon;
+        } else if (isReached) {
+          circleColor = AppColors.primary;
+          circleBg = AppColors.bgSecondary;
+          connectorColor = AppColors.primary;
+          textColor = AppColors.textDark;
+          stepIcon = LucideIcons.check;
+        } else {
+          circleColor = AppColors.borderStroke2;
+          circleBg = AppColors.bgLight;
+          connectorColor = AppColors.borderStroke;
+          textColor = AppColors.textLight;
+          stepIcon = step.icon;
+        }
+
+        // Date to show
+        String? dateLabel;
+        if (i == 0 && isReached) dateLabel = _fmtDate(appliedAt);
+        if (isCurrent && i > 0) dateLabel = _fmtDate(updatedAt);
+
+        return IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Left column: circle + connector
+              SizedBox(
+                width: 40,
+                child: Column(
+                  children: [
+                    // Circle
+                    Container(
+                      width: 34,
+                      height: 34,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: circleBg,
+                        border: Border.all(
+                          color: circleColor,
+                          width: isCurrent ? 2 : 1.5,
+                        ),
+                      ),
+                      child: Icon(stepIcon,
+                          size: 14, color: circleColor),
+                    ),
+                    // Connector line
+                    if (!isLast)
+                      Expanded(
+                        child: Container(
+                          width: 2,
+                          margin: const EdgeInsets.symmetric(vertical: 4),
+                          color: connectorColor,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Right column: content
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.only(
+                    bottom: isLast ? 0 : 20,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 6),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              step.label,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: isCurrent
+                                    ? FontWeight.w700
+                                    : FontWeight.w600,
+                                color: textColor,
+                              ),
+                            ),
+                          ),
+                          if (isCurrent) ...[
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 7, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: isRejectedStep
+                                    ? const Color(0xFFFFF6F5)
+                                    : AppColors.bgSecondary,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: isRejectedStep
+                                      ? const Color(0xFFF2A39C)
+                                      : const Color(0xFF4BA3DA),
+                                ),
+                              ),
+                              child: Text(
+                                isRejectedStep ? 'Stopped here' : 'Current',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.w600,
+                                  color: isRejectedStep
+                                      ? const Color(0xFFD84A3A)
+                                      : const Color(0xFF1C7AB8),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        isRejectedStep
+                            ? 'Your application was not moved forward.'
+                            : step.desc,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isReached
+                              ? AppColors.textMedium
+                              : AppColors.textLight,
+                        ),
+                      ),
+                      if (dateLabel != null) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            Icon(LucideIcons.clock,
+                                size: 11,
+                                color: isRejectedStep
+                                    ? const Color(0xFFD84A3A)
+                                    : AppColors.primary),
+                            const SizedBox(width: 4),
+                            Text(
+                              dateLabel,
+                              style: TextStyle(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                                color: isRejectedStep
+                                    ? const Color(0xFFD84A3A)
+                                    : AppColors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                      if (isCurrent && !isRejectedStep && nextStep != null) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          children: [
+                            const Icon(LucideIcons.arrowRight,
+                                size: 11,
+                                color: AppColors.textLight),
+                            const SizedBox(width: 4),
+                            Flexible(
+                              child: Text(
+                                'Next: $nextStep',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.textLight,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      }),
+    );
+  }
+
+  String _fmtDate(String date) {
+    final d = DateTime.tryParse(date)?.toLocal();
+    if (d == null) return '';
+    const m = [
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${m[d.month]} ${d.day}, ${d.year}';
+  }
+}
+
+// ─── Info Card (inside tracking sheet) ───────────────────────────────────────
+
+class _InfoCard extends StatelessWidget {
+  final ApplicationEntity app;
+  final _StatusStyle style;
+  const _InfoCard({required this.app, required this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.bgLight,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: AppColors.borderStroke),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Application Details',
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: AppColors.textDark,
+            ),
+          ),
+          const SizedBox(height: 10),
+          _row(LucideIcons.calendar, 'Applied on', _fmtDate(app.appliedAt)),
+          _row(LucideIcons.refreshCw, 'Last updated',
+              _fmtDate(app.updatedAt)),
+          _row(LucideIcons.briefcase, 'Type', app.employmentType),
+          _row(LucideIcons.monitor, 'Work mode', app.workMode),
+          _row(LucideIcons.mapPin, 'Location', app.location),
+          if (app.salaryRange.isNotEmpty && app.salaryRange != '—')
+            _row(LucideIcons.indianRupee, 'Compensation', app.salaryRange),
+        ],
+      ),
+    );
+  }
+
+  Widget _row(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 7),
+      child: Row(
+        children: [
+          Icon(icon, size: 13, color: AppColors.textLight),
+          const SizedBox(width: 8),
+          Text(
+            '$label:',
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textLight,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
+              textAlign: TextAlign.end,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _fmtDate(String date) {
+    final d = DateTime.tryParse(date)?.toLocal();
+    if (d == null) return '—';
+    const m = [
+      '',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec'
+    ];
+    return '${m[d.month]} ${d.day}, ${d.year}';
+  }
+}
+
+// ─── Empty State ──────────────────────────────────────────────────────────────
+
+class _EmptyState extends StatelessWidget {
+  final String tab;
+  const _EmptyState({required this.tab});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Center(
+        child: Column(
+          children: [
+            Container(
+              width: 72,
+              height: 72,
+              decoration: const BoxDecoration(
+                color: AppColors.bgSecondary,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(
+                LucideIcons.briefcase,
+                size: 30,
+                color: AppColors.primary,
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text(
+              'No applications found',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Your $tab applications will appear here.',
+              style: const TextStyle(
+                  fontSize: 13, color: AppColors.textMedium),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Error Block ──────────────────────────────────────────────────────────────
 
 class _ErrorBlock extends StatelessWidget {
   final String message;
@@ -759,18 +1387,35 @@ class _ErrorBlock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(height: 40),
-          Text(
-            message,
-            style: const TextStyle(color: AppColors.textMedium),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 12),
-          ElevatedButton(onPressed: onRetry, child: const Text('Retry')),
-        ],
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 60),
+      child: Center(
+        child: Column(
+          children: [
+            const Icon(LucideIcons.circleAlert,
+                size: 36, color: AppColors.error),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: const TextStyle(
+                  color: AppColors.textMedium, fontSize: 14),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton.icon(
+              onPressed: onRetry,
+              icon: const Icon(LucideIcons.refreshCw, size: 14),
+              label: const Text('Retry'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
