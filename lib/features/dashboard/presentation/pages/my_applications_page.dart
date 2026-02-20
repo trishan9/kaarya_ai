@@ -1,13 +1,120 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/core/widgets/notifications_widget.dart';
 import 'package:kaarya/features/applications/domain/entities/application_entity.dart';
+import 'package:kaarya/features/applications/presentation/state/application_state.dart';
+import 'package:kaarya/features/applications/presentation/view_model/application_view_model.dart';
 import 'package:kaarya/features/jobs/presentation/pages/job_detail_page.dart';
-import 'package:kaarya/features/dashboard/presentation/state/dashboard_state.dart';
-import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+
+// ─── Status helpers ───────────────────────────────────────────────────────────
+
+typedef _StatusStyle = ({String label, Color color, Color bg, Color border});
+
+_StatusStyle _statusStyle(String status) {
+  switch (status) {
+    case 'applied':
+      return (
+        label: 'Waiting for Approval',
+        color: const Color(0xFFA96F10),
+        bg: const Color(0xFFFFF9EF),
+        border: const Color(0xFFF0BF62),
+      );
+    case 'reviewing':
+      return (
+        label: 'Under Review',
+        color: const Color(0xFF1C7AB8),
+        bg: const Color(0xFFEFF8FF),
+        border: const Color(0xFF4BA3DA),
+      );
+    case 'shortlisted':
+      return (
+        label: 'Shortlisted',
+        color: const Color(0xFF3F8A28),
+        bg: const Color(0xFFF3FBEF),
+        border: const Color(0xFF80B86B),
+      );
+    case 'interview_scheduled':
+    case 'interview':
+      return (
+        label: 'Interview Invited',
+        color: const Color(0xFF1C7AB8),
+        bg: const Color(0xFFEFF8FF),
+        border: const Color(0xFF4BA3DA),
+      );
+    case 'accepted':
+    case 'offered':
+      return (
+        label: 'Accepted',
+        color: AppColors.success,
+        bg: AppColors.bgLightGreen,
+        border: const Color(0xFF80B86B),
+      );
+    case 'rejected':
+      return (
+        label: 'Rejected',
+        color: const Color(0xFFD84A3A),
+        bg: const Color(0xFFFFF6F5),
+        border: const Color(0xFFF2A39C),
+      );
+    case 'withdrawn':
+      return (
+        label: 'Withdrawn',
+        color: AppColors.textMedium,
+        bg: AppColors.bgTertiary,
+        border: AppColors.borderStroke,
+      );
+    default:
+      return (
+        label: 'Applied',
+        color: AppColors.textMedium,
+        bg: AppColors.bgTertiary,
+        border: AppColors.borderStroke,
+      );
+  }
+}
+
+// ─── Timeline data ────────────────────────────────────────────────────────────
+
+const _timelineSteps = [
+  (icon: LucideIcons.send, label: 'Application Submitted', desc: 'Your application was sent to the employer'),
+  (icon: LucideIcons.search, label: 'Application Screening', desc: 'Recruiter is reviewing your application'),
+  (icon: LucideIcons.userRound, label: 'HR Interview', desc: 'Initial HR interview with the team'),
+  (icon: LucideIcons.clipboardList, label: 'Assessment', desc: 'Technical or skills assessment'),
+  (icon: LucideIcons.users, label: 'Second Interview', desc: 'Follow-up interview with the team'),
+  (icon: LucideIcons.fileText, label: 'Offering', desc: 'Job offer is being prepared'),
+  (icon: LucideIcons.circleCheck, label: 'Accepted', desc: 'Congratulations — you got the job!'),
+];
+
+/// Returns the 0-based index of the current reached step.
+int _currentStepIndex(String status) {
+  switch (status) {
+    case 'applied':
+      return 0;
+    case 'reviewing':
+    case 'shortlisted':
+      return 1;
+    case 'interview_scheduled':
+    case 'interview':
+      return 2;
+    case 'accepted':
+    case 'offered':
+      return 6;
+    case 'rejected':
+    case 'withdrawn':
+      return 1; // show at screening level for rejected
+    default:
+      return 0;
+  }
+}
+
+bool _isTerminalNegative(String status) =>
+    status == 'rejected' || status == 'withdrawn';
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
 
 class MyApplicationsPage extends ConsumerStatefulWidget {
   const MyApplicationsPage({super.key});
@@ -18,8 +125,9 @@ class MyApplicationsPage extends ConsumerStatefulWidget {
 
 class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
   int _selectedTab = 0;
+
   static const _tabs = [
-    'All Applications',
+    'All',
     'Screening',
     'Interview',
     'Offering',
@@ -30,19 +138,41 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
   void initState() {
     super.initState();
     Future.microtask(
-      () => ref.read(dashboardViewModelProvider.notifier).loadMyApplications(),
+      () => ref
+          .read(applicationViewModelProvider.notifier)
+          .loadMyApplications(),
     );
   }
 
+  Future<void> _refresh() => ref
+      .read(applicationViewModelProvider.notifier)
+      .loadMyApplications(forceRefresh: true);
+
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(dashboardViewModelProvider);
+    final state = ref.watch(applicationViewModelProvider);
     final data = state.applicationsData;
-    final status = state.applicationsStatus;
+    final isLoading =
+        state.applicationsStatus == ApplicationLoadStatus.loading;
+    final isError = state.applicationsStatus == ApplicationLoadStatus.error;
+
+    final apps = data?.applications ?? [];
+    final filtered = _filtered(apps);
 
     return Scaffold(
+      backgroundColor: AppColors.bgLight,
       appBar: AppBar(
-        title: const Text('My Applications'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          'My Applications',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textDark,
+          ),
+        ),
         actions: const [
           Padding(
             padding: EdgeInsets.only(right: 14),
