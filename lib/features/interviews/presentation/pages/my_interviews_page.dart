@@ -254,7 +254,7 @@ class _HeroBanner extends StatelessWidget {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Stack(
         children: [
@@ -262,8 +262,8 @@ class _HeroBanner extends StatelessWidget {
             right: -20,
             top: -20,
             child: Container(
-              width: 100,
-              height: 100,
+              width: 110,
+              height: 110,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withAlpha(15),
