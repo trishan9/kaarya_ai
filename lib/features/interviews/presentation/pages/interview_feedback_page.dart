@@ -13,10 +13,15 @@ class InterviewFeedbackPage extends ConsumerStatefulWidget {
   final String sessionId;
   final String? interviewId;
 
+  /// When true, skip the AI-generation wait (use for already-completed sessions
+  /// navigated from history, not from a just-finished live interview).
+  final bool immediate;
+
   const InterviewFeedbackPage({
     super.key,
     required this.sessionId,
     this.interviewId,
+    this.immediate = false,
   });
 
   @override
@@ -25,24 +30,38 @@ class InterviewFeedbackPage extends ConsumerStatefulWidget {
 }
 
 class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
-  bool _isGenerating = true;
+  late bool _isGenerating;
+  // Stays true until the first loadFeedback call completes (success or failure).
+  // Ensures the loading spinner is always shown on first render — prevents any
+  // flash of empty/stale state before the API response arrives.
+  bool _localLoading = true;
   static const _generationDelay = Duration(seconds: 5);
   static const _retryDelay = Duration(seconds: 4);
 
   @override
   void initState() {
     super.initState();
-    _waitThenFetch();
+    _isGenerating = !widget.immediate;
+    // Defer until after first build — Riverpod disallows state updates during
+    // the widget mount / _firstBuild phase (would throw a ProviderElement error).
+    Future.microtask(_waitThenFetch);
   }
 
   Future<void> _waitThenFetch() async {
-    // Give the backend time to finish generating the AI evaluation
-    await Future.delayed(_generationDelay);
-    if (!mounted) return;
-    setState(() => _isGenerating = false);
-    await ref
-        .read(takeInterviewViewModelProvider.notifier)
-        .loadFeedback(widget.sessionId);
+    try {
+      if (!widget.immediate) {
+        // Give the backend time to finish generating the AI evaluation
+        // (only needed right after a live interview completes).
+        await Future.delayed(_generationDelay);
+        if (!mounted) return;
+        setState(() => _isGenerating = false);
+      }
+      await ref
+          .read(takeInterviewViewModelProvider.notifier)
+          .loadFeedback(widget.sessionId);
+    } finally {
+      if (mounted) setState(() => _localLoading = false);
+    }
     if (!mounted) return;
     // If scores look like unfinished placeholders, retry once after a short delay
     final feedback = ref.read(takeInterviewViewModelProvider).feedback;
@@ -56,10 +75,12 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
   }
 
   bool _looksLikePlaceholder(dynamic feedback) {
-    if (feedback == null) return true;
-    // If totalScore is null or 0, evaluation isn't done yet
+    // null means the API returned an error — show the error state + Retry,
+    // don't auto-retry (a second request won't help if evaluation isn't ready).
+    if (feedback == null) return false;
+    // If totalScore is null or 0, evaluation generation may still be in flight
     if (feedback.totalScore == null || feedback.totalScore == 0) return true;
-    // If all category scores are identical and suspiciously low (e.g. all 7)
+    // If all category scores are identical it's likely a default placeholder
     final scores = feedback.categoryScores
         .map((c) => c.score)
         .where((s) => s != null)
@@ -82,7 +103,7 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
           onPressed: () => AppRoutes.pop(context),
         ),
       ),
-      body: _isGenerating || state.isFeedbackLoading
+      body: _isGenerating || _localLoading || state.isFeedbackLoading
           ? _buildGeneratingState(_isGenerating)
           : feedback == null
               ? _buildEmptyState(state.error)
@@ -124,6 +145,9 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
   }
 
   Widget _buildEmptyState(String? error) {
+    final message = error != null && error.isNotEmpty
+        ? error
+        : 'Your evaluation is still being generated.\nTap Retry in a few seconds.';
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -133,21 +157,23 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
             Icon(LucideIcons.fileSearch, size: 48, color: AppColors.textLight),
             const SizedBox(height: 16),
             Text(
-              error ?? 'Feedback not available yet.',
+              message,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontSize: 15,
                 color: AppColors.textLight,
+                height: 1.5,
               ),
             ),
             const SizedBox(height: 16),
-            TextButton(
+            ElevatedButton.icon(
               onPressed: () {
                 ref
                     .read(takeInterviewViewModelProvider.notifier)
                     .loadFeedback(widget.sessionId);
               },
-              child: const Text('Retry'),
+              icon: Icon(LucideIcons.rotateCcw, size: 15),
+              label: const Text('Retry'),
             ),
           ],
         ),
