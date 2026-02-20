@@ -142,22 +142,34 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
 
   /// Load feedback for a completed session.
   Future<void> loadFeedback(String sessionId) async {
-    state = state.copyWith(isFeedbackLoading: true);
+    state = state.copyWith(isFeedbackLoading: true, feedback: null, error: null);
 
-    final result = await _getFeedback(
-      GetInterviewFeedbackUseCaseParams(sessionId: sessionId),
-    );
+    try {
+      final result = await _getFeedback(
+        GetInterviewFeedbackUseCaseParams(sessionId: sessionId),
+      );
 
-    result.fold(
-      (failure) => state = state.copyWith(
+      result.fold(
+        (failure) => state = state.copyWith(
+          isFeedbackLoading: false,
+          error: failure.message,
+        ),
+        (feedback) => state = state.copyWith(
+          isFeedbackLoading: false,
+          feedback: feedback,
+        ),
+      );
+    } catch (e) {
+      state = state.copyWith(
         isFeedbackLoading: false,
-        error: failure.message,
-      ),
-      (feedback) => state = state.copyWith(
-        isFeedbackLoading: false,
-        feedback: feedback,
-      ),
-    );
+        error: 'Failed to load feedback. Please retry.',
+      );
+    }
+  }
+
+  /// Clear stale feedback so the page never shows a previous session's result.
+  void clearFeedback() {
+    state = state.copyWith(feedback: null, isFeedbackLoading: false, error: null);
   }
 
   /// Reset state for a new interview.
