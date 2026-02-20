@@ -39,7 +39,7 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.jobTitle ?? 'Job Details'),
+        title: Text(job?.title ?? widget.jobTitle ?? 'Job Details'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
