@@ -181,37 +181,107 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () => ref
-            .read(dashboardViewModelProvider.notifier)
-            .loadMyApplications(forceRefresh: true),
+        color: AppColors.primary,
+        onRefresh: _refresh,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
           children: [
-            _buildHero(data),
-            const SizedBox(height: 16),
-            _buildTabs(),
+            _HeroBanner(data: data),
             const SizedBox(height: 14),
-            if (status == DashboardLoadStatus.loading && data == null)
-              const SizedBox(height: 200, child: LoaderWidget())
-            else if (status == DashboardLoadStatus.error && data == null)
+            _TabBar(
+              tabs: _tabs,
+              selected: _selectedTab,
+              counts: _tabCounts(apps),
+              onSelected: (i) => setState(() => _selectedTab = i),
+            ),
+            const SizedBox(height: 14),
+            if (isLoading && data == null)
+              const SizedBox(height: 260, child: LoaderWidget())
+            else if (isError && data == null)
               _ErrorBlock(
-                message:
-                    state.applicationsErrorMessage ??
+                message: state.applicationsErrorMessage ??
                     'Failed to load applications',
-                onRetry: () => ref
-                    .read(dashboardViewModelProvider.notifier)
-                    .loadMyApplications(forceRefresh: true),
+                onRetry: _refresh,
               )
-            else
-              ..._buildList(_filtered(data?.applications ?? [])),
+            else ..._buildList(context, filtered),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildHero(ApplicationsListEntity? data) {
+  List<ApplicationEntity> _filtered(List<ApplicationEntity> apps) {
+    if (_selectedTab == 0) return apps;
+    const tabStatuses = [
+      <String>[],
+      ['applied', 'reviewing', 'shortlisted'],
+      ['interview_scheduled', 'interview'],
+      ['accepted', 'offered'],
+      ['rejected', 'withdrawn'],
+    ];
+    final statuses = tabStatuses[_selectedTab];
+    return apps.where((a) => statuses.contains(a.status)).toList();
+  }
+
+  List<int> _tabCounts(List<ApplicationEntity> apps) {
+    return [
+      apps.length,
+      apps
+          .where((a) => ['applied', 'reviewing', 'shortlisted']
+              .contains(a.status))
+          .length,
+      apps
+          .where((a) => ['interview_scheduled', 'interview']
+              .contains(a.status))
+          .length,
+      apps
+          .where((a) => ['accepted', 'offered'].contains(a.status))
+          .length,
+      apps
+          .where((a) => ['rejected', 'withdrawn'].contains(a.status))
+          .length,
+    ];
+  }
+
+  List<Widget> _buildList(
+      BuildContext context, List<ApplicationEntity> apps) {
+    if (apps.isEmpty) {
+      return [_EmptyState(tab: _tabs[_selectedTab])];
+    }
+    return apps.map((app) {
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: _ApplicationCard(
+          app: app,
+          onTrack: () => _showTracking(context, app),
+          onViewJob: () => AppRoutes.push(
+            context,
+            JobDetailPage(jobId: app.jobId, jobTitle: app.jobTitle),
+          ),
+        ),
+      );
+    }).toList();
+  }
+
+  void _showTracking(BuildContext context, ApplicationEntity app) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _TrackingSheet(app: app),
+    );
+  }
+}
+
+// ─── Hero Banner ──────────────────────────────────────────────────────────────
+
+class _HeroBanner extends StatelessWidget {
+  final ApplicationsListEntity? data;
+  const _HeroBanner({required this.data});
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -219,7 +289,7 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Stack(
         children: [
@@ -227,8 +297,8 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
             right: -20,
             top: -20,
             child: Container(
-              width: 100,
-              height: 100,
+              width: 110,
+              height: 110,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withAlpha(15),
