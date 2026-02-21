@@ -37,8 +37,42 @@ class ResourceRemoteDataSource implements IResourceRemoteDataSource {
           'category': category.trim(),
       },
     );
-    final data = _extractDataMap(response);
-    return ResourceCoursesListApiResponse.fromJson(data);
+    final body = response.data;
+    if (body is! Map) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: 'Invalid response payload.',
+      );
+    }
+    final normalized = _castMap(body);
+    if (normalized['success'] != true) {
+      throw DioException(
+        requestOptions: response.requestOptions,
+        response: response,
+        message: _nullableString(normalized['message']) ?? 'Request failed.',
+      );
+    }
+    final rawData = normalized['data'];
+    // API returns data as a plain list directly
+    if (rawData is List) {
+      return ResourceCoursesListApiResponse(
+        courses: ResourceCourseApiModel.fromApiList(rawData),
+        totalCount: rawData.length,
+        page: 1,
+        size: rawData.length,
+      );
+    }
+    // API returns data as a map (containing resources/courses/totalCount/etc.)
+    if (rawData is Map) {
+      return ResourceCoursesListApiResponse.fromJson(_castMap(rawData));
+    }
+    return const ResourceCoursesListApiResponse(
+      courses: [],
+      totalCount: 0,
+      page: 1,
+      size: 20,
+    );
   }
 
   @override
@@ -46,7 +80,7 @@ class ResourceRemoteDataSource implements IResourceRemoteDataSource {
     final response = await _apiClient.get(ApiEndpoints.resourceById(courseId));
     final data = _extractDataMap(response);
     final resource = _asMap(data['resource']) ?? data;
-    return ResourceCourseApiModel.fromJson(resource);
+    return ResourceCourseApiModel.fromApiResponse(resource);
   }
 
   @override
@@ -85,7 +119,7 @@ class ResourceRemoteDataSource implements IResourceRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final resource = _asMap(data['resource']) ?? data;
-    return ResourceCourseApiModel.fromJson(resource);
+    return ResourceCourseApiModel.fromApiResponse(resource);
   }
 
   @override
@@ -99,7 +133,7 @@ class ResourceRemoteDataSource implements IResourceRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final resource = _asMap(data['resource']) ?? data;
-    return ResourceCourseApiModel.fromJson(resource);
+    return ResourceCourseApiModel.fromApiResponse(resource);
   }
 
   @override
