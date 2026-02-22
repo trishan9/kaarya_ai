@@ -51,8 +51,11 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
         );
       }
 
-      final user = AuthApiModel.fromJson(data['user']);
+      final userData = data['user'] as Map<String, dynamic>? ?? data;
+      final user = AuthApiModel.fromJson(userData);
 
+      // Clear previous session first so role is never stale
+      await _userSessionService.clearSession();
       await _tokenService.saveToken(token);
       await _userSessionService.saveUserSession(
         userId: user.id!,
@@ -121,8 +124,10 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
       if (response.data['success'] == true) {
         final data = response.data['data'] as Map<String, dynamic>;
-        final currentUser = AuthApiModel.fromJson(data);
+        final userData = data['user'] as Map<String, dynamic>? ?? data;
+        final currentUser = AuthApiModel.fromJson(userData);
 
+        // Always refresh session with latest role from API
         await _userSessionService.saveUserSession(
           userId: currentUser.id!,
           email: currentUser.email,
