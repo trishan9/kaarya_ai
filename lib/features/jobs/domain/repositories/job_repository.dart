@@ -6,6 +6,9 @@ import 'package:kaarya/features/jobs/domain/entities/job_metrics_entity.dart';
 import 'package:kaarya/features/jobs/domain/entities/jobs_section_entity.dart';
 
 abstract interface class IJobRepository {
+  /// Returns cached jobs section if available (for cache-first loading).
+  Future<JobsSectionEntity?> getJobsSectionFromCache();
+
   Future<Either<Failure, JobsSectionEntity>> getJobsSection({
     String? searchQuery,
     String? locationQuery,
@@ -32,4 +35,12 @@ abstract interface class IJobRepository {
     List<String>? portfolioLinks,
   });
   Future<Either<Failure, bool>> toggleJobBookmark(String jobId, bool save);
+
+  Future<Either<Failure, List<JobEntity>>> listCompanyJobs({
+    required String companyId,
+    String? status,
+    String? search,
+    int page,
+    int size,
+  });
 }

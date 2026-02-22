@@ -85,39 +85,46 @@ class JobRemoteDatasource implements IJobRemoteDataSource {
     final et = employmentType?.trim() ?? '';
     final egt = engagementType?.trim() ?? '';
 
-    final forYou = await _fetchJobs(
-      feed: 'for_you',
-      searchQuery: s,
-      locationQuery: l,
-      status: st,
-      employmentType: et,
-      engagementType: egt,
-    );
-    final trending = await _fetchJobs(
-      feed: 'trending',
-      searchQuery: s,
-      locationQuery: l,
-      status: st,
-      employmentType: et,
-      engagementType: egt,
-    );
-    final newThisWeek = await _fetchJobs(
-      feed: 'last_week',
-      searchQuery: s,
-      locationQuery: l,
-      status: st,
-      employmentType: et,
-      engagementType: egt,
-    );
-    final remote = await _fetchJobs(
-      feed: 'for_you',
-      remoteOnly: true,
-      searchQuery: s,
-      locationQuery: l,
-      status: st,
-      employmentType: et,
-      engagementType: egt,
-    );
+    final results = await Future.wait([
+      _fetchJobs(
+        feed: 'for_you',
+        searchQuery: s,
+        locationQuery: l,
+        status: st,
+        employmentType: et,
+        engagementType: egt,
+      ),
+      _fetchJobs(
+        feed: 'trending',
+        searchQuery: s,
+        locationQuery: l,
+        status: st,
+        employmentType: et,
+        engagementType: egt,
+      ),
+      _fetchJobs(
+        feed: 'last_week',
+        searchQuery: s,
+        locationQuery: l,
+        status: st,
+        employmentType: et,
+        engagementType: egt,
+      ),
+      _fetchJobs(
+        feed: 'for_you',
+        remoteOnly: true,
+        searchQuery: s,
+        locationQuery: l,
+        status: st,
+        employmentType: et,
+        engagementType: egt,
+      ),
+    ]);
+
+    final forYou = results[0];
+    final trending = results[1];
+    final newThisWeek = results[2];
+    final remote = results[3];
 
     return JobsSectionApiModel(
       searchQuery: s,
@@ -155,7 +162,7 @@ class JobRemoteDatasource implements IJobRemoteDataSource {
 
   @override
   Future<JobApiModel> updateJob(String jobId, Map<String, dynamic> data) async {
-    final response = await _apiClient.put(
+    final response = await _apiClient.patch(
       ApiEndpoints.jobById(jobId),
       data: data,
     );
@@ -206,15 +213,51 @@ class JobRemoteDatasource implements IJobRemoteDataSource {
   }
 
   @override
+  Future<List<JobApiModel>> listCompanyJobs({
+    required String companyId,
+    String? status,
+    String? search,
+    int page = 1,
+    int size = 50,
+  }) async {
+    final response = await _apiClient.get(
+      ApiEndpoints.jobs,
+      queryParameters: {
+        'companyId': companyId,
+        'page': page,
+        'size': size,
+        if (status != null && status.isNotEmpty) 'status': status,
+        if (search != null && search.isNotEmpty) 'search': search,
+      },
+    );
+    final data = _extractDataMap(response);
+    return JobApiModel.fromApiList(data['jobs'] ?? data['data'] ?? data);
+  }
+
+  bool _isBookmarkSuccess(Response response) {
+    final status = response.statusCode ?? 0;
+    if (status < 200 || status >= 300) return false;
+    final body = response.data;
+    if (body == null) return true;
+    if (body is! Map) return true;
+    final map = _castMap(body);
+    if (map['success'] == false) return false;
+    if (map['success'] == true) return true;
+    final data = map['data'];
+    if (data is Map) {
+      final dataMap = _castMap(data);
+      if (dataMap['success'] == false) return false;
+      if (dataMap['success'] == true) return true;
+    }
+    return true;
+  }
+
+  @override
   Future<bool> toggleJobBookmark(String jobId, bool save) async {
     final endpoint = ApiEndpoints.bookmarkJob(jobId);
     final response = save
         ? await _apiClient.post(endpoint)
         : await _apiClient.delete(endpoint);
-    final body = response.data;
-    if (body is Map) {
-      return _castMap(body)['success'] == true;
-    }
-    return false;
+    return _isBookmarkSuccess(response);
   }
 }

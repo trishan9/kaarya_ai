@@ -34,6 +34,12 @@ class JobRepository implements IJobRepository {
        _networkInfo = networkInfo;
 
   @override
+  Future<JobsSectionEntity?> getJobsSectionFromCache() async {
+    final cached = await _local.getJobsSection();
+    return cached?.toApiModel().toEntity();
+  }
+
+  @override
   Future<Either<Failure, JobsSectionEntity>> getJobsSection({
     String? searchQuery,
     String? locationQuery,
@@ -246,6 +252,38 @@ class JobRepository implements IJobRepository {
         ApiFailure(
           statusCode: e.response?.statusCode,
           message: e.response?.data['message'] ?? 'Failed to update bookmark',
+        ),
+      );
+    } catch (e) {
+      return Left(ApiFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<JobEntity>>> listCompanyJobs({
+    required String companyId,
+    String? status,
+    String? search,
+    int page = 1,
+    int size = 50,
+  }) async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(NetworkFailure(message: 'No internet connection'));
+    }
+    try {
+      final data = await _remote.listCompanyJobs(
+        companyId: companyId,
+        status: status,
+        search: search,
+        page: page,
+        size: size,
+      );
+      return Right(data.map((e) => e.toEntity()).toList());
+    } on DioException catch (e) {
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to load company jobs',
         ),
       );
     } catch (e) {

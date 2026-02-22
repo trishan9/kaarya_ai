@@ -25,6 +25,14 @@ abstract interface class IJobRemoteDataSource {
     List<String>? portfolioLinks,
   });
   Future<bool> toggleJobBookmark(String jobId, bool save);
+
+  Future<List<JobApiModel>> listCompanyJobs({
+    required String companyId,
+    String? status,
+    String? search,
+    int page,
+    int size,
+  });
 }
 
 abstract interface class IJobLocalDataSource {
