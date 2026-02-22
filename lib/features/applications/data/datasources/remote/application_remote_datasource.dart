@@ -174,18 +174,51 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
   }
 
   @override
+  Future<List<JobApplicantApiModel>> getJobApplicants({
+    required String jobId,
+    int page = 1,
+    int size = 50,
+    String? status,
+  }) async {
+    final queryParams = <String, dynamic>{'page': page, 'size': size};
+    if (status != null && status.isNotEmpty) {
+      queryParams['status'] = status;
+    }
+
+    final response = await _apiClient.get(
+      ApiEndpoints.jobApplications(jobId),
+      queryParameters: queryParams,
+    );
+
+    final data = _extractRawData(response);
+    List<dynamic>? list;
+    if (data is Map<String, dynamic>) {
+      final inner = data['data'];
+      list = inner is List ? inner : (data['applications'] is List ? data['applications'] : null);
+    } else if (data is List) {
+      list = data;
+    }
+
+    return JobApplicantApiModel.fromApiList(list ?? []);
+  }
+
+  @override
   Future<bool> updateApplication({
     required String jobId,
     required String applicationId,
-    required String status,
-    Map<String, dynamic>? interviewMetadata,
+    String? status,
+    DateTime? interviewScheduledAt,
+    String? interviewNote,
   }) async {
-    final body = <String, dynamic>{'status': status};
-    if (interviewMetadata != null && interviewMetadata.isNotEmpty) {
-      body['interviewMetadata'] = interviewMetadata;
+    final body = <String, dynamic>{};
+    if (status != null && status.isNotEmpty) body['status'] = status;
+    if (interviewScheduledAt != null) {
+      body['interviewScheduledAt'] = interviewScheduledAt.toIso8601String();
     }
+    if (interviewNote != null) body['interviewNote'] = interviewNote;
+    if (body.isEmpty) throw ArgumentError('At least one field is required');
 
-    await _apiClient.put(
+    await _apiClient.patch(
       ApiEndpoints.updateApplication(jobId, applicationId),
       data: body,
     );
@@ -247,7 +280,8 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
     required String applicationId,
     required String action,
   }) async {
-    await _apiClient.put(
+    // Backend expects PATCH with "viewed" or "downloaded" (matches web frontend)
+    await _apiClient.patch(
       ApiEndpoints.updateResumeActivity(jobId, applicationId),
       data: {'action': action},
     );

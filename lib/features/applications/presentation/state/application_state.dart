@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:kaarya/features/applications/domain/entities/application_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/application_summary_entity.dart';
+import 'package:kaarya/features/applications/domain/entities/job_applicant_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/resume_entity.dart';
 
 enum ApplicationLoadStatus { initial, loading, loaded, error }
@@ -23,6 +24,10 @@ class ApplicationState extends Equatable {
   final ApplicationLoadStatus jobApplicationsStatus;
   final ApplicationsListEntity? jobApplicationsData;
   final String? jobApplicationsErrorMessage;
+
+  final ApplicationLoadStatus jobApplicantsStatus;
+  final JobApplicantsListEntity? jobApplicantsData;
+  final String? jobApplicantsErrorMessage;
 
   final ApplicationLoadStatus resumesStatus;
   final List<ResumeEntity>? resumesData;
@@ -47,6 +52,9 @@ class ApplicationState extends Equatable {
     this.jobApplicationsStatus = ApplicationLoadStatus.initial,
     this.jobApplicationsData,
     this.jobApplicationsErrorMessage,
+    this.jobApplicantsStatus = ApplicationLoadStatus.initial,
+    this.jobApplicantsData,
+    this.jobApplicantsErrorMessage,
     this.resumesStatus = ApplicationLoadStatus.initial,
     this.resumesData,
     this.resumesErrorMessage,
@@ -70,6 +78,9 @@ class ApplicationState extends Equatable {
     ApplicationLoadStatus? jobApplicationsStatus,
     Object? jobApplicationsData = _unset,
     Object? jobApplicationsErrorMessage = _unset,
+    ApplicationLoadStatus? jobApplicantsStatus,
+    Object? jobApplicantsData = _unset,
+    Object? jobApplicantsErrorMessage = _unset,
     ApplicationLoadStatus? resumesStatus,
     Object? resumesData = _unset,
     Object? resumesErrorMessage = _unset,
@@ -110,6 +121,13 @@ class ApplicationState extends Equatable {
       jobApplicationsErrorMessage: jobApplicationsErrorMessage == _unset
           ? this.jobApplicationsErrorMessage
           : jobApplicationsErrorMessage as String?,
+      jobApplicantsStatus: jobApplicantsStatus ?? this.jobApplicantsStatus,
+      jobApplicantsData: jobApplicantsData == _unset
+          ? this.jobApplicantsData
+          : jobApplicantsData as JobApplicantsListEntity?,
+      jobApplicantsErrorMessage: jobApplicantsErrorMessage == _unset
+          ? this.jobApplicantsErrorMessage
+          : jobApplicantsErrorMessage as String?,
       resumesStatus: resumesStatus ?? this.resumesStatus,
       resumesData: resumesData == _unset
           ? this.resumesData
@@ -140,6 +158,9 @@ class ApplicationState extends Equatable {
     jobApplicationsStatus,
     jobApplicationsData,
     jobApplicationsErrorMessage,
+    jobApplicantsStatus,
+    jobApplicantsData,
+    jobApplicantsErrorMessage,
     resumesStatus,
     resumesData,
     resumesErrorMessage,

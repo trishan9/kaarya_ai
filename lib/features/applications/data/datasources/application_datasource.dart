@@ -33,11 +33,19 @@ abstract interface class IApplicationRemoteDataSource {
     String? status,
   });
 
+  Future<List<JobApplicantApiModel>> getJobApplicants({
+    required String jobId,
+    int page = 1,
+    int size = 50,
+    String? status,
+  });
+
   Future<bool> updateApplication({
     required String jobId,
     required String applicationId,
-    required String status,
-    Map<String, dynamic>? interviewMetadata,
+    String? status,
+    DateTime? interviewScheduledAt,
+    String? interviewNote,
   });
 
   Future<List<ResumeApiModel>> listMyResumes({int page = 1, int size = 50});

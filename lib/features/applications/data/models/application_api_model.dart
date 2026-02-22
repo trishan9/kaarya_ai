@@ -2,6 +2,7 @@ import 'package:json_annotation/json_annotation.dart';
 import 'package:kaarya/core/utils/json_parse_helpers.dart';
 import 'package:kaarya/features/applications/domain/entities/application_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/application_summary_entity.dart';
+import 'package:kaarya/features/applications/domain/entities/job_applicant_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/resume_entity.dart';
 
 part 'application_api_model.g.dart';
@@ -209,6 +210,108 @@ class ResumeApiModel {
     return items
         .whereType<Map>()
         .map((e) => ResumeApiModel.fromApiResponse(jsonCastMap(e)))
+        .toList();
+  }
+}
+
+class JobApplicantApiModel {
+  final String id;
+  final String status;
+  final String appliedAt;
+  final String updatedAt;
+  final String? coverLetter;
+  final String? candidateId;
+  final String candidateName;
+  final String? candidateEmail;
+  final String? candidatePhoto;
+  final bool candidateOpenToWork;
+  final String? resumeId;
+  final String? resumeFileName;
+  final String? resumeUrl;
+  final int resumeViewCount;
+  final int resumeDownloadCount;
+  final String? interviewDate;
+  final String? interviewNote;
+
+  const JobApplicantApiModel({
+    required this.id,
+    required this.status,
+    required this.appliedAt,
+    required this.updatedAt,
+    this.coverLetter,
+    this.candidateId,
+    required this.candidateName,
+    this.candidateEmail,
+    this.candidatePhoto,
+    this.candidateOpenToWork = false,
+    this.resumeId,
+    this.resumeFileName,
+    this.resumeUrl,
+    this.resumeViewCount = 0,
+    this.resumeDownloadCount = 0,
+    this.interviewDate,
+    this.interviewNote,
+  });
+
+  factory JobApplicantApiModel.fromApiResponse(Map<String, dynamic> json) {
+    final candidate = jsonAsMap(json['candidate']);
+    final resume = jsonAsMap(json['resume']);
+    final resumeActivity = jsonAsMap(json['resumeActivity']);
+    final candidateProfile = jsonAsMap(candidate?['candidateProfile']);
+    final interviewMeta = jsonAsMap(json['interviewMetadata']);
+
+    return JobApplicantApiModel(
+      id: jsonString(json['id'] ?? json['_id']),
+      status: jsonString(json['status'], fallback: 'applied'),
+      appliedAt: jsonString(json['appliedAt'] ?? json['createdAt']),
+      updatedAt: jsonString(json['updatedAt'] ?? json['createdAt']),
+      coverLetter: jsonNullableString(json['coverLetter']),
+      candidateId: jsonNullableString(candidate?['id'] ?? json['studentId']),
+      candidateName: jsonString(candidate?['name'], fallback: 'Candidate'),
+      candidateEmail: jsonNullableString(candidate?['email']),
+      candidatePhoto: jsonNullableString(candidate?['photo']),
+      candidateOpenToWork: jsonBool(candidateProfile?['openToWork']),
+      resumeId: jsonNullableString(resume?['id'] ?? json['resumeId']),
+      resumeFileName: jsonNullableString(
+        resume?['fileName'] ?? resume?['originalName'] ?? json['resumeFileName'],
+      ),
+      resumeUrl: jsonNullableString(
+        resume?['url'] ?? resume?['fileUrl'],
+      ),
+      resumeViewCount: jsonInt(resumeActivity?['viewCount']),
+      resumeDownloadCount: jsonInt(resumeActivity?['downloadCount']),
+      interviewDate: jsonNullableString(interviewMeta?['date']),
+      interviewNote: jsonNullableString(
+        interviewMeta?['note'] ?? interviewMeta?['meetingLink'],
+      ),
+    );
+  }
+
+  JobApplicantEntity toEntity() => JobApplicantEntity(
+    id: id,
+    status: status,
+    appliedAt: appliedAt,
+    updatedAt: updatedAt,
+    coverLetter: coverLetter,
+    candidateId: candidateId,
+    candidateName: candidateName,
+    candidateEmail: candidateEmail,
+    candidatePhoto: candidatePhoto,
+    candidateOpenToWork: candidateOpenToWork,
+    resumeId: resumeId,
+    resumeFileName: resumeFileName,
+    resumeUrl: resumeUrl,
+    resumeViewCount: resumeViewCount,
+    resumeDownloadCount: resumeDownloadCount,
+    interviewDate: interviewDate,
+    interviewNote: interviewNote,
+  );
+
+  static List<JobApplicantApiModel> fromApiList(dynamic items) {
+    if (items is! List) return const <JobApplicantApiModel>[];
+    return items
+        .whereType<Map>()
+        .map((e) => JobApplicantApiModel.fromApiResponse(jsonCastMap(e)))
         .toList();
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/core/error/failures.dart';
+import 'package:kaarya/features/applications/data/repositories/application_repository.dart';
 import 'package:kaarya/features/applications/domain/entities/resume_entity.dart';
 import 'package:kaarya/features/applications/domain/usecases/apply_to_job_usecase.dart';
 import 'package:kaarya/features/applications/domain/usecases/delete_resume_usecase.dart';
@@ -175,6 +176,44 @@ class ApplicationViewModel extends Notifier<ApplicationState> {
     );
   }
 
+  Future<void> loadJobApplicants({
+    required String jobId,
+    int page = 1,
+    int size = 50,
+    String? status,
+    bool forceRefresh = false,
+  }) async {
+    if (!forceRefresh &&
+        state.jobApplicantsStatus == ApplicationLoadStatus.loaded &&
+        state.jobApplicantsData?.jobId == jobId) {
+      return;
+    }
+
+    state = state.copyWith(
+      jobApplicantsStatus: ApplicationLoadStatus.loading,
+      jobApplicantsErrorMessage: null,
+    );
+
+    final result = await ref.read(applicationRepositoryProvider).getJobApplicants(
+      jobId: jobId,
+      page: page,
+      size: size,
+      status: status,
+    );
+
+    result.fold(
+      (failure) => state = state.copyWith(
+        jobApplicantsStatus: ApplicationLoadStatus.error,
+        jobApplicantsErrorMessage: failure.message,
+      ),
+      (data) => state = state.copyWith(
+        jobApplicantsStatus: ApplicationLoadStatus.loaded,
+        jobApplicantsData: data,
+        jobApplicantsErrorMessage: null,
+      ),
+    );
+  }
+
   Future<void> loadJobApplications({
     required String jobId,
     int page = 1,
@@ -218,8 +257,9 @@ class ApplicationViewModel extends Notifier<ApplicationState> {
   Future<Failure?> updateApplication({
     required String jobId,
     required String applicationId,
-    required String status,
-    Map<String, dynamic>? interviewMetadata,
+    String? status,
+    DateTime? interviewScheduledAt,
+    String? interviewNote,
   }) async {
     state = state.copyWith(
       updateApplicationStatus: ApplicationLoadStatus.loading,
@@ -230,7 +270,8 @@ class ApplicationViewModel extends Notifier<ApplicationState> {
         jobId: jobId,
         applicationId: applicationId,
         status: status,
-        interviewMetadata: interviewMetadata,
+        interviewScheduledAt: interviewScheduledAt,
+        interviewNote: interviewNote,
       ),
     );
 

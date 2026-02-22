@@ -2,6 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:kaarya/core/error/failures.dart';
 import 'package:kaarya/features/applications/domain/entities/application_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/application_summary_entity.dart';
+import 'package:kaarya/features/applications/domain/entities/job_applicant_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/resume_entity.dart';
 
 abstract interface class IApplicationRepository {
@@ -37,11 +38,19 @@ abstract interface class IApplicationRepository {
     String? status,
   });
 
+  Future<Either<Failure, JobApplicantsListEntity>> getJobApplicants({
+    required String jobId,
+    int page,
+    int size,
+    String? status,
+  });
+
   Future<Either<Failure, bool>> updateApplication({
     required String jobId,
     required String applicationId,
-    required String status,
-    Map<String, dynamic>? interviewMetadata,
+    String? status,
+    DateTime? interviewScheduledAt,
+    String? interviewNote,
   });
 
   Future<Either<Failure, List<ResumeEntity>>> listMyResumes({

@@ -10,6 +10,7 @@ import 'package:kaarya/features/applications/data/models/application_hive_model.
 import 'package:kaarya/features/applications/data/models/resume_hive_model.dart';
 import 'package:kaarya/features/applications/domain/entities/application_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/application_summary_entity.dart';
+import 'package:kaarya/features/applications/domain/entities/job_applicant_entity.dart';
 import 'package:kaarya/features/applications/domain/entities/resume_entity.dart';
 import 'package:kaarya/features/applications/domain/repositories/application_repository.dart';
 
@@ -175,18 +176,49 @@ class ApplicationRepository implements IApplicationRepository {
   }
 
   @override
+  Future<Either<Failure, JobApplicantsListEntity>> getJobApplicants({
+    required String jobId,
+    int page = 1,
+    int size = 50,
+    String? status,
+  }) async {
+    try {
+      final data = await _remoteDatasource.getJobApplicants(
+        jobId: jobId,
+        page: page,
+        size: size,
+        status: status,
+      );
+      return Right(
+        JobApplicantsListEntity(
+          applicants: data.map((e) => e.toEntity()).toList(),
+          jobId: jobId,
+        ),
+      );
+    } on DioException catch (e) {
+      return Left(
+        _mapDioException(e, fallbackMessage: 'Failed to load applicants'),
+      );
+    } catch (e) {
+      return Left(ApiFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, bool>> updateApplication({
     required String jobId,
     required String applicationId,
-    required String status,
-    Map<String, dynamic>? interviewMetadata,
+    String? status,
+    DateTime? interviewScheduledAt,
+    String? interviewNote,
   }) async {
     try {
       final result = await _remoteDatasource.updateApplication(
         jobId: jobId,
         applicationId: applicationId,
         status: status,
-        interviewMetadata: interviewMetadata,
+        interviewScheduledAt: interviewScheduledAt,
+        interviewNote: interviewNote,
       );
       return Right(result);
     } on DioException catch (e) {
