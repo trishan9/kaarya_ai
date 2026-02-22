@@ -8,6 +8,18 @@ class AppRoutes {
     Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
+  /// Push with no transition - use for pages with WebView to avoid fade on navigate.
+  static Future<T?> pushNoTransition<T>(BuildContext context, Widget page) {
+    return Navigator.push<T>(
+      context,
+      PageRouteBuilder<T>(
+        pageBuilder: (_, __, ___) => page,
+        transitionDuration: Duration.zero,
+        reverseTransitionDuration: Duration.zero,
+      ),
+    );
+  }
+
   /// Replace current route with a new one
   static void pushReplacement(BuildContext context, Widget page) {
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => page));
