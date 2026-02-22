@@ -23,20 +23,29 @@ class DashboardRemoteDatasource implements IDashboardRemoteDataSource {
   Future<DashboardOverviewApiModel> getOverviewData({String? monthKey}) async {
     final normalizedMonth = _normalizeMonthKey(monthKey);
 
-    final forYouJobs = await _fetchJobs(feed: 'for_you');
-    final trendingJobs = await _fetchJobs(feed: 'trending');
-    final newThisWeekJobs = await _fetchJobs(feed: 'last_week');
-    final remoteJobs = await _fetchJobs(feed: 'for_you', remoteOnly: true);
-    final summaryBundle = await _fetchApplicationsSummaryBundle(
-      monthKey: normalizedMonth,
-    );
-    final invitation = await _fetchInterviewInvitation();
-    final profileRating = await _fetchProfileRating();
-    final takenInterviews = await _fetchInterviews(
-      ownership: 'taken_by_me',
-      sortBy: 'updated',
-      allowForbidden: true,
-    );
+    final results = await Future.wait([
+      _fetchJobs(feed: 'for_you'),
+      _fetchJobs(feed: 'trending'),
+      _fetchJobs(feed: 'last_week'),
+      _fetchJobs(feed: 'for_you', remoteOnly: true),
+      _fetchApplicationsSummaryBundle(monthKey: normalizedMonth),
+      _fetchInterviewInvitation(),
+      _fetchProfileRating(),
+      _fetchInterviews(
+        ownership: 'taken_by_me',
+        sortBy: 'updated',
+        allowForbidden: true,
+      ),
+    ]);
+
+    final forYouJobs = results[0] as List<DashboardJobApiModel>;
+    final trendingJobs = results[1] as List<DashboardJobApiModel>;
+    final newThisWeekJobs = results[2] as List<DashboardJobApiModel>;
+    final remoteJobs = results[3] as List<DashboardJobApiModel>;
+    final summaryBundle = results[4] as _ApplicationsSummaryBundle;
+    final invitation = results[5] as DashboardInvitationApiModel?;
+    final profileRating = results[6] as double;
+    final takenInterviews = results[7] as List<DashboardInterviewApiModel>;
 
     final urgentJobs = _buildUrgentJobs(forYouJobs);
 
@@ -78,7 +87,7 @@ class DashboardRemoteDatasource implements IDashboardRemoteDataSource {
       ApiEndpoints.jobs,
       queryParameters: {
         'page': 1,
-        'size': 30,
+        'size': 15,
         'feed': feed,
         if (remoteOnly) 'remoteOnly': true,
         if ((searchQuery ?? '').trim().isNotEmpty)
@@ -118,7 +127,7 @@ class DashboardRemoteDatasource implements IDashboardRemoteDataSource {
   Future<DashboardInvitationApiModel?> _fetchInterviewInvitation() async {
     final response = await _apiClient.get(
       ApiEndpoints.myApplications,
-      queryParameters: {'page': 1, 'size': 50, 'status': 'interview_scheduled'},
+      queryParameters: {'page': 1, 'size': 15, 'status': 'interview_scheduled'},
     );
 
     final data = _extractDataMap(response);
@@ -192,7 +201,7 @@ class DashboardRemoteDatasource implements IDashboardRemoteDataSource {
         ApiEndpoints.interviews,
         queryParameters: {
           'page': 1,
-          'size': 50,
+          'size': 15,
           'ownership': ownership,
           'sortBy': sortBy,
           if ((searchQuery ?? '').trim().isNotEmpty)

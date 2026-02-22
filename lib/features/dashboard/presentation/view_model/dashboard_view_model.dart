@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/core/error/failures.dart';
+import 'package:kaarya/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:kaarya/features/applications/domain/usecases/apply_to_job_usecase.dart';
 import 'package:kaarya/features/applications/domain/usecases/get_my_applications_usecase.dart';
 import 'package:kaarya/features/applications/domain/usecases/list_my_resumes_usecase.dart';
@@ -19,7 +20,6 @@ import 'package:kaarya/features/jobs/domain/usecases/get_job_detail_usecase.dart
 import 'package:kaarya/features/jobs/domain/usecases/get_jobs_section_usecase.dart';
 import 'package:kaarya/features/leaderboard/domain/usecases/get_leaderboard_usecase.dart';
 import 'package:kaarya/features/dashboard/domain/usecases/get_overview_usecase.dart';
-import 'package:kaarya/features/dashboard/data/repositories/dashboard_repository.dart';
 import 'package:kaarya/features/dashboard/presentation/state/dashboard_state.dart';
 
 final dashboardViewModelProvider =
@@ -98,10 +98,14 @@ class DashboardViewModel extends Notifier<DashboardState> {
       ),
     );
     result.fold(
-      (failure) => state = state.copyWith(
-        overviewStatus: DashboardLoadStatus.error,
-        overviewErrorMessage: failure.message,
-      ),
+      (failure) {
+        if (state.overviewData == null) {
+          state = state.copyWith(
+            overviewStatus: DashboardLoadStatus.error,
+            overviewErrorMessage: failure.message,
+          );
+        }
+      },
       (overview) => state = state.copyWith(
         overviewStatus: DashboardLoadStatus.loaded,
         overviewData: overview,

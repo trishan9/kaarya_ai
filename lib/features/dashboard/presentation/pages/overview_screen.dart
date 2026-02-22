@@ -25,11 +25,14 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref
-          .read(dashboardViewModelProvider.notifier)
-          .loadOverview(forceRefresh: true),
-    );
+    Future.microtask(() {
+      final vm = ref.read(dashboardViewModelProvider.notifier);
+      final state = ref.read(dashboardViewModelProvider);
+      if (state.overviewStatus != DashboardLoadStatus.loading &&
+          state.overviewData == null) {
+        vm.loadOverview(forceRefresh: true);
+      }
+    });
   }
 
   @override
