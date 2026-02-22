@@ -1,7 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/features/bookmarks/data/repositories/bookmark_repository.dart';
+import 'package:kaarya/features/bookmarks/domain/entities/bookmark_entity.dart';
 import 'package:kaarya/features/bookmarks/domain/repositories/bookmark_repository.dart';
 import 'package:kaarya/features/bookmarks/presentation/state/bookmark_state.dart';
+import 'package:kaarya/features/interviews/domain/entities/interview_entity.dart';
+import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 
 final bookmarkViewModelProvider =
     NotifierProvider<BookmarkViewModel, BookmarkState>(
@@ -54,6 +57,67 @@ class BookmarkViewModel extends Notifier<BookmarkState> {
   Future<bool?> unsaveInterviewBookmark(String interviewId) async {
     final result = await _repo.unsaveInterviewBookmark(interviewId);
     return result.fold((_) => null, (ok) => ok);
+  }
+
+  /// Optimistically remove item from list without refetching.
+  void removeJobFromBookmarks(String jobId) {
+    final b = state.bookmarks;
+    if (b == null) return;
+    final newJobs = b.jobs.where((j) => j.id != jobId).toList();
+    state = state.copyWith(
+      bookmarks: BookmarksListEntity(
+        jobs: newJobs,
+        interviews: b.interviews,
+        totalSaved: b.totalSaved - 1,
+        bookmarkedJobs: b.bookmarkedJobs - 1,
+        savedInterviews: b.savedInterviews,
+      ),
+    );
+  }
+
+  void removeInterviewFromBookmarks(String interviewId) {
+    final b = state.bookmarks;
+    if (b == null) return;
+    final newInterviews = b.interviews.where((i) => i.id != interviewId).toList();
+    state = state.copyWith(
+      bookmarks: BookmarksListEntity(
+        jobs: b.jobs,
+        interviews: newInterviews,
+        totalSaved: b.totalSaved - 1,
+        bookmarkedJobs: b.bookmarkedJobs,
+        savedInterviews: b.savedInterviews - 1,
+      ),
+    );
+  }
+
+  void addJobBackToBookmarks(JobEntity job) {
+    final b = state.bookmarks;
+    if (b == null) return;
+    final newJobs = [...b.jobs, job]..sort((a, c) => c.createdAt.compareTo(a.createdAt));
+    state = state.copyWith(
+      bookmarks: BookmarksListEntity(
+        jobs: newJobs,
+        interviews: b.interviews,
+        totalSaved: b.totalSaved + 1,
+        bookmarkedJobs: b.bookmarkedJobs + 1,
+        savedInterviews: b.savedInterviews,
+      ),
+    );
+  }
+
+  void addInterviewBackToBookmarks(InterviewEntity interview) {
+    final b = state.bookmarks;
+    if (b == null) return;
+    final newInterviews = [...b.interviews, interview];
+    state = state.copyWith(
+      bookmarks: BookmarksListEntity(
+        jobs: b.jobs,
+        interviews: newInterviews,
+        totalSaved: b.totalSaved + 1,
+        bookmarkedJobs: b.bookmarkedJobs,
+        savedInterviews: b.savedInterviews + 1,
+      ),
+    );
   }
 
   void clearError() {

@@ -50,24 +50,34 @@ class BookmarkRemoteDataSource implements IBookmarkRemoteDataSource {
     return BookmarksApiModel.fromApiResponse(data);
   }
 
+  bool _isSuccessResponse(Response response) {
+    final status = response.statusCode ?? 0;
+    if (status < 200 || status >= 300) return false;
+    final body = response.data;
+    if (body == null) return true; // e.g. 204 No Content
+    if (body is! Map) return true; // 2xx with non-map body, assume success
+    final map = jsonCastMap(body);
+    if (map['success'] == false) return false;
+    if (map['success'] == true) return true;
+    final data = map['data'];
+    if (data is Map) {
+      final dataMap = jsonCastMap(data);
+      if (dataMap['success'] == false) return false;
+      if (dataMap['success'] == true) return true;
+    }
+    return true; // 2xx with no explicit failure
+  }
+
   @override
   Future<bool> saveJobBookmark(String jobId) async {
     final response = await _apiClient.post(ApiEndpoints.bookmarkJob(jobId));
-    final body = response.data;
-    if (body is Map) {
-      return jsonCastMap(body)['success'] == true;
-    }
-    return false;
+    return _isSuccessResponse(response);
   }
 
   @override
   Future<bool> unsaveJobBookmark(String jobId) async {
     final response = await _apiClient.delete(ApiEndpoints.bookmarkJob(jobId));
-    final body = response.data;
-    if (body is Map) {
-      return jsonCastMap(body)['success'] == true;
-    }
-    return false;
+    return _isSuccessResponse(response);
   }
 
   @override
@@ -75,11 +85,7 @@ class BookmarkRemoteDataSource implements IBookmarkRemoteDataSource {
     final response = await _apiClient.post(
       ApiEndpoints.bookmarkInterview(interviewId),
     );
-    final body = response.data;
-    if (body is Map) {
-      return jsonCastMap(body)['success'] == true;
-    }
-    return false;
+    return _isSuccessResponse(response);
   }
 
   @override
@@ -87,10 +93,6 @@ class BookmarkRemoteDataSource implements IBookmarkRemoteDataSource {
     final response = await _apiClient.delete(
       ApiEndpoints.bookmarkInterview(interviewId),
     );
-    final body = response.data;
-    if (body is Map) {
-      return jsonCastMap(body)['success'] == true;
-    }
-    return false;
+    return _isSuccessResponse(response);
   }
 }

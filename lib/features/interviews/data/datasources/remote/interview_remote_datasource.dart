@@ -166,38 +166,42 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     final normalizedType = (interviewType ?? '').trim();
     final normalizedStatus = (status ?? '').trim();
 
-    final forYou = await _fetchInterviews(
-      ownership: baseOwnership,
-      sortBy: normalizedSort ?? 'newest',
-      searchQuery: normalizedSearch,
-      interviewType: normalizedType,
-      status: normalizedStatus,
-    );
+    final results = await Future.wait([
+      _fetchInterviews(
+        ownership: baseOwnership,
+        sortBy: normalizedSort ?? 'newest',
+        searchQuery: normalizedSearch,
+        interviewType: normalizedType,
+        status: normalizedStatus,
+      ),
+      _fetchInterviews(
+        ownership: baseOwnership,
+        sortBy: normalizedSort ?? 'popular',
+        searchQuery: normalizedSearch,
+        interviewType: normalizedType,
+        status: normalizedStatus,
+      ),
+      _fetchInterviews(
+        ownership: 'created_by_me',
+        sortBy: normalizedSort ?? 'updated',
+        searchQuery: normalizedSearch,
+        interviewType: normalizedType,
+        status: normalizedStatus,
+      ),
+      _fetchInterviews(
+        ownership: 'taken_by_me',
+        sortBy: normalizedSort ?? 'updated',
+        searchQuery: normalizedSearch,
+        interviewType: normalizedType,
+        status: normalizedStatus,
+        allowForbidden: true,
+      ),
+    ]);
 
-    final trending = await _fetchInterviews(
-      ownership: baseOwnership,
-      sortBy: normalizedSort ?? 'popular',
-      searchQuery: normalizedSearch,
-      interviewType: normalizedType,
-      status: normalizedStatus,
-    );
-
-    final byYou = await _fetchInterviews(
-      ownership: 'created_by_me',
-      sortBy: normalizedSort ?? 'updated',
-      searchQuery: normalizedSearch,
-      interviewType: normalizedType,
-      status: normalizedStatus,
-    );
-
-    final takenByMe = await _fetchInterviews(
-      ownership: 'taken_by_me',
-      sortBy: normalizedSort ?? 'updated',
-      searchQuery: normalizedSearch,
-      interviewType: normalizedType,
-      status: normalizedStatus,
-      allowForbidden: true,
-    );
+    final forYou = results[0];
+    final trending = results[1];
+    final byYou = results[2];
+    final takenByMe = results[3];
 
     final newThisWeek = [...forYou]
       ..sort((left, right) {
@@ -383,6 +387,24 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     return InterviewAnalyticsApiModel.fromResponseData(data);
   }
 
+  bool _isBookmarkSuccess(Response response) {
+    final status = response.statusCode ?? 0;
+    if (status < 200 || status >= 300) return false;
+    final body = response.data;
+    if (body == null) return true;
+    if (body is! Map) return true;
+    final map = _castMap(body);
+    if (map['success'] == false) return false;
+    if (map['success'] == true) return true;
+    final data = map['data'];
+    if (data is Map) {
+      final dataMap = _castMap(data);
+      if (dataMap['success'] == false) return false;
+      if (dataMap['success'] == true) return true;
+    }
+    return true;
+  }
+
   @override
   Future<bool> setInterviewSaved({
     required String interviewId,
@@ -392,11 +414,6 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     final response = isSaved
         ? await _apiClient.post(endpoint)
         : await _apiClient.delete(endpoint);
-
-    final body = response.data;
-    if (body is Map) {
-      return _castMap(body)['success'] == true;
-    }
-    return false;
+    return _isBookmarkSuccess(response);
   }
 }

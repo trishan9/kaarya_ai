@@ -37,9 +37,12 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref.read(jobsViewModelProvider.notifier).loadJobsSection(),
-    );
+    Future.microtask(() {
+      final state = ref.read(jobsViewModelProvider);
+      if (!state.isLoading && state.section == null) {
+        ref.read(jobsViewModelProvider.notifier).loadJobsSection();
+      }
+    });
   }
 
   @override
@@ -172,7 +175,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               SizedBox(
                 width: double.infinity,
                 height: 42,
-                child: ElevatedButton(
+                child: ElevatedButton.icon(
                   onPressed: () => _refreshJobsFromApi(),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFDCECF7),
@@ -182,7 +185,8 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
-                  child: const Text("Find Job"),
+                  icon: const Icon(LucideIcons.search, size: 18),
+                  label: const Text("Find Job"),
                 ),
               ),
             ],
@@ -296,28 +300,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
         child: JobCardWidget(
           job: job,
           onBookmark: () async {
-            final ok = await ref
-                .read(jobsViewModelProvider.notifier)
-                .toggleBookmark(job.id, !job.isSaved);
-            if (ok == null && mounted) {
+            final vm = ref.read(jobsViewModelProvider.notifier);
+            final newSaved = !job.isSaved;
+            vm.updateJobBookmarkState(job.id, newSaved);
+            final ok = await vm.toggleBookmark(job.id, newSaved);
+            if (ok != true && mounted) {
+              vm.updateJobBookmarkState(job.id, job.isSaved);
               SnackbarUtils.showError(context, "Failed to update bookmark");
-            } else {
-              final loc = _locationController.text.trim();
-              ref
-                  .read(jobsViewModelProvider.notifier)
-                  .loadJobsSection(
-                    searchQuery: _searchController.text.trim(),
-                    locationQuery: loc.isNotEmpty
-                        ? loc
-                        : _singleValueOrNull(_filters.locations),
-                    status: _apiStatus(_filters.statusLabels),
-                    employmentType: _singleValueOrNull(
-                      _filters.employmentTypes,
-                    ),
-                    engagementType: _singleValueOrNull(
-                      _filters.engagementTypes,
-                    ),
-                  );
             }
           },
         ),
