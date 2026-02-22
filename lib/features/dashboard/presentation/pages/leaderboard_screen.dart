@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/leaderboard/domain/entities/leaderboard_entity.dart';
 import 'package:kaarya/features/leaderboard/presentation/view_model/leaderboard_view_model.dart';
@@ -56,6 +57,7 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final isRecruiter = ref.watch(isRecruiterProvider);
     final state = ref.watch(leaderboardViewModelProvider);
     final data = state.leaderboard;
     final isLoading = state.isLoading;
@@ -77,8 +79,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
         children: [
           _HeroBanner(data: data),
           const SizedBox(height: 16),
-          _ScopeToggle(scope: _scope, onChanged: _switchScope),
-          const SizedBox(height: 20),
+          if (!isRecruiter) ...[
+            _ScopeToggle(scope: _scope, onChanged: _switchScope),
+            const SizedBox(height: 20),
+          ] else
+            const SizedBox(height: 20),
           if (isLoading && data == null)
             const SizedBox(height: 300, child: LoaderWidget())
           else if (state.error != null && data == null)

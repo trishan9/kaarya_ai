@@ -4,6 +4,7 @@ import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/navigation_provider.dart';
+import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
 import 'package:kaarya/features/auth/presentation/pages/settings_page.dart';
 import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
@@ -11,6 +12,8 @@ import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view
 import 'package:kaarya/features/dashboard/presentation/pages/my_applications_page.dart';
 import 'package:kaarya/features/bookmarks/presentation/pages/saved_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/my_interviews_page.dart';
+import 'package:kaarya/features/resources/presentation/pages/resources_hub_screen.dart';
+import 'package:kaarya/features/recruiter/presentation/pages/post_new_job_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppDrawerWidget extends ConsumerStatefulWidget {
@@ -21,17 +24,154 @@ class AppDrawerWidget extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
+  List<Widget> _buildRecruiterNav(
+    void Function(dynamic) goToRecruiterDest,
+    void Function(Widget) pushPage,
+  ) {
+    final current = ref.watch(recruiterNavProvider);
+    return [
+      _sectionLabel('WORKSPACE'),
+      _navItem(
+        icon: LucideIcons.layoutDashboard,
+        title: 'Overview',
+        selected: current == RecruiterDestination.overview,
+        onTap: () => goToRecruiterDest(RecruiterDestination.overview),
+      ),
+      _navItem(
+        icon: LucideIcons.briefcase,
+        title: 'Company Jobs',
+        selected: current == RecruiterDestination.companyJobs,
+        onTap: () => goToRecruiterDest(RecruiterDestination.companyJobs),
+      ),
+      _navItem(
+        icon: LucideIcons.plus,
+        title: 'Post New Job',
+        selected: current == RecruiterDestination.postNewJob,
+        onTap: () {
+          AppRoutes.pop(context);
+          AppRoutes.pushNoTransition(context, const PostNewJobPage());
+        },
+      ),
+      _navItem(
+        icon: LucideIcons.calendar,
+        title: 'Interview Management',
+        selected: current == RecruiterDestination.interviewManagement,
+        onTap: () {},
+      ),
+      _navItem(
+        icon: LucideIcons.trophy,
+        title: 'Leaderboard',
+        selected: current == RecruiterDestination.leaderboard,
+        onTap: () => goToRecruiterDest(RecruiterDestination.leaderboard),
+      ),
+      const SizedBox(height: 8),
+      _sectionLabel('OTHERS'),
+      _navItem(
+        icon: LucideIcons.bookOpen,
+        title: 'Resources',
+        onTap: () => pushPage(const ResourcesHubScreen()),
+      ),
+      _navItem(
+        icon: LucideIcons.settings,
+        title: 'Settings',
+        onTap: () => pushPage(const SettingsPage()),
+      ),
+      const SizedBox(height: 20),
+    ];
+  }
+
+  List<Widget> _buildCandidateNav(
+    AppDestination current,
+    String? pushedPage,
+    void Function(AppDestination) goToBottom,
+    void Function(Widget) pushPage,
+  ) {
+    return [
+      _sectionLabel('MAIN'),
+      _navItem(
+        icon: LucideIcons.layoutDashboard,
+        title: 'Overview',
+        selected: pushedPage == null && current == AppDestination.overview,
+        onTap: () => goToBottom(AppDestination.overview),
+      ),
+      _navItem(
+        icon: LucideIcons.globe,
+        title: 'Explore Jobs',
+        selected: pushedPage == null && current == AppDestination.explore,
+        onTap: () => goToBottom(AppDestination.explore),
+      ),
+      _navItem(
+        icon: LucideIcons.sparkles,
+        title: 'Resume Builder AI',
+        selected: pushedPage == null && current == AppDestination.resumeBuilder,
+        onTap: () => goToBottom(AppDestination.resumeBuilder),
+      ),
+      _navItem(
+        icon: LucideIcons.mic,
+        title: 'AI Interview Hub',
+        selected: pushedPage == null && current == AppDestination.interviewHub,
+        onTap: () => goToBottom(AppDestination.interviewHub),
+      ),
+      _navItem(
+        icon: LucideIcons.bookOpen,
+        title: 'Learning Resources',
+        selected: pushedPage == 'resources',
+        onTap: () => pushPage(const ResourcesHubScreen()),
+      ),
+      _navItem(
+        icon: LucideIcons.trophy,
+        title: 'Leaderboard',
+        selected: pushedPage == null && current == AppDestination.leaderboard,
+        onTap: () => goToBottom(AppDestination.leaderboard),
+      ),
+      const SizedBox(height: 8),
+      _sectionLabel('YOUR ACTIVITY'),
+      _navItem(
+        icon: LucideIcons.folder,
+        title: 'My Applications',
+        onTap: () => pushPage(const MyApplicationsPage()),
+      ),
+      _navItem(
+        icon: LucideIcons.calendarCheck,
+        title: 'My Interviews',
+        onTap: () => pushPage(const MyInterviewsPage()),
+      ),
+      _navItem(
+        icon: LucideIcons.bookmark,
+        title: 'Saved',
+        onTap: () => pushPage(const SavedPage()),
+      ),
+      const SizedBox(height: 8),
+      _sectionLabel('OTHERS'),
+      _navItem(
+        icon: LucideIcons.settings,
+        title: 'Settings',
+        onTap: () => pushPage(const SettingsPage()),
+      ),
+      const SizedBox(height: 20),
+    ];
+  }
+
   @override
   Widget build(BuildContext context) {
+    final isRecruiter = ref.watch(isRecruiterProvider);
     final current = ref.watch(bottomNavProvider);
+    final pushedPage = ref.watch(pushedPageProvider);
     final session = ref.watch(userSessionServiceProvider);
     final userName = session.getCurrentUserFullName() ?? 'User';
     final userEmail = session.getCurrentUserEmail() ?? '';
     final userPhoto = session.getCurrentUserProfilePicture() ?? '';
 
     void goToBottom(AppDestination dest) {
+      ref.read(pushedPageProvider.notifier).state = null;
       ref.read(bottomNavProvider.notifier).state = dest;
-      AppRoutes.pop(context);
+      Navigator.popUntil(context, (route) => route.isFirst);
+    }
+
+    void goToRecruiterDest(dynamic dest) {
+      ref.read(pushedPageProvider.notifier).state = null;
+      ref.read(recruiterNavProvider.notifier).state = dest;
+      Navigator.popUntil(context, (route) => route.isFirst);
     }
 
     void pushPage(Widget page) {
@@ -91,64 +231,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _sectionLabel('MAIN'),
-                    _navItem(
-                      icon: LucideIcons.layoutDashboard,
-                      title: 'Overview',
-                      selected: current == AppDestination.overview,
-                      onTap: () => goToBottom(AppDestination.overview),
-                    ),
-                    _navItem(
-                      icon: LucideIcons.globe,
-                      title: 'Explore Jobs',
-                      selected: current == AppDestination.explore,
-                      onTap: () => goToBottom(AppDestination.explore),
-                    ),
-                    _navItem(
-                      icon: LucideIcons.sparkles,
-                      title: 'Resume Builder AI',
-                      selected: current == AppDestination.resumeBuilder,
-                      onTap: () => goToBottom(AppDestination.resumeBuilder),
-                    ),
-                    _navItem(
-                      icon: LucideIcons.mic,
-                      title: 'AI Interview Hub',
-                      selected: current == AppDestination.interviewHub,
-                      onTap: () => goToBottom(AppDestination.interviewHub),
-                    ),
-                    _navItem(
-                      icon: LucideIcons.trophy,
-                      title: 'Leaderboard',
-                      selected: current == AppDestination.leaderboard,
-                      onTap: () => goToBottom(AppDestination.leaderboard),
-                    ),
-                    const SizedBox(height: 8),
-                    _sectionLabel('YOUR ACTIVITY'),
-                    _navItem(
-                      icon: LucideIcons.folder,
-                      title: 'My Applications',
-                      onTap: () => pushPage(const MyApplicationsPage()),
-                    ),
-                    _navItem(
-                      icon: LucideIcons.calendarCheck,
-                      title: 'My Interviews',
-                      onTap: () => pushPage(const MyInterviewsPage()),
-                    ),
-                    _navItem(
-                      icon: LucideIcons.bookmark,
-                      title: 'Saved',
-                      onTap: () => pushPage(const SavedPage()),
-                    ),
-                    const SizedBox(height: 8),
-                    _sectionLabel('OTHERS'),
-                    _navItem(
-                      icon: LucideIcons.settings,
-                      title: 'Settings',
-                      onTap: () => pushPage(const SettingsPage()),
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                  children: isRecruiter ? _buildRecruiterNav(goToRecruiterDest, pushPage) : _buildCandidateNav(current, pushedPage, goToBottom, pushPage),
                 ),
               ),
             ),
@@ -167,14 +250,38 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          userName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                        Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                userName,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (isRecruiter) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withAlpha(25),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'Recruiter',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                         const SizedBox(height: 1),
                         Text(
@@ -186,6 +293,14 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
+                        if (isRecruiter)
+                          const Text(
+                            'Recruiter access',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textMedium,
+                            ),
+                          ),
                       ],
                     ),
                   ),
