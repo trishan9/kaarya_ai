@@ -14,6 +14,7 @@ import 'package:kaarya/features/bookmarks/presentation/pages/saved_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/my_interviews_page.dart';
 import 'package:kaarya/features/resources/presentation/pages/resources_hub_screen.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/post_new_job_page.dart';
+import 'package:kaarya/features/companies/domain/entities/recruiter_workspace_entity.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppDrawerWidget extends ConsumerStatefulWidget {
@@ -29,6 +30,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     void Function(Widget) pushPage,
   ) {
     final current = ref.watch(recruiterNavProvider);
+
     return [
       _sectionLabel('WORKSPACE'),
       _navItem(
@@ -484,6 +486,209 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _WorkspaceSelector extends StatelessWidget {
+  const _WorkspaceSelector({
+    required this.workspaces,
+    required this.selectedWorkspace,
+    required this.onAddWorkspace,
+    required this.onSwitchWorkspace,
+  });
+
+  final List<RecruiterWorkspaceEntity> workspaces;
+  final RecruiterWorkspaceEntity? selectedWorkspace;
+  final VoidCallback onAddWorkspace;
+  final void Function(RecruiterWorkspaceEntity) onSwitchWorkspace;
+
+  static const double _selectorHeight = 48;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasWorkspaces = workspaces.isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Header: WORKSPACES title + create icon on the right
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'WORKSPACES',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMedium,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                InkWell(
+                  onTap: onAddWorkspace,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      LucideIcons.plus,
+                      size: 18,
+                      color: AppColors.textMedium,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Workspace selector: white card with logo, name, arrow
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: hasWorkspaces && workspaces.length > 1
+                  ? () => _showWorkspaceMenu(context)
+                  : null,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: _selectorHeight,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.borderStroke,
+                    width: 1,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    _buildLogo(),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        selectedWorkspace?.companyName ?? 'No workspace',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: selectedWorkspace != null
+                              ? AppColors.textDark
+                              : AppColors.textLight,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (hasWorkspaces && workspaces.length > 1)
+                      Icon(
+                        LucideIcons.chevronsUpDown,
+                        size: 18,
+                        color: AppColors.textMedium,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    if (selectedWorkspace?.companyLogo != null &&
+        selectedWorkspace!.companyLogo!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          selectedWorkspace!.companyLogo!,
+          width: 36,
+          height: 36,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildPlaceholderLogo(),
+        ),
+      );
+    }
+    return _buildPlaceholderLogo();
+  }
+
+  Widget _buildPlaceholderLogo() {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.success,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(
+        LucideIcons.building2,
+        size: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  void _showWorkspaceMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Text(
+                'Switch Workspace',
+                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+            ...workspaces.map((ws) {
+              final isSelected = selectedWorkspace?.companyId == ws.companyId;
+              return ListTile(
+                leading: ws.companyLogo != null && ws.companyLogo!.isNotEmpty
+                    ? CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(ws.companyLogo!),
+                      )
+                    : CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.primary.withAlpha(40),
+                        child: const Icon(
+                          LucideIcons.building2,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                title: Text(ws.companyName),
+                trailing: isSelected
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onSwitchWorkspace(ws);
+                },
+              );
+            }),
+            const SizedBox(height: 16),
           ],
         ),
       ),
