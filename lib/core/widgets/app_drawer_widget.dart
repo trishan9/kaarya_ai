@@ -68,13 +68,13 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         onTap: () => goToRecruiterDest(RecruiterDestination.overview),
       ),
       _navItem(
-        icon: LucideIcons.briefcase,
+        icon: LucideIcons.briefcaseBusiness,
         title: 'Company Jobs',
         selected: current == RecruiterDestination.companyJobs,
         onTap: () => goToRecruiterDest(RecruiterDestination.companyJobs),
       ),
       _navItem(
-        icon: LucideIcons.plus,
+        icon: LucideIcons.squarePlus,
         title: 'Post New Job',
         selected: current == RecruiterDestination.postNewJob,
         onTap: () {
