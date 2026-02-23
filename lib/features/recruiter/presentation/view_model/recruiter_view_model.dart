@@ -91,6 +91,36 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     );
   }
 
+  /// Join an existing workspace by invite code. On success, refreshes workspaces and selects it.
+  /// Returns error message on failure, null on success.
+  Future<String?> joinWorkspace({
+    required String inviteCode,
+    required String designation,
+  }) async {
+    final result = await _companyRepo.joinByCode(
+      inviteCode: inviteCode.trim(),
+      designation: designation.trim(),
+    );
+    return result.fold<Future<String?>>(
+      (f) => Future.value(f.message),
+      (company) async {
+        await loadWorkspaces(forceRefresh: true);
+        final ws = state.workspaces?.firstWhere(
+          (w) => w.companyId == company.id,
+          orElse: () => RecruiterWorkspaceEntity(
+            companyId: company.id,
+            companyName: company.name,
+            companyLogo: company.logo,
+            designation: designation.trim(),
+            joinedAt: company.createdAt,
+          ),
+        );
+        selectWorkspace(ws);
+        return null;
+      },
+    );
+  }
+
   Future<void> loadCompanyJobs({
     required String companyId,
     String? companyName,
