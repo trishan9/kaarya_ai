@@ -184,11 +184,7 @@ class DashboardPage extends ConsumerWidget {
 class _RecruiterDashboard extends ConsumerWidget {
   const _RecruiterDashboard();
 
-  static const _recruiterTitles = [
-    "Overview",
-    "Company Jobs",
-    "Leaderboard",
-  ];
+  static const _recruiterTitles = ["Overview", "Company Jobs", "Leaderboard"];
 
   static const _recruiterScreens = [
     RecruiterOverviewScreen(),
@@ -260,13 +256,13 @@ class _RecruiterDashboard extends ConsumerWidget {
                 label: "Overview",
               ),
               BottomNavigationBarItem(
-                icon: Icon(LucideIcons.briefcase),
-                activeIcon: Icon(LucideIcons.briefcase),
+                icon: Icon(LucideIcons.briefcaseBusiness),
+                activeIcon: Icon(LucideIcons.briefcaseBusiness),
                 label: "Company Jobs",
               ),
               BottomNavigationBarItem(
-                icon: Icon(Icons.leaderboard_outlined),
-                activeIcon: Icon(Icons.leaderboard),
+                icon: Icon(LucideIcons.trophy),
+                activeIcon: Icon(LucideIcons.trophy),
                 label: "Leaderboard",
               ),
             ],
