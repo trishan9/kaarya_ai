@@ -55,6 +55,42 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     state = state.copyWith(selectedWorkspace: workspace);
   }
 
+  /// Create a new company workspace. On success, refreshes workspaces and selects the new one.
+  /// Returns error message on failure, null on success.
+  Future<String?> createWorkspace({
+    required String name,
+    required String industry,
+    required String location,
+    required String designation,
+    String? logoPath,
+  }) async {
+    final result = await _companyRepo.createCompany(
+      name: name,
+      industry: industry,
+      location: location,
+      designation: designation,
+      logoPath: logoPath,
+    );
+    return result.fold<Future<String?>>(
+      (f) => Future.value(f.message),
+      (company) async {
+        await loadWorkspaces(forceRefresh: true);
+        final ws = state.workspaces?.firstWhere(
+          (w) => w.companyId == company.id,
+          orElse: () => RecruiterWorkspaceEntity(
+            companyId: company.id,
+            companyName: company.name,
+            companyLogo: company.logo,
+            designation: designation,
+            joinedAt: company.createdAt,
+          ),
+        );
+        selectWorkspace(ws);
+        return null;
+      },
+    );
+  }
+
   Future<void> loadCompanyJobs({
     required String companyId,
     String? companyName,
