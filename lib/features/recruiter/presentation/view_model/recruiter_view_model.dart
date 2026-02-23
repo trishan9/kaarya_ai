@@ -121,6 +121,18 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     );
   }
 
+  /// Switch workspace and refresh company jobs for the new workspace.
+  Future<void> switchWorkspaceAndRefresh(
+    RecruiterWorkspaceEntity workspace,
+  ) async {
+    selectWorkspace(workspace);
+    await loadCompanyJobs(
+      companyId: workspace.companyId,
+      companyName: workspace.companyName,
+      forceRefresh: true,
+    );
+  }
+
   Future<void> loadCompanyJobs({
     required String companyId,
     String? companyName,
