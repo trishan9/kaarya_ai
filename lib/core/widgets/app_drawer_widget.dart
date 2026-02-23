@@ -13,8 +13,10 @@ import 'package:kaarya/features/dashboard/presentation/pages/my_applications_pag
 import 'package:kaarya/features/bookmarks/presentation/pages/saved_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/my_interviews_page.dart';
 import 'package:kaarya/features/resources/presentation/pages/resources_hub_screen.dart';
+import 'package:kaarya/features/recruiter/presentation/pages/create_or_join_workspace_page.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/post_new_job_page.dart';
 import 'package:kaarya/features/companies/domain/entities/recruiter_workspace_entity.dart';
+import 'package:kaarya/features/recruiter/presentation/view_model/recruiter_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppDrawerWidget extends ConsumerStatefulWidget {
@@ -30,9 +32,35 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     void Function(Widget) pushPage,
   ) {
     final current = ref.watch(recruiterNavProvider);
+    final recruiterState = ref.watch(recruiterViewModelProvider);
+    final workspaces = recruiterState.workspaces ?? [];
+    final selectedWorkspace =
+        recruiterState.selectedWorkspace ?? workspaces.firstOrNull;
 
     return [
-      _sectionLabel('WORKSPACE'),
+      _WorkspaceSelector(
+        workspaces: workspaces,
+        selectedWorkspace: selectedWorkspace,
+        onAddWorkspace: () async {
+          Navigator.of(context).pop();
+          final result = await Navigator.of(context).push<bool>(
+            MaterialPageRoute(
+              builder: (_) => const CreateOrJoinWorkspacePage(),
+            ),
+          );
+          if (result == true) {
+            ref.read(recruiterViewModelProvider.notifier).loadWorkspaces();
+          }
+        },
+        onSwitchWorkspace: (ws) async {
+          Navigator.of(context).pop();
+          await ref
+              .read(recruiterViewModelProvider.notifier)
+              .switchWorkspaceAndRefresh(ws);
+        },
+      ),
+      const SizedBox(height: 8),
+      _sectionLabel('MAIN'),
       _navItem(
         icon: LucideIcons.layoutDashboard,
         title: 'Overview',
