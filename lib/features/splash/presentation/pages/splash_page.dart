@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/user_role_provider.dart';
+import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
 import 'package:kaarya/features/auth/domain/usecases/get_current_user_usecase.dart';
 import 'package:kaarya/features/jobs/presentation/view_model/jobs_view_model.dart';
 import 'package:kaarya/core/widgets/app_logo_widget.dart';
@@ -39,9 +40,11 @@ class _SplashPageState extends ConsumerState<SplashPage> {
       // Prefetch overview so it may be ready when dashboard loads
       ref.read(dashboardViewModelProvider.notifier).loadOverview();
       // Prefetch Explore jobs for candidates
-      if (!ref.read(isRecruiterProvider)) {
+      if (!ref.read(isRecruiterProvider) && !ref.read(isCollegeProvider)) {
         ref.read(jobsViewModelProvider.notifier).loadJobsSection();
       }
+      // Prefetch college workspaces for college role and candidates
+      ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
       // Force session/role providers to refresh so dashboard shows correct view
       ref.invalidate(userSessionServiceProvider);
       AppRoutes.pushReplacement(context, const DashboardPage());
