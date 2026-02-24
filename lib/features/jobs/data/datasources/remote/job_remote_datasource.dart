@@ -234,6 +234,28 @@ class JobRemoteDatasource implements IJobRemoteDataSource {
     return JobApiModel.fromApiList(data['jobs'] ?? data['data'] ?? data);
   }
 
+  @override
+  Future<List<JobApiModel>> listCollegeJobs({
+    required String collegeId,
+    String? status,
+    String? search,
+    int page = 1,
+    int size = 50,
+  }) async {
+    final response = await _apiClient.get(
+      ApiEndpoints.jobs,
+      queryParameters: {
+        'collegeId': collegeId,
+        'page': page,
+        'size': size,
+        if (status != null && status.isNotEmpty) 'status': status,
+        if (search != null && search.isNotEmpty) 'search': search,
+      },
+    );
+    final data = _extractDataMap(response);
+    return JobApiModel.fromApiList(data['jobs'] ?? data['data'] ?? data);
+  }
+
   bool _isBookmarkSuccess(Response response) {
     final status = response.statusCode ?? 0;
     if (status < 200 || status >= 300) return false;

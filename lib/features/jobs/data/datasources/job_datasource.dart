@@ -33,6 +33,14 @@ abstract interface class IJobRemoteDataSource {
     int page,
     int size,
   });
+
+  Future<List<JobApiModel>> listCollegeJobs({
+    required String collegeId,
+    String? status,
+    String? search,
+    int page,
+    int size,
+  });
 }
 
 abstract interface class IJobLocalDataSource {

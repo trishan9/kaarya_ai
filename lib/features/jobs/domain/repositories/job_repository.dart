@@ -43,4 +43,12 @@ abstract interface class IJobRepository {
     int page,
     int size,
   });
+
+  Future<Either<Failure, List<JobEntity>>> listCollegeJobs({
+    required String collegeId,
+    String? status,
+    String? search,
+    int page,
+    int size,
+  });
 }

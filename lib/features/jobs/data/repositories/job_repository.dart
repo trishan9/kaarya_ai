@@ -290,4 +290,36 @@ class JobRepository implements IJobRepository {
       return Left(ApiFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, List<JobEntity>>> listCollegeJobs({
+    required String collegeId,
+    String? status,
+    String? search,
+    int page = 1,
+    int size = 50,
+  }) async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(NetworkFailure(message: 'No internet connection'));
+    }
+    try {
+      final data = await _remote.listCollegeJobs(
+        collegeId: collegeId,
+        status: status,
+        search: search,
+        page: page,
+        size: size,
+      );
+      return Right(data.map((e) => e.toEntity()).toList());
+    } on DioException catch (e) {
+      return Left(
+        ApiFailure(
+          statusCode: e.response?.statusCode,
+          message: e.response?.data['message'] ?? 'Failed to load college jobs',
+        ),
+      );
+    } catch (e) {
+      return Left(ApiFailure(message: e.toString()));
+    }
+  }
 }
