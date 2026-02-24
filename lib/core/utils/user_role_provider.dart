@@ -9,3 +9,11 @@ final isRecruiterProvider = Provider<bool>((ref) {
   if (role == null || role.trim().isEmpty) return false;
   return role.trim().toLowerCase() == 'recruiter';
 });
+
+/// Provider that returns true if the current user has college role.
+final isCollegeProvider = Provider<bool>((ref) {
+  final session = ref.watch(userSessionServiceProvider);
+  final role = session.getCurrentUserRole();
+  if (role == null || role.trim().isEmpty) return false;
+  return role.trim().toLowerCase() == 'college';
+});

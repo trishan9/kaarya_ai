@@ -17,6 +17,17 @@ enum RecruiterDestination {
   leaderboard,
 }
 
+/// College-specific bottom nav destinations.
+enum CollegeDestination {
+  overview,
+  collegeJobs,
+  postNewJob,
+  interviewManagement,
+  createInterview,
+  leaderboard,
+  collegeSettings,
+}
+
 final bottomNavProvider = StateProvider<AppDestination>(
   (ref) => AppDestination.overview,
 );
@@ -24,6 +35,11 @@ final bottomNavProvider = StateProvider<AppDestination>(
 /// Recruiter bottom nav selection.
 final recruiterNavProvider = StateProvider<RecruiterDestination>(
   (ref) => RecruiterDestination.overview,
+);
+
+/// College bottom nav selection.
+final collegeNavProvider = StateProvider<CollegeDestination>(
+  (ref) => CollegeDestination.overview,
 );
 
 /// Tracks the name of the currently active pushed page (e.g. 'resources').
