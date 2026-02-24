@@ -4,8 +4,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
+import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
+import 'package:kaarya/features/companies/domain/entities/recruiter_workspace_entity.dart';
+import 'package:kaarya/features/colleges/domain/entities/college_workspace_entity.dart';
+import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_detail_entity.dart';
 import 'package:kaarya/features/jobs/presentation/view_model/jobs_view_model.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/location_picker_page.dart';
@@ -41,7 +45,12 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(recruiterViewModelProvider.notifier).loadWorkspaces();
+      final isCollege = ref.read(isCollegeProvider);
+      if (isCollege) {
+        ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
+      } else {
+        ref.read(recruiterViewModelProvider.notifier).loadWorkspaces();
+      }
       _prefillFromJob();
     });
   }
@@ -70,8 +79,17 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = ref.watch(recruiterViewModelProvider);
-    final workspace = state.selectedWorkspace ?? state.workspaces?.firstOrNull;
+    final isCollege = ref.watch(isCollegeProvider);
+    final collegeState = ref.watch(collegeDashboardViewModelProvider);
+    final recruiterState = ref.watch(recruiterViewModelProvider);
+
+    final collegeWorkspace = collegeState.selectedWorkspace ?? collegeState.workspaces?.firstOrNull;
+    final recruiterWorkspace = recruiterState.selectedWorkspace ?? recruiterState.workspaces?.firstOrNull;
+
+    final workspace = isCollege ? collegeWorkspace : recruiterWorkspace;
+    final displayName = workspace != null
+        ? (workspace is CollegeWorkspaceEntity ? workspace.collegeName : (workspace as RecruiterWorkspaceEntity).companyName)
+        : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -88,9 +106,9 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (workspace != null) ...[
+              if (workspace != null && displayName != null) ...[
                 Text(
-                  workspace.companyName,
+                  displayName,
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -349,17 +367,26 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
       return;
     }
 
-    final state = ref.read(recruiterViewModelProvider);
-    final workspace = state.selectedWorkspace ?? state.workspaces?.firstOrNull;
+    final isCollege = ref.read(isCollegeProvider);
+    final collegeState = ref.read(collegeDashboardViewModelProvider);
+    final recruiterState = ref.read(recruiterViewModelProvider);
+
+    final collegeWorkspace = collegeState.selectedWorkspace ?? collegeState.workspaces?.firstOrNull;
+    final recruiterWorkspace = recruiterState.selectedWorkspace ?? recruiterState.workspaces?.firstOrNull;
+
+    final workspace = isCollege ? collegeWorkspace : recruiterWorkspace;
     if (workspace == null) {
-      setState(() => _errorMessage = 'No workspace selected. Please join a company first.');
+      setState(() => _errorMessage = isCollege
+          ? 'No college workspace. Contact support.'
+          : 'No workspace selected. Please join a company first.');
       return;
     }
 
     setState(() => _isSubmitting = true);
 
     final payload = <String, dynamic>{
-      'companyId': workspace.companyId,
+      if (isCollege) 'collegeId': (workspace as CollegeWorkspaceEntity).collegeId,
+      if (!isCollege) 'companyId': (workspace as RecruiterWorkspaceEntity).companyId,
       'title': _titleController.text.trim(),
       'description': description,
       'deadline': _deadline!.toIso8601String(),
@@ -390,11 +417,18 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
         context,
         _isEditMode ? 'Job updated successfully!' : 'Job created successfully!',
       );
-      ref.read(recruiterViewModelProvider.notifier).loadCompanyJobs(
-            companyId: workspace.companyId,
-            companyName: workspace.companyName,
-            forceRefresh: true,
-          );
+      if (isCollege) {
+        ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
+              collegeId: (workspace as CollegeWorkspaceEntity).collegeId,
+              forceRefresh: true,
+            );
+      } else {
+        ref.read(recruiterViewModelProvider.notifier).loadCompanyJobs(
+              companyId: (workspace as RecruiterWorkspaceEntity).companyId,
+              companyName: (workspace as RecruiterWorkspaceEntity).companyName,
+              forceRefresh: true,
+            );
+      }
       SchedulerBinding.instance.addPostFrameCallback((_) {
         if (mounted) Navigator.of(context).pop();
       });
