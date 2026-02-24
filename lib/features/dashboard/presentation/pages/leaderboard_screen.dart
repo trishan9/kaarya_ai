@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
+import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
 import 'package:kaarya/features/leaderboard/domain/entities/leaderboard_entity.dart';
 import 'package:kaarya/features/leaderboard/presentation/view_model/leaderboard_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -35,29 +36,88 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(
-      () => ref
-          .read(leaderboardViewModelProvider.notifier)
-          .loadLeaderboard(scope: _scope),
-    );
+    Future.microtask(_loadLeaderboard);
   }
 
-  Future<void> _refresh() =>
+  String? get _selectedCollegeId {
+    final collegeState = ref.read(collegeDashboardViewModelProvider);
+    return collegeState.selectedWorkspace?.collegeId ??
+        collegeState.workspaces?.firstOrNull?.collegeId;
+  }
+
+  void _loadLeaderboard() {
+    final isCollege = ref.read(isCollegeProvider);
+    final isRecruiter = ref.read(isRecruiterProvider);
+    final collegeId = _selectedCollegeId;
+
+    // College role: always college leaderboard
+    if (isCollege && collegeId != null) {
       ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
-            scope: _scope,
+            scope: 'college',
+            collegeId: collegeId,
           );
+      return;
+    }
+    // Recruiter: always global
+    if (isRecruiter) {
+      ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+            scope: 'global',
+          );
+      return;
+    }
+    // Candidate: use _scope; when college scope, pass collegeId
+    ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+          scope: _scope,
+          collegeId: _scope == 'college' ? collegeId : null,
+        );
+  }
+
+  Future<void> _refresh() {
+    final isCollege = ref.read(isCollegeProvider);
+    final isRecruiter = ref.read(isRecruiterProvider);
+    final collegeId = _selectedCollegeId;
+
+    if (isCollege && collegeId != null) {
+      return ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+            scope: 'college',
+            collegeId: collegeId,
+          );
+    }
+    if (isRecruiter) {
+      return ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+            scope: 'global',
+          );
+    }
+    return ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+          scope: _scope,
+          collegeId: _scope == 'college' ? collegeId : null,
+        );
+  }
 
   void _switchScope(String scope) {
     if (_scope == scope) return;
     setState(() => _scope = scope);
-    ref
-        .read(leaderboardViewModelProvider.notifier)
-        .loadLeaderboard(scope: scope);
+    final collegeId = _selectedCollegeId;
+    ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+          scope: scope,
+          collegeId: scope == 'college' ? collegeId : null,
+        );
   }
 
   @override
   Widget build(BuildContext context) {
     final isRecruiter = ref.watch(isRecruiterProvider);
+    final isCollege = ref.watch(isCollegeProvider);
+    final collegeState = ref.watch(collegeDashboardViewModelProvider);
+    final hasCollegeWorkspaces = collegeState.workspacesStatus ==
+            CollegeDashboardLoadStatus.loaded &&
+        (collegeState.workspaces?.isNotEmpty ?? false);
+
+    // Show scope toggle only for candidates who are in a college workspace
+    final showScopeToggle = !isRecruiter &&
+        !isCollege &&
+        hasCollegeWorkspaces;
+
     final state = ref.watch(leaderboardViewModelProvider);
     final data = state.leaderboard;
     final isLoading = state.isLoading;
@@ -70,25 +130,31 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
         ? pageEntries.skip(3).toList()
         : (top3.length == 3 ? <LeaderboardEntryEntity>[] : pageEntries);
 
-    return RefreshIndicator(
-      color: AppColors.primary,
-      onRefresh: _refresh,
-      child: ListView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-        children: [
-          _HeroBanner(data: data),
-          const SizedBox(height: 16),
-          if (!isRecruiter) ...[
-            _ScopeToggle(scope: _scope, onChanged: _switchScope),
-            const SizedBox(height: 20),
-          ] else
-            const SizedBox(height: 20),
-          if (isLoading && data == null)
-            const SizedBox(height: 300, child: LoaderWidget())
-          else if (state.error != null && data == null)
-            _ErrorState(message: state.error, onRetry: _refresh)
-          else if (data != null) ...[
+    return Stack(
+      children: [
+        RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: _refresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+            children: [
+              _HeroBanner(data: data),
+              const SizedBox(height: 16),
+              if (showScopeToggle) ...[
+                _ScopeToggle(
+                  scope: _scope,
+                  onChanged: isLoading ? (_) {} : _switchScope,
+                  isLoading: isLoading,
+                ),
+                const SizedBox(height: 20),
+              ] else
+                const SizedBox(height: 20),
+              if (isLoading && data == null)
+                const SizedBox(height: 300, child: LoaderWidget())
+              else if (state.error != null && data == null)
+                _ErrorState(message: state.error, onRetry: _refresh)
+              else if (data != null) ...[
             if (top3.length == 3) ...[
               _PodiumSection(
                 top3: top3,
@@ -108,6 +174,15 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
           ],
         ],
       ),
+    ),
+        if (isLoading && data != null)
+          Positioned.fill(
+            child: Container(
+              color: Colors.white.withAlpha(180),
+              child: const Center(child: LoaderWidget()),
+            ),
+          ),
+      ],
     );
   }
 }
@@ -244,7 +319,13 @@ class _StatBox extends StatelessWidget {
 class _ScopeToggle extends StatelessWidget {
   final String scope;
   final ValueChanged<String> onChanged;
-  const _ScopeToggle({required this.scope, required this.onChanged});
+  final bool isLoading;
+
+  const _ScopeToggle({
+    required this.scope,
+    required this.onChanged,
+    this.isLoading = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -261,13 +342,13 @@ class _ScopeToggle extends StatelessWidget {
             label: 'Global Board',
             icon: LucideIcons.globe,
             selected: scope == 'global',
-            onTap: () => onChanged('global'),
+            onTap: isLoading ? null : () => onChanged('global'),
           ),
           _ScopeTab(
             label: 'College Board',
             icon: LucideIcons.graduationCap,
             selected: scope == 'college',
-            onTap: () => onChanged('college'),
+            onTap: isLoading ? null : () => onChanged('college'),
           ),
         ],
       ),
@@ -279,16 +360,19 @@ class _ScopeTab extends StatelessWidget {
   final String label;
   final IconData icon;
   final bool selected;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+
   const _ScopeTab({
     required this.label,
     required this.icon,
     required this.selected,
-    required this.onTap,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final isDisabled = onTap == null;
+
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -305,7 +389,9 @@ class _ScopeTab extends StatelessWidget {
               Icon(
                 icon,
                 size: 14,
-                color: selected ? Colors.white : AppColors.textLight,
+                color: selected
+                    ? Colors.white
+                    : (isDisabled ? AppColors.textLight.withAlpha(128) : AppColors.textLight),
               ),
               const SizedBox(width: 6),
               Text(
@@ -313,7 +399,9 @@ class _ScopeTab extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                  color: selected ? Colors.white : AppColors.textMedium,
+                  color: selected
+                      ? Colors.white
+                      : (isDisabled ? AppColors.textMedium.withAlpha(180) : AppColors.textMedium),
                 ),
               ),
             ],
