@@ -17,6 +17,9 @@ import 'package:kaarya/features/recruiter/presentation/pages/create_or_join_work
 import 'package:kaarya/features/recruiter/presentation/pages/post_new_job_page.dart';
 import 'package:kaarya/features/companies/domain/entities/recruiter_workspace_entity.dart';
 import 'package:kaarya/features/recruiter/presentation/view_model/recruiter_view_model.dart';
+import 'package:kaarya/features/colleges/domain/entities/college_workspace_entity.dart';
+import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
+import 'package:kaarya/features/colleges/presentation/pages/join_college_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class AppDrawerWidget extends ConsumerStatefulWidget {
@@ -27,6 +30,18 @@ class AppDrawerWidget extends ConsumerStatefulWidget {
 }
 
 class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() {
+      final isRecruiter = ref.read(isRecruiterProvider);
+      final isCollege = ref.read(isCollegeProvider);
+      if (!isRecruiter && !isCollege) {
+        ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
+      }
+    });
+  }
+
   List<Widget> _buildRecruiterNav(
     void Function(dynamic) goToRecruiterDest,
     void Function(Widget) pushPage,
@@ -110,13 +125,109 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     ];
   }
 
+  List<Widget> _buildCollegeNav(
+    void Function(dynamic) goToCollegeDest,
+    void Function(Widget) pushPage,
+  ) {
+    final current = ref.watch(collegeNavProvider);
+    final collegeState = ref.watch(collegeDashboardViewModelProvider);
+    final workspaces = collegeState.workspaces ?? [];
+    final selectedWorkspace =
+        collegeState.selectedWorkspace ?? workspaces.firstOrNull;
+
+    return [
+      _CollegeDisplayOnly(workspace: selectedWorkspace),
+      const SizedBox(height: 8),
+      _sectionLabel('WORKSPACE'),
+      _navItem(
+        icon: LucideIcons.layoutDashboard,
+        title: 'Overview',
+        selected: current == CollegeDestination.overview,
+        onTap: () => goToCollegeDest(CollegeDestination.overview),
+      ),
+      _navItem(
+        icon: LucideIcons.briefcaseBusiness,
+        title: 'College Jobs',
+        selected: current == CollegeDestination.collegeJobs,
+        onTap: () => goToCollegeDest(CollegeDestination.collegeJobs),
+      ),
+      _navItem(
+        icon: LucideIcons.squarePlus,
+        title: 'Post New Job',
+        selected: current == CollegeDestination.postNewJob,
+        onTap: () {
+          AppRoutes.pop(context);
+          AppRoutes.pushNoTransition(context, const PostNewJobPage());
+        },
+      ),
+      _navItem(
+        icon: LucideIcons.trophy,
+        title: 'Leaderboard',
+        selected: current == CollegeDestination.leaderboard,
+        onTap: () => goToCollegeDest(CollegeDestination.leaderboard),
+      ),
+      const SizedBox(height: 8),
+      _sectionLabel('OTHERS'),
+      _navItem(
+        icon: LucideIcons.bookOpen,
+        title: 'Resources',
+        onTap: () => pushPage(const ResourcesHubScreen()),
+      ),
+      _navItem(
+        icon: LucideIcons.settings,
+        title: 'Settings',
+        onTap: () => pushPage(const SettingsPage()),
+      ),
+      const SizedBox(height: 20),
+    ];
+  }
+
   List<Widget> _buildCandidateNav(
     AppDestination current,
     String? pushedPage,
     void Function(AppDestination) goToBottom,
     void Function(Widget) pushPage,
   ) {
+    final collegeState = ref.watch(collegeDashboardViewModelProvider);
+    final collegeWorkspaces = collegeState.workspaces ?? [];
+    // Only show college switcher when we've loaded and user has joined colleges
+    final hasCollegeWorkspaces = collegeState.workspacesStatus ==
+            CollegeDashboardLoadStatus.loaded &&
+        collegeWorkspaces.isNotEmpty;
+
+    final workspacesLoaded = collegeState.workspacesStatus ==
+        CollegeDashboardLoadStatus.loaded;
+
+    void openJoinCollege() async {
+      Navigator.of(context).pop();
+      final result = await Navigator.of(context).push<bool>(
+        MaterialPageRoute(
+          builder: (_) => const JoinCollegePage(),
+        ),
+      );
+      if (result == true) {
+        ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
+      }
+    }
+
     return [
+      if (workspacesLoaded) ...[
+        if (hasCollegeWorkspaces)
+          _CollegeSelectorForCandidate(
+            workspaces: collegeWorkspaces,
+            selectedWorkspace: collegeState.selectedWorkspace ?? collegeWorkspaces.firstOrNull,
+            onJoinCollege: openJoinCollege,
+            onSwitchWorkspace: (ws) async {
+              Navigator.of(context).pop();
+              await ref
+                  .read(collegeDashboardViewModelProvider.notifier)
+                  .switchWorkspaceAndRefresh(ws);
+            },
+          )
+        else
+          _JoinCollegePrompt(onJoin: openJoinCollege),
+        const SizedBox(height: 8),
+      ],
       _sectionLabel('MAIN'),
       _navItem(
         icon: LucideIcons.layoutDashboard,
@@ -185,6 +296,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   @override
   Widget build(BuildContext context) {
     final isRecruiter = ref.watch(isRecruiterProvider);
+    final isCollege = ref.watch(isCollegeProvider);
     final current = ref.watch(bottomNavProvider);
     final pushedPage = ref.watch(pushedPageProvider);
     final session = ref.watch(userSessionServiceProvider);
@@ -201,6 +313,12 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     void goToRecruiterDest(dynamic dest) {
       ref.read(pushedPageProvider.notifier).state = null;
       ref.read(recruiterNavProvider.notifier).state = dest;
+      Navigator.popUntil(context, (route) => route.isFirst);
+    }
+
+    void goToCollegeDest(dynamic dest) {
+      ref.read(pushedPageProvider.notifier).state = null;
+      ref.read(collegeNavProvider.notifier).state = dest;
       Navigator.popUntil(context, (route) => route.isFirst);
     }
 
@@ -261,7 +379,11 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: isRecruiter ? _buildRecruiterNav(goToRecruiterDest, pushPage) : _buildCandidateNav(current, pushedPage, goToBottom, pushPage),
+                  children: isCollege
+                      ? _buildCollegeNav(goToCollegeDest, pushPage)
+                      : isRecruiter
+                          ? _buildRecruiterNav(goToRecruiterDest, pushPage)
+                          : _buildCandidateNav(current, pushedPage, goToBottom, pushPage),
                 ),
               ),
             ),
@@ -311,6 +433,24 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                                 ),
                               ),
                             ],
+                            if (isCollege) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: AppColors.primary.withAlpha(25),
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'College',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w600,
+                                    color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ],
                         ),
                         const SizedBox(height: 1),
@@ -326,6 +466,14 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                         if (isRecruiter)
                           const Text(
                             'Recruiter access',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: AppColors.textMedium,
+                            ),
+                          ),
+                        if (isCollege)
+                          const Text(
+                            'College access',
                             style: TextStyle(
                               fontSize: 11,
                               color: AppColors.textMedium,
@@ -500,6 +648,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                       AppRoutes.pop(ctx);
                       await ref.read(authViewModelProvider.notifier).logoutUser();
                       ref.read(dashboardViewModelProvider.notifier).resetState();
+                      ref.read(collegeDashboardViewModelProvider.notifier).resetState();
                       if (context.mounted) {
                         AppRoutes.pushAndRemoveUntil(context, const LoginPage());
                       }
@@ -514,6 +663,417 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                 ),
               ],
             ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Prompt for candidates with no colleges to join via invite code.
+class _JoinCollegePrompt extends StatelessWidget {
+  const _JoinCollegePrompt({required this.onJoin});
+
+  final VoidCallback onJoin;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'COLLEGES',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMedium,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                InkWell(
+                  onTap: onJoin,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      LucideIcons.plus,
+                      size: 18,
+                      color: AppColors.textMedium,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onJoin,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: 48,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderStroke, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgSecondary,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Icon(
+                        LucideIcons.graduationCap,
+                        size: 18,
+                        color: AppColors.textMedium,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        'Join college via invite code',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      LucideIcons.plus,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Display-only college selector for college role - no switch or create.
+class _CollegeDisplayOnly extends StatelessWidget {
+  const _CollegeDisplayOnly({required this.workspace});
+
+  final CollegeWorkspaceEntity? workspace;
+
+  static const double _selectorHeight = 48;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: Text(
+              'COLLEGES',
+              style: const TextStyle(
+                fontSize: 11,
+                color: AppColors.textMedium,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ),
+          Container(
+            height: _selectorHeight,
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.borderStroke, width: 1),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(15),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                _buildLogo(),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    workspace?.collegeName ?? 'No college',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: workspace != null
+                          ? AppColors.textDark
+                          : AppColors.textLight,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(
+                  LucideIcons.chevronsUpDown,
+                  size: 18,
+                  color: AppColors.textMedium,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    if (workspace?.collegeLogo != null &&
+        workspace!.collegeLogo!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          workspace!.collegeLogo!,
+          width: 36,
+          height: 36,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildPlaceholderLogo(),
+        ),
+      );
+    }
+    return _buildPlaceholderLogo();
+  }
+
+  Widget _buildPlaceholderLogo() {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.success,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(
+        LucideIcons.graduationCap,
+        size: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+}
+
+/// College workspace selector for candidates - with switch and join (no create).
+class _CollegeSelectorForCandidate extends StatelessWidget {
+  const _CollegeSelectorForCandidate({
+    required this.workspaces,
+    required this.selectedWorkspace,
+    required this.onJoinCollege,
+    required this.onSwitchWorkspace,
+  });
+
+  final List<CollegeWorkspaceEntity> workspaces;
+  final CollegeWorkspaceEntity? selectedWorkspace;
+  final VoidCallback onJoinCollege;
+  final void Function(CollegeWorkspaceEntity) onSwitchWorkspace;
+
+  static const double _selectorHeight = 48;
+
+  @override
+  Widget build(BuildContext context) {
+    final hasWorkspaces = workspaces.isNotEmpty;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'COLLEGES',
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppColors.textMedium,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.8,
+                  ),
+                ),
+                InkWell(
+                  onTap: onJoinCollege,
+                  borderRadius: BorderRadius.circular(6),
+                  child: Padding(
+                    padding: const EdgeInsets.all(4),
+                    child: Icon(
+                      LucideIcons.plus,
+                      size: 18,
+                      color: AppColors.textMedium,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: hasWorkspaces && workspaces.length > 1
+                  ? () => _showCollegeMenu(context)
+                  : null,
+              borderRadius: BorderRadius.circular(12),
+              child: Container(
+                height: _selectorHeight,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.borderStroke, width: 1),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withAlpha(15),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    _buildLogo(),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        selectedWorkspace?.collegeName ?? 'No college',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: selectedWorkspace != null
+                              ? AppColors.textDark
+                              : AppColors.textLight,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (hasWorkspaces && workspaces.length > 1)
+                      Icon(
+                        LucideIcons.chevronsUpDown,
+                        size: 18,
+                        color: AppColors.textMedium,
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLogo() {
+    if (selectedWorkspace?.collegeLogo != null &&
+        selectedWorkspace!.collegeLogo!.isNotEmpty) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Image.network(
+          selectedWorkspace!.collegeLogo!,
+          width: 36,
+          height: 36,
+          fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => _buildPlaceholderLogo(),
+        ),
+      );
+    }
+    return _buildPlaceholderLogo();
+  }
+
+  Widget _buildPlaceholderLogo() {
+    return Container(
+      width: 36,
+      height: 36,
+      decoration: BoxDecoration(
+        color: AppColors.success,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: const Icon(
+        LucideIcons.graduationCap,
+        size: 18,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  void _showCollegeMenu(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
+              child: Text(
+                'Switch College',
+                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w600,
+                    ),
+              ),
+            ),
+            ...workspaces.map((ws) {
+              final isSelected =
+                  selectedWorkspace?.collegeId == ws.collegeId;
+              return ListTile(
+                leading: ws.collegeLogo != null && ws.collegeLogo!.isNotEmpty
+                    ? CircleAvatar(
+                        radius: 20,
+                        backgroundImage: NetworkImage(ws.collegeLogo!),
+                      )
+                    : CircleAvatar(
+                        radius: 20,
+                        backgroundColor: AppColors.primary.withAlpha(40),
+                        child: const Icon(
+                          LucideIcons.graduationCap,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                title: Text(ws.collegeName),
+                trailing: isSelected
+                    ? const Icon(Icons.check, color: AppColors.primary)
+                    : null,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  onSwitchWorkspace(ws);
+                },
+              );
+            }),
+            const SizedBox(height: 16),
           ],
         ),
       ),
