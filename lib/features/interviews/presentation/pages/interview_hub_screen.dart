@@ -7,6 +7,7 @@ import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/interviews/domain/entities/interview_entity.dart';
 import 'package:kaarya/features/interviews/domain/entities/interview_section_entity.dart';
+import 'package:kaarya/features/interviews/presentation/pages/create_interview_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/interview_detail_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/interview_feedback_page.dart';
 import 'package:kaarya/features/dashboard/presentation/state/dashboard_state.dart';
@@ -187,7 +188,11 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const CreateInterviewPage(),
+                    ),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white.withAlpha(40),
                     foregroundColor: Colors.white,
