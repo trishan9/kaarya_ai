@@ -31,6 +31,8 @@ abstract interface class IInterviewRepository {
     List<String>? tags,
     String? instructions,
     bool? generateQuestions,
+    String? companyId,
+    String? collegeId,
   });
 
   Future<Either<Failure, InterviewEntity>> updateInterview({

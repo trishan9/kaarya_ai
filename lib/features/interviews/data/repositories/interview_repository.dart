@@ -115,6 +115,8 @@ class InterviewRepository implements IInterviewRepository {
     List<String>? tags,
     String? instructions,
     bool? generateQuestions,
+    String? companyId,
+    String? collegeId,
   }) async {
     if (!await _networkInfo.isConnected) {
       return const Left(NetworkFailure(message: 'No internet connection'));
@@ -134,6 +136,8 @@ class InterviewRepository implements IInterviewRepository {
         tags: tags,
         instructions: instructions,
         generateQuestions: generateQuestions,
+        companyId: companyId,
+        collegeId: collegeId,
       );
       return Right(data.toEntity());
     } on DioException catch (e) {

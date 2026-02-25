@@ -37,6 +37,8 @@ class CreateInterviewUseCase
       tags: params.tags,
       instructions: params.instructions,
       generateQuestions: params.generateQuestions,
+      companyId: params.companyId,
+      collegeId: params.collegeId,
     );
   }
 }
@@ -55,6 +57,8 @@ class CreateInterviewUseCaseParams {
   final List<String>? tags;
   final String? instructions;
   final bool? generateQuestions;
+  final String? companyId;
+  final String? collegeId;
 
   const CreateInterviewUseCaseParams({
     required this.title,
@@ -70,5 +74,7 @@ class CreateInterviewUseCaseParams {
     this.tags,
     this.instructions,
     this.generateQuestions,
+    this.companyId,
+    this.collegeId,
   });
 }
