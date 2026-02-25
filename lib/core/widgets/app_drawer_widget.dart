@@ -11,6 +11,7 @@ import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dar
 import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/my_applications_page.dart';
 import 'package:kaarya/features/bookmarks/presentation/pages/saved_page.dart';
+import 'package:kaarya/features/interviews/presentation/pages/interview_management_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/my_interviews_page.dart';
 import 'package:kaarya/features/resources/presentation/pages/resources_hub_screen.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/create_or_join_workspace_page.dart';
@@ -101,7 +102,13 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.calendar,
         title: 'Interview Management',
         selected: current == RecruiterDestination.interviewManagement,
-        onTap: () {},
+        onTap: () {
+          AppRoutes.pop(context);
+          AppRoutes.pushNoTransition(
+            context,
+            const InterviewManagementPage(),
+          );
+        },
       ),
       _navItem(
         icon: LucideIcons.trophy,
@@ -158,6 +165,18 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         onTap: () {
           AppRoutes.pop(context);
           AppRoutes.pushNoTransition(context, const PostNewJobPage());
+        },
+      ),
+      _navItem(
+        icon: LucideIcons.calendar,
+        title: 'Interview Management',
+        selected: current == CollegeDestination.interviewManagement,
+        onTap: () {
+          AppRoutes.pop(context);
+          AppRoutes.pushNoTransition(
+            context,
+            const InterviewManagementPage(),
+          );
         },
       ),
       _navItem(
