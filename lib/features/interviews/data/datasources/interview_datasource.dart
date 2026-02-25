@@ -26,6 +26,8 @@ abstract interface class IInterviewRemoteDataSource {
     List<String>? tags,
     String? instructions,
     bool? generateQuestions,
+    String? companyId,
+    String? collegeId,
   });
 
   Future<InterviewApiModel> updateInterview({

@@ -256,6 +256,8 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
     List<String>? tags,
     String? instructions,
     bool? generateQuestions,
+    String? companyId,
+    String? collegeId,
   }) async {
     final response = await _apiClient.post(
       ApiEndpoints.interviews,
@@ -276,6 +278,8 @@ class InterviewRemoteDatasource implements IInterviewRemoteDataSource {
         if (instructions != null && instructions.isNotEmpty)
           'instructions': instructions,
         if (generateQuestions != null) 'generateQuestions': generateQuestions,
+        if (companyId != null && companyId.isNotEmpty) 'companyId': companyId,
+        if (collegeId != null && collegeId.isNotEmpty) 'collegeId': collegeId,
       },
     );
     final data = _extractDataMap(response);
