@@ -9,14 +9,16 @@ import 'package:kaarya/features/auth/domain/repositories/auth_repository.dart';
 class ChangePasswordParams extends Equatable {
   final String currentPassword;
   final String newPassword;
+  final String confirmNewPassword;
 
   const ChangePasswordParams({
     required this.currentPassword,
     required this.newPassword,
+    required this.confirmNewPassword,
   });
 
   @override
-  List<Object?> get props => [currentPassword, newPassword];
+  List<Object?> get props => [currentPassword, newPassword, confirmNewPassword];
 }
 
 final changePasswordUseCaseProvider = Provider<ChangePasswordUseCase>((ref) {
@@ -37,6 +39,7 @@ class ChangePasswordUseCase
     return _authRepository.changePassword(
       params.currentPassword,
       params.newPassword,
+      params.confirmNewPassword,
     );
   }
 }
