@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
 import 'package:kaarya/core/api/api_client.dart';
 import 'package:kaarya/core/api/api_endpoints.dart';
 
@@ -52,7 +53,8 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
 
     final data = _extractRawData(response);
     if (data is Map<String, dynamic>) {
-      final list = data['applications'] ?? data['data'] ?? data['items'] ?? data['rows'];
+      final list =
+          data['applications'] ?? data['data'] ?? data['items'] ?? data['rows'];
       if (list is List) {
         return ApplicationApiModel.fromApiList(list);
       }
@@ -194,7 +196,9 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
     List<dynamic>? list;
     if (data is Map<String, dynamic>) {
       final inner = data['data'];
-      list = inner is List ? inner : (data['applications'] is List ? data['applications'] : null);
+      list = inner is List
+          ? inner
+          : (data['applications'] is List ? data['applications'] : null);
     } else if (data is List) {
       list = data;
     }
@@ -238,9 +242,9 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
 
     final data = _extractRawData(response);
     if (data is Map<String, dynamic>) {
-      final innerData = data['data'];
-      if (innerData is List) {
-        return ResumeApiModel.fromApiList(innerData);
+      final items = data['resumes'] ?? data['data'] ?? data['items'];
+      if (items is List) {
+        return ResumeApiModel.fromApiList(items);
       }
     }
     if (data is List) {
@@ -253,9 +257,9 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
   @override
   Future<ResumeApiModel> uploadResume({required String filePath}) async {
     final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(
+      'resume': await MultipartFile.fromFile(
         filePath,
-        filename: filePath.split('/').last,
+        filename: p.basename(filePath),
       ),
     });
 
