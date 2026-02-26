@@ -18,6 +18,15 @@ class UpdateProfileFormCard extends ConsumerStatefulWidget {
     required this.emailAddressController,
     required this.profileImageUrl,
     this.onPhotoChanged,
+    this.headlineController,
+    this.phoneController,
+    this.locationController,
+    this.summaryController,
+    this.linkedinController,
+    this.githubController,
+    this.portfolioUrlController,
+    this.isBasicProfile = false,
+    this.embedInCard = true,
   });
 
   final GlobalKey<FormState> formKey;
@@ -25,6 +34,19 @@ class UpdateProfileFormCard extends ConsumerStatefulWidget {
   final TextEditingController emailAddressController;
   final String profileImageUrl;
   final ValueChanged<File?>? onPhotoChanged;
+  final TextEditingController? headlineController;
+  final TextEditingController? phoneController;
+  final TextEditingController? locationController;
+  final TextEditingController? summaryController;
+  final TextEditingController? linkedinController;
+  final TextEditingController? githubController;
+  final TextEditingController? portfolioUrlController;
+
+  /// When true, only shows Profile Picture, Full Name, Email (for recruiters/college).
+  final bool isBasicProfile;
+
+  /// When false, renders without Card wrapper (for embedding in CandidateProfileFormCard).
+  final bool embedInCard;
 
   @override
   ConsumerState<UpdateProfileFormCard> createState() =>
@@ -183,8 +205,401 @@ class _UpdateProfileFormCardState extends ConsumerState<UpdateProfileFormCard> {
     );
   }
 
+  Widget _buildContent(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.isBasicProfile ? "Basic Information" : "Detail Information",
+          style: Theme.of(context).textTheme.titleMedium,
+        ),
+
+        SizedBox(height: 14),
+
+        Form(
+          key: widget.formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
+          child: Column(
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Profile Picture",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  ),
+
+                  SizedBox(height: 6),
+
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isCompact = constraints.maxWidth < 520;
+                      final hasLocalPhoto = _selectedPhotoFile != null;
+                      final hasRemotePhoto = widget.profileImageUrl.isNotEmpty;
+                      final hasPhoto = hasLocalPhoto || hasRemotePhoto;
+
+                      if (!hasPhoto) {
+                        return SizedBox(
+                          height: 120,
+                          width: double.infinity,
+                          child: GestureDetector(
+                            onTap: () {
+                              _pickMedia();
+                            },
+                            child: Container(
+                              height: 120,
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade50,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: Colors.grey.shade300),
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    LucideIcons.cloudUpload,
+                                    size: 28,
+                                    color: AppColors.primary,
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    "Drag and drop your file, or",
+                                    textAlign: TextAlign.center,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(color: Colors.grey.shade700),
+                                  ),
+                                  Text(
+                                    "choose here",
+                                    textAlign: TextAlign.center,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.primary,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                  ),
+                                  SizedBox(height: 6),
+                                  Text(
+                                    "Support: JPEG, JPG, PNG - max 5MB",
+                                    textAlign: TextAlign.center,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: Colors.grey.shade500,
+                                          fontSize: 12,
+                                        ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+
+                      final imageWidget = SizedBox(
+                        width: isCompact ? double.infinity : 160,
+                        height: 120,
+                        child: Stack(
+                          children: [
+                            _ProfileImagePreview(
+                              localFile: _selectedPhotoFile,
+                              imageUrl: hasLocalPhoto
+                                  ? null
+                                  : widget.profileImageUrl,
+                            ),
+                            if (hasLocalPhoto)
+                              Positioned(
+                                right: 8,
+                                bottom: 8,
+                                child: _DeleteAvatarButton(
+                                  onPressed: _clearSelectedPhoto,
+                                ),
+                              ),
+                          ],
+                        ),
+                      );
+
+                      final uploadWidget = SizedBox(
+                        height: 120,
+                        width: double.infinity,
+                        child: GestureDetector(
+                          onTap: () {
+                            _pickMedia();
+                          },
+                          child: Container(
+                            height: 120,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey.shade300),
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  LucideIcons.cloudUpload,
+                                  size: 28,
+                                  color: AppColors.primary,
+                                ),
+                                SizedBox(height: 8),
+                                Text(
+                                  "Drag and drop your file, or",
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(color: Colors.grey.shade700),
+                                ),
+                                Text(
+                                  "choose here",
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  "Support: JPEG, JPG, PNG - max 5MB",
+                                  textAlign: TextAlign.center,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: Colors.grey.shade500,
+                                        fontSize: 12,
+                                      ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+
+                      return Flex(
+                        direction: isCompact ? Axis.vertical : Axis.horizontal,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          imageWidget,
+                          SizedBox(
+                            width: isCompact ? 0 : 14,
+                            height: isCompact ? 12 : 0,
+                          ),
+                          if (isCompact)
+                            uploadWidget
+                          else
+                            Expanded(child: uploadWidget),
+                        ],
+                      );
+                    },
+                  ),
+
+                  SizedBox(height: 14),
+
+                  Text(
+                    "Full Name",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  ),
+
+                  SizedBox(height: 6),
+
+                  MyTextFormField(
+                    controller: widget.fullNameController,
+                    text: "Trishan Wagle",
+                    inputType: TextInputType.text,
+                    validationErrorMessage: "Full name is required",
+                  ),
+
+                  SizedBox(height: 14),
+
+                  Text(
+                    "Email Address",
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
+                  ),
+
+                  SizedBox(height: 6),
+
+                  MyTextFormField(
+                    controller: widget.emailAddressController,
+                    text: "mailtotrishan@gmail.com",
+                    inputType: TextInputType.emailAddress,
+                    validationErrorMessage: "Email address is required",
+                    validator: (value) {
+                      final trimmed = value?.trim() ?? '';
+                      if (trimmed.isEmpty) {
+                        return "Email address is required";
+                      }
+                      if (!RegExp(
+                        r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+                      ).hasMatch(trimmed)) {
+                        return "Enter a valid email address";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  if (!widget.isBasicProfile) ...[
+                    SizedBox(height: 14),
+
+                    Text(
+                      "Headline",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.headlineController,
+                      text: "Product-minded Flutter Developer",
+                      inputType: TextInputType.text,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "Phone Number",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.phoneController,
+                      text: "9841XXXXXX",
+                      inputType: TextInputType.text,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "Current Location",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.locationController,
+                      text: "Kathmandu, Nepal",
+                      inputType: TextInputType.text,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "Bio",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.summaryController,
+                      text: "Experienced Flutter Developer",
+                      inputType: TextInputType.text,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "LinkedIn URL",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.linkedinController,
+                      text: "https://linkedin.com/in/username",
+                      inputType: TextInputType.url,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "GitHub URL",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.githubController,
+                      text: "https://github.com/username",
+                      inputType: TextInputType.url,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+
+                    Text(
+                      "Portfolio URL",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 15,
+                      ),
+                    ),
+
+                    SizedBox(height: 6),
+
+                    MyTextFormField(
+                      controller: widget.portfolioUrlController,
+                      text: "https://yourportfolio.com",
+                      inputType: TextInputType.text,
+                      optional: true,
+                    ),
+
+                    SizedBox(height: 14),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final content = Padding(
+      padding: EdgeInsets.all(widget.embedInCard ? 16.0 : 0),
+      child: _buildContent(context),
+    );
+    if (!widget.embedInCard) return content;
     return Card(
       color: Colors.white,
       elevation: 0,
@@ -193,350 +608,7 @@ class _UpdateProfileFormCardState extends ConsumerState<UpdateProfileFormCard> {
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.grey.shade300),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Detail Information",
-              style: Theme.of(context).textTheme.titleMedium,
-            ),
-
-            SizedBox(height: 14),
-
-            Form(
-              key: widget.formKey,
-              child: Column(
-                children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Profile Picture",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isCompact = constraints.maxWidth < 520;
-                          final hasLocalPhoto = _selectedPhotoFile != null;
-                          final hasRemotePhoto =
-                              widget.profileImageUrl.isNotEmpty;
-                          final hasPhoto = hasLocalPhoto || hasRemotePhoto;
-
-                          if (!hasPhoto) {
-                            return SizedBox(
-                              height: 120,
-                              width: double.infinity,
-                              child: GestureDetector(
-                                onTap: () {
-                                  _pickMedia();
-                                },
-                                child: Container(
-                                  height: 120,
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade50,
-                                    borderRadius: BorderRadius.circular(10),
-                                    border: Border.all(
-                                      color: Colors.grey.shade300,
-                                    ),
-                                  ),
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        LucideIcons.cloudUpload,
-                                        size: 28,
-                                        color: AppColors.primary,
-                                      ),
-                                      SizedBox(height: 8),
-                                      Text(
-                                        "Drag and drop your file, or",
-                                        textAlign: TextAlign.center,
-                                        maxLines: 2,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Colors.grey.shade700,
-                                            ),
-                                      ),
-                                      Text(
-                                        "choose here",
-                                        textAlign: TextAlign.center,
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: AppColors.primary,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                      ),
-                                      SizedBox(height: 6),
-                                      Text(
-                                        "Support: JPEG, JPG, PNG - max 5MB",
-                                        textAlign: TextAlign.center,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .bodySmall
-                                            ?.copyWith(
-                                              color: Colors.grey.shade500,
-                                              fontSize: 12,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-
-                          final imageWidget = SizedBox(
-                            width: isCompact ? double.infinity : 160,
-                            height: 120,
-                            child: Stack(
-                              children: [
-                                _ProfileImagePreview(
-                                  localFile: _selectedPhotoFile,
-                                  imageUrl: hasLocalPhoto
-                                      ? null
-                                      : widget.profileImageUrl,
-                                ),
-                                if (hasLocalPhoto)
-                                  Positioned(
-                                    right: 8,
-                                    bottom: 8,
-                                    child: _DeleteAvatarButton(
-                                      onPressed: _clearSelectedPhoto,
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          );
-
-                          final uploadWidget = SizedBox(
-                            height: 120,
-                            width: double.infinity,
-                            child: GestureDetector(
-                              onTap: () {
-                                _pickMedia();
-                              },
-                              child: Container(
-                                height: 120,
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey.shade50,
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(
-                                    color: Colors.grey.shade300,
-                                  ),
-                                ),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      LucideIcons.cloudUpload,
-                                      size: 28,
-                                      color: AppColors.primary,
-                                    ),
-                                    SizedBox(height: 8),
-                                    Text(
-                                      "Drag and drop your file, or",
-                                      textAlign: TextAlign.center,
-                                      maxLines: 2,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Colors.grey.shade700,
-                                          ),
-                                    ),
-                                    Text(
-                                      "choose here",
-                                      textAlign: TextAlign.center,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: AppColors.primary,
-                                            fontWeight: FontWeight.w600,
-                                          ),
-                                    ),
-                                    SizedBox(height: 6),
-                                    Text(
-                                      "Support: JPEG, JPG, PNG - max 5MB",
-                                      textAlign: TextAlign.center,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodySmall
-                                          ?.copyWith(
-                                            color: Colors.grey.shade500,
-                                            fontSize: 12,
-                                          ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-
-                          return Flex(
-                            direction: isCompact
-                                ? Axis.vertical
-                                : Axis.horizontal,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              imageWidget,
-                              SizedBox(
-                                width: isCompact ? 0 : 14,
-                                height: isCompact ? 12 : 0,
-                              ),
-                              if (isCompact)
-                                uploadWidget
-                              else
-                                Expanded(child: uploadWidget),
-                            ],
-                          );
-                        },
-                      ),
-
-                      SizedBox(height: 14),
-
-                      Text(
-                        "Full Name",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      MyTextFormField(
-                        controller: widget.fullNameController,
-                        text: "Trishan Wagle",
-                        inputType: TextInputType.text,
-                        validationErrorMessage: "Full name is required",
-                      ),
-
-                      SizedBox(height: 14),
-
-                      Text(
-                        "Email Address",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      MyTextFormField(
-                        controller: widget.emailAddressController,
-                        text: "mailtotrishan@gmail.com",
-                        inputType: TextInputType.emailAddress,
-                        validationErrorMessage: "Email address is required",
-                      ),
-
-                      SizedBox(height: 14),
-
-                      Text(
-                        "Phone Number",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      MyTextFormField(
-                        text: "9841XXXXXX",
-                        inputType: TextInputType.text,
-                        optional: true,
-                      ),
-
-                      SizedBox(height: 14),
-
-                      Text(
-                        "Full Address",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      MyTextFormField(
-                        text: "Kathmandu-24, Dillibazar, Kathmandu, Nepal",
-                        inputType: TextInputType.text,
-                        optional: true,
-                      ),
-
-                      SizedBox(height: 14),
-
-                      Text(
-                        "Bio",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      MyTextFormField(
-                        text: "Experienced Flutter Developer",
-                        inputType: TextInputType.text,
-                        optional: true,
-                      ),
-
-                      SizedBox(height: 14),
-
-                      Text(
-                        "Social Media",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 15,
-                        ),
-                      ),
-
-                      SizedBox(height: 6),
-
-                      MyTextFormField(
-                        text: "https://github.com/trishan9",
-                        inputType: TextInputType.text,
-                        optional: true,
-                      ),
-
-                      SizedBox(height: 14),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+      child: content,
     );
   }
 }
@@ -557,7 +629,7 @@ class _ProfileImagePreview extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 10,
             offset: Offset(0, 4),
           ),
@@ -594,7 +666,7 @@ class _DeleteAvatarButton extends StatelessWidget {
         shape: BoxShape.circle,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 6,
             offset: Offset(0, 2),
           ),
