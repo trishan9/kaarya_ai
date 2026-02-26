@@ -211,6 +211,7 @@ class AuthRepository implements IAuthRepository {
     String? name,
     String? email,
     File? photo,
+    Map<String, dynamic>? candidateProfile,
   ) async {
     if (await _networkInfo.isConnected) {
       try {
@@ -218,6 +219,7 @@ class AuthRepository implements IAuthRepository {
           name,
           email,
           photo,
+          candidateProfile,
         );
 
         if (userModel != null) {
@@ -250,12 +252,14 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, bool>> changePassword(
     String currentPassword,
     String newPassword,
+    String confirmNewPassword,
   ) async {
     if (await _networkInfo.isConnected) {
       try {
         final result = await _authRemoteDataSource.changePassword(
           currentPassword,
           newPassword,
+          confirmNewPassword,
         );
         return Right(result);
       } on DioException catch (e) {

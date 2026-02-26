@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dio/dio.dart';
@@ -151,6 +152,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     String? name,
     String? email,
     File? photo,
+    Map<String, dynamic>? candidateProfile,
   ) async {
     if (!_userSessionService.isLoggedIn()) {
       return null;
@@ -172,6 +174,9 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
     if (photo != null) {
       data["photo"] = await MultipartFile.fromFile(photo.path);
+    }
+    if (candidateProfile != null && candidateProfile.isNotEmpty) {
+      data["candidateProfile"] = jsonEncode(candidateProfile);
     }
 
     if (data.isEmpty) {
@@ -212,10 +217,15 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
   Future<bool> changePassword(
     String currentPassword,
     String newPassword,
+    String confirmNewPassword,
   ) async {
     final response = await _apiClient.post(
       ApiEndpoints.changePassword,
-      data: {'currentPassword': currentPassword, 'newPassword': newPassword},
+      data: {
+        'currentPassword': currentPassword,
+        'newPassword': newPassword,
+        'confirmNewPassword': confirmNewPassword,
+      },
     );
     return response.data['success'] == true;
   }
