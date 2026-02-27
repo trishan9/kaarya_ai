@@ -44,6 +44,8 @@ abstract interface class ICollegeRepository {
   Future<Either<Failure, bool>> inviteStudent({
     required String collegeId,
     required String email,
+    String? program,
+    int? year,
   });
 
   Future<Either<Failure, bool>> removeStudent({

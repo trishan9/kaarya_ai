@@ -13,14 +13,18 @@ final inviteStudentUseCaseProvider = Provider<InviteStudentUseCase>((ref) {
 class InviteStudentUseCaseParams extends Equatable {
   final String collegeId;
   final String email;
+  final String? program;
+  final int? year;
 
   const InviteStudentUseCaseParams({
     required this.collegeId,
     required this.email,
+    this.program,
+    this.year,
   });
 
   @override
-  List<Object?> get props => [collegeId, email];
+  List<Object?> get props => [collegeId, email, program, year];
 }
 
 class InviteStudentUseCase
@@ -35,6 +39,8 @@ class InviteStudentUseCase
     return _repository.inviteStudent(
       collegeId: params.collegeId,
       email: params.email,
+      program: params.program,
+      year: params.year,
     );
   }
 }
