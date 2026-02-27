@@ -146,10 +146,15 @@ class ApiClient {
     Options? options,
     ProgressCallback? onSendProgress,
   }) async {
-    return _dio.post(
+    final requestOptions = (options ?? Options()).copyWith(
+      method: options?.method ?? 'POST',
+      contentType: 'multipart/form-data',
+    );
+
+    return _dio.request(
       path,
       data: formData,
-      options: options,
+      options: requestOptions,
       onSendProgress: onSendProgress,
     );
   }
