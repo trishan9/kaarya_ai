@@ -15,6 +15,7 @@ enum RecruiterDestination {
   postNewJob,
   interviewManagement,
   leaderboard,
+  settings,
 }
 
 /// College-specific bottom nav destinations.

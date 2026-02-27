@@ -8,8 +8,8 @@ import 'package:kaarya/features/jobs/domain/repositories/job_repository.dart';
 
 final recruiterViewModelProvider =
     NotifierProvider<RecruiterViewModel, RecruiterState>(
-  RecruiterViewModel.new,
-);
+      RecruiterViewModel.new,
+    );
 
 class RecruiterViewModel extends Notifier<RecruiterState> {
   @override
@@ -41,13 +41,22 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
         workspacesError: f.message,
         workspaces: null,
       ),
-      (workspaces) => state = state.copyWith(
-        workspacesStatus: RecruiterLoadStatus.loaded,
-        workspaces: workspaces,
-        workspacesError: null,
-        selectedWorkspace: state.selectedWorkspace ??
-            (workspaces.isNotEmpty ? workspaces.first : null),
-      ),
+      (workspaces) {
+        final currentSelectedId = state.selectedWorkspace?.companyId;
+        final refreshedSelected = currentSelectedId == null
+            ? (workspaces.isNotEmpty ? workspaces.first : null)
+            : workspaces
+                      .where((w) => w.companyId == currentSelectedId)
+                      .firstOrNull ??
+                  (workspaces.isNotEmpty ? workspaces.first : null);
+
+        state = state.copyWith(
+          workspacesStatus: RecruiterLoadStatus.loaded,
+          workspaces: workspaces,
+          workspacesError: null,
+          selectedWorkspace: refreshedSelected,
+        );
+      },
     );
   }
 
@@ -71,24 +80,23 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
       designation: designation,
       logoPath: logoPath,
     );
-    return result.fold<Future<String?>>(
-      (f) => Future.value(f.message),
-      (company) async {
-        await loadWorkspaces(forceRefresh: true);
-        final ws = state.workspaces?.firstWhere(
-          (w) => w.companyId == company.id,
-          orElse: () => RecruiterWorkspaceEntity(
-            companyId: company.id,
-            companyName: company.name,
-            companyLogo: company.logo,
-            designation: designation,
-            joinedAt: company.createdAt,
-          ),
-        );
-        selectWorkspace(ws);
-        return null;
-      },
-    );
+    return result.fold<Future<String?>>((f) => Future.value(f.message), (
+      company,
+    ) async {
+      await loadWorkspaces(forceRefresh: true);
+      final ws = state.workspaces?.firstWhere(
+        (w) => w.companyId == company.id,
+        orElse: () => RecruiterWorkspaceEntity(
+          companyId: company.id,
+          companyName: company.name,
+          companyLogo: company.logo,
+          designation: designation,
+          joinedAt: company.createdAt,
+        ),
+      );
+      selectWorkspace(ws);
+      return null;
+    });
   }
 
   /// Join an existing workspace by invite code. On success, refreshes workspaces and selects it.
@@ -101,24 +109,23 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
       inviteCode: inviteCode.trim(),
       designation: designation.trim(),
     );
-    return result.fold<Future<String?>>(
-      (f) => Future.value(f.message),
-      (company) async {
-        await loadWorkspaces(forceRefresh: true);
-        final ws = state.workspaces?.firstWhere(
-          (w) => w.companyId == company.id,
-          orElse: () => RecruiterWorkspaceEntity(
-            companyId: company.id,
-            companyName: company.name,
-            companyLogo: company.logo,
-            designation: designation.trim(),
-            joinedAt: company.createdAt,
-          ),
-        );
-        selectWorkspace(ws);
-        return null;
-      },
-    );
+    return result.fold<Future<String?>>((f) => Future.value(f.message), (
+      company,
+    ) async {
+      await loadWorkspaces(forceRefresh: true);
+      final ws = state.workspaces?.firstWhere(
+        (w) => w.companyId == company.id,
+        orElse: () => RecruiterWorkspaceEntity(
+          companyId: company.id,
+          companyName: company.name,
+          companyLogo: company.logo,
+          designation: designation.trim(),
+          joinedAt: company.createdAt,
+        ),
+      );
+      selectWorkspace(ws);
+      return null;
+    });
   }
 
   /// Switch workspace and refresh company jobs for the new workspace.
@@ -162,9 +169,13 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
       (jobs) {
         // Ensure recruiter only sees own company's jobs (defense in depth)
         final filtered = companyName != null
-            ? jobs.where((j) =>
-                j.companyName.toLowerCase() == companyName.toLowerCase())
-                .toList()
+            ? jobs
+                  .where(
+                    (j) =>
+                        j.companyName.toLowerCase() ==
+                        companyName.toLowerCase(),
+                  )
+                  .toList()
             : jobs;
         state = state.copyWith(
           companyJobsStatus: RecruiterLoadStatus.loaded,
@@ -187,7 +198,10 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     final openJobs = jobs.where((j) => j.status.toLowerCase() == 'open');
     final draftJobs = jobs.where((j) => j.status.toLowerCase() == 'draft');
 
-    final totalApplicants = jobs.fold<int>(0, (s, j) => s + j.applicationsCount);
+    final totalApplicants = jobs.fold<int>(
+      0,
+      (s, j) => s + j.applicationsCount,
+    );
     final totalViews = jobs.fold<int>(0, (s, j) => s + j.viewsCount);
 
     final now = DateTime.now();
@@ -204,26 +218,27 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
       workModeCounts[mode] = (workModeCounts[mode] ?? 0) + 1;
     }
 
-    final upcomingDeadlines = openJobs
-        .map((j) {
-          final d = DateTime.tryParse(j.deadline);
-          if (d == null || d.isBefore(now)) return null;
-          final diff = d.difference(now).inDays;
-          if (diff > 30) return null;
-          return UpcomingDeadlineItem(
-            id: j.id,
-            title: j.title,
-            deadline: j.deadline,
-            applicants: j.applicationsCount,
-          );
-        })
-        .whereType<UpcomingDeadlineItem>()
-        .toList()
-      ..sort((a, b) {
-        final da = DateTime.tryParse(a.deadline) ?? DateTime.now();
-        final db = DateTime.tryParse(b.deadline) ?? DateTime.now();
-        return da.compareTo(db);
-      });
+    final upcomingDeadlines =
+        openJobs
+            .map((j) {
+              final d = DateTime.tryParse(j.deadline);
+              if (d == null || d.isBefore(now)) return null;
+              final diff = d.difference(now).inDays;
+              if (diff > 30) return null;
+              return UpcomingDeadlineItem(
+                id: j.id,
+                title: j.title,
+                deadline: j.deadline,
+                applicants: j.applicationsCount,
+              );
+            })
+            .whereType<UpcomingDeadlineItem>()
+            .toList()
+          ..sort((a, b) {
+            final da = DateTime.tryParse(a.deadline) ?? DateTime.now();
+            final db = DateTime.tryParse(b.deadline) ?? DateTime.now();
+            return da.compareTo(db);
+          });
 
     return RecruiterOverviewData(
       openJobsCount: openJobs.length,
@@ -292,16 +307,15 @@ class RecruiterState {
     List<JobEntity>? companyJobs,
     String? workspacesError,
     String? companyJobsError,
-  }) =>
-      RecruiterState(
-        workspacesStatus: workspacesStatus ?? this.workspacesStatus,
-        companyJobsStatus: companyJobsStatus ?? this.companyJobsStatus,
-        workspaces: workspaces ?? this.workspaces,
-        selectedWorkspace: selectedWorkspace ?? this.selectedWorkspace,
-        companyJobs: companyJobs ?? this.companyJobs,
-        workspacesError: workspacesError ?? this.workspacesError,
-        companyJobsError: companyJobsError ?? this.companyJobsError,
-      );
+  }) => RecruiterState(
+    workspacesStatus: workspacesStatus ?? this.workspacesStatus,
+    companyJobsStatus: companyJobsStatus ?? this.companyJobsStatus,
+    workspaces: workspaces ?? this.workspaces,
+    selectedWorkspace: selectedWorkspace ?? this.selectedWorkspace,
+    companyJobs: companyJobs ?? this.companyJobs,
+    workspacesError: workspacesError ?? this.workspacesError,
+    companyJobsError: companyJobsError ?? this.companyJobsError,
+  );
 }
 
 class RecruiterOverviewData {

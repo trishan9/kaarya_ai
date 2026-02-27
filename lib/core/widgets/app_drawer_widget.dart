@@ -104,10 +104,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         selected: current == RecruiterDestination.interviewManagement,
         onTap: () {
           AppRoutes.pop(context);
-          AppRoutes.pushNoTransition(
-            context,
-            const InterviewManagementPage(),
-          );
+          AppRoutes.pushNoTransition(context, const InterviewManagementPage());
         },
       ),
       _navItem(
@@ -115,6 +112,12 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         title: 'Leaderboard',
         selected: current == RecruiterDestination.leaderboard,
         onTap: () => goToRecruiterDest(RecruiterDestination.leaderboard),
+      ),
+      _navItem(
+        icon: LucideIcons.settings2,
+        title: 'Company Settings',
+        selected: current == RecruiterDestination.settings,
+        onTap: () => goToRecruiterDest(RecruiterDestination.settings),
       ),
       const SizedBox(height: 8),
       _sectionLabel('OTHERS'),
@@ -125,7 +128,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
       ),
       _navItem(
         icon: LucideIcons.settings,
-        title: 'Settings',
+        title: 'Account Settings',
         onTap: () => pushPage(const SettingsPage()),
       ),
       const SizedBox(height: 20),
@@ -173,10 +176,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         selected: current == CollegeDestination.interviewManagement,
         onTap: () {
           AppRoutes.pop(context);
-          AppRoutes.pushNoTransition(
-            context,
-            const InterviewManagementPage(),
-          );
+          AppRoutes.pushNoTransition(context, const InterviewManagementPage());
         },
       ),
       _navItem(
@@ -184,6 +184,12 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         title: 'Leaderboard',
         selected: current == CollegeDestination.leaderboard,
         onTap: () => goToCollegeDest(CollegeDestination.leaderboard),
+      ),
+      _navItem(
+        icon: LucideIcons.settings2,
+        title: 'College Settings',
+        selected: current == CollegeDestination.collegeSettings,
+        onTap: () => goToCollegeDest(CollegeDestination.collegeSettings),
       ),
       const SizedBox(height: 8),
       _sectionLabel('OTHERS'),
@@ -194,7 +200,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
       ),
       _navItem(
         icon: LucideIcons.settings,
-        title: 'Settings',
+        title: 'Account Settings',
         onTap: () => pushPage(const SettingsPage()),
       ),
       const SizedBox(height: 20),
@@ -210,20 +216,18 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     final collegeState = ref.watch(collegeDashboardViewModelProvider);
     final collegeWorkspaces = collegeState.workspaces ?? [];
     // Only show college switcher when we've loaded and user has joined colleges
-    final hasCollegeWorkspaces = collegeState.workspacesStatus ==
-            CollegeDashboardLoadStatus.loaded &&
+    final hasCollegeWorkspaces =
+        collegeState.workspacesStatus == CollegeDashboardLoadStatus.loaded &&
         collegeWorkspaces.isNotEmpty;
 
-    final workspacesLoaded = collegeState.workspacesStatus ==
-        CollegeDashboardLoadStatus.loaded;
+    final workspacesLoaded =
+        collegeState.workspacesStatus == CollegeDashboardLoadStatus.loaded;
 
     void openJoinCollege() async {
       Navigator.of(context).pop();
-      final result = await Navigator.of(context).push<bool>(
-        MaterialPageRoute(
-          builder: (_) => const JoinCollegePage(),
-        ),
-      );
+      final result = await Navigator.of(
+        context,
+      ).push<bool>(MaterialPageRoute(builder: (_) => const JoinCollegePage()));
       if (result == true) {
         ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
       }
@@ -234,7 +238,8 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         if (hasCollegeWorkspaces)
           _CollegeSelectorForCandidate(
             workspaces: collegeWorkspaces,
-            selectedWorkspace: collegeState.selectedWorkspace ?? collegeWorkspaces.firstOrNull,
+            selectedWorkspace:
+                collegeState.selectedWorkspace ?? collegeWorkspaces.firstOrNull,
             onJoinCollege: openJoinCollege,
             onSwitchWorkspace: (ws) async {
               Navigator.of(context).pop();
@@ -379,8 +384,11 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                       color: AppColors.textMedium,
                       fontSize: 14,
                     ),
-                    prefixIcon: const Icon(LucideIcons.search,
-                        size: 18, color: AppColors.textMedium),
+                    prefixIcon: const Icon(
+                      LucideIcons.search,
+                      size: 18,
+                      color: AppColors.textMedium,
+                    ),
                     filled: true,
                     fillColor: const Color(0xFFF8F9FA),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
@@ -401,8 +409,13 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                   children: isCollege
                       ? _buildCollegeNav(goToCollegeDest, pushPage)
                       : isRecruiter
-                          ? _buildRecruiterNav(goToRecruiterDest, pushPage)
-                          : _buildCandidateNav(current, pushedPage, goToBottom, pushPage),
+                      ? _buildRecruiterNav(goToRecruiterDest, pushPage)
+                      : _buildCandidateNav(
+                          current,
+                          pushedPage,
+                          goToBottom,
+                          pushPage,
+                        ),
                 ),
               ),
             ),
@@ -437,7 +450,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                             if (isRecruiter) ...[
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary.withAlpha(25),
                                   borderRadius: BorderRadius.circular(4),
@@ -455,7 +471,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                             if (isCollege) ...[
                               const SizedBox(width: 6),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.primary.withAlpha(25),
                                   borderRadius: BorderRadius.circular(4),
@@ -530,17 +549,14 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
 
   Widget _userAvatar(String photoUrl, String name) {
     if (photoUrl.isNotEmpty) {
-      return CircleAvatar(
-        radius: 20,
-        backgroundImage: NetworkImage(photoUrl),
-      );
+      return CircleAvatar(radius: 20, backgroundImage: NetworkImage(photoUrl));
     }
     final parts = name.split(' ');
     final initials = parts.length >= 2
         ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
         : name.isNotEmpty
-            ? name[0].toUpperCase()
-            : 'U';
+        ? name[0].toUpperCase()
+        : 'U';
     return CircleAvatar(
       radius: 20,
       backgroundColor: AppColors.bgSecondary,
@@ -634,18 +650,18 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
             Text(
               'Logout',
               style: Theme.of(ctx).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.textDark,
-                  ),
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
             ),
             const SizedBox(height: 8),
             Text(
               'Are you sure you want to sign out of your account?',
               textAlign: TextAlign.center,
               style: Theme.of(ctx).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textLight,
-                    height: 1.4,
-                  ),
+                color: AppColors.textLight,
+                height: 1.4,
+              ),
             ),
             const SizedBox(height: 24),
             Row(
@@ -665,11 +681,20 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                   child: ElevatedButton(
                     onPressed: () async {
                       AppRoutes.pop(ctx);
-                      await ref.read(authViewModelProvider.notifier).logoutUser();
-                      ref.read(dashboardViewModelProvider.notifier).resetState();
-                      ref.read(collegeDashboardViewModelProvider.notifier).resetState();
+                      await ref
+                          .read(authViewModelProvider.notifier)
+                          .logoutUser();
+                      ref
+                          .read(dashboardViewModelProvider.notifier)
+                          .resetState();
+                      ref
+                          .read(collegeDashboardViewModelProvider.notifier)
+                          .resetState();
                       if (context.mounted) {
-                        AppRoutes.pushAndRemoveUntil(context, const LoginPage());
+                        AppRoutes.pushAndRemoveUntil(
+                          context,
+                          const LoginPage(),
+                        );
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -777,11 +802,7 @@ class _JoinCollegePrompt extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Icon(
-                      LucideIcons.plus,
-                      size: 18,
-                      color: AppColors.primary,
-                    ),
+                    Icon(LucideIcons.plus, size: 18, color: AppColors.primary),
                   ],
                 ),
               ),
@@ -867,8 +888,7 @@ class _CollegeDisplayOnly extends StatelessWidget {
   }
 
   Widget _buildLogo() {
-    if (workspace?.collegeLogo != null &&
-        workspace!.collegeLogo!.isNotEmpty) {
+    if (workspace?.collegeLogo != null && workspace!.collegeLogo!.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(8),
         child: Image.network(
@@ -1059,14 +1079,13 @@ class _CollegeSelectorForCandidate extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Text(
                 'Switch College',
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
             ...workspaces.map((ws) {
-              final isSelected =
-                  selectedWorkspace?.collegeId == ws.collegeId;
+              final isSelected = selectedWorkspace?.collegeId == ws.collegeId;
               return ListTile(
                 leading: ws.collegeLogo != null && ws.collegeLogo!.isNotEmpty
                     ? CircleAvatar(
@@ -1168,10 +1187,7 @@ class _WorkspaceSelector extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.borderStroke,
-                    width: 1,
-                  ),
+                  border: Border.all(color: AppColors.borderStroke, width: 1),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withAlpha(15),
@@ -1239,11 +1255,7 @@ class _WorkspaceSelector extends StatelessWidget {
         color: AppColors.success,
         borderRadius: BorderRadius.circular(8),
       ),
-      child: const Icon(
-        LucideIcons.building2,
-        size: 18,
-        color: Colors.white,
-      ),
+      child: const Icon(LucideIcons.building2, size: 18, color: Colors.white),
     );
   }
 
@@ -1263,9 +1275,9 @@ class _WorkspaceSelector extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
               child: Text(
                 'Switch Workspace',
-                style: Theme.of(ctx).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
+                style: Theme.of(
+                  ctx,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
               ),
             ),
             ...workspaces.map((ws) {

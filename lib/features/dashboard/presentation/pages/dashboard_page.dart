@@ -8,10 +8,12 @@ import 'package:kaarya/features/interviews/presentation/pages/interview_hub_scre
 import 'package:kaarya/features/dashboard/presentation/pages/leaderboard_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/overview_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/resume_builder_screen.dart';
+import 'package:kaarya/features/companies/presentation/pages/company_settings_page.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/company_jobs_screen.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/recruiter_overview_screen.dart';
 import 'package:kaarya/features/colleges/presentation/pages/college_overview_screen.dart';
 import 'package:kaarya/features/colleges/presentation/pages/college_jobs_screen.dart';
+import 'package:kaarya/features/colleges/presentation/pages/college_settings_page.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/app_drawer_widget.dart';
 import 'package:kaarya/core/widgets/notifications_widget.dart';
@@ -190,12 +192,18 @@ class DashboardPage extends ConsumerWidget {
 class _RecruiterDashboard extends ConsumerWidget {
   const _RecruiterDashboard();
 
-  static const _recruiterTitles = ["Overview", "Company Jobs", "Leaderboard"];
+  static const _recruiterTitles = [
+    "Overview",
+    "Company Jobs",
+    "Leaderboard",
+    "Company Settings",
+  ];
 
   static const _recruiterScreens = [
     RecruiterOverviewScreen(),
     CompanyJobsScreen(),
     LeaderboardScreen(),
+    CompanySettingsPage(),
   ];
 
   @override
@@ -229,7 +237,7 @@ class _RecruiterDashboard extends ConsumerWidget {
             height: 2,
             color: const Color(0xFFF0F0F0),
             child: Row(
-              children: List.generate(3, (index) {
+              children: List.generate(4, (index) {
                 return Expanded(
                   child: Center(
                     child: AnimatedContainer(
@@ -264,12 +272,17 @@ class _RecruiterDashboard extends ConsumerWidget {
               BottomNavigationBarItem(
                 icon: Icon(LucideIcons.briefcaseBusiness),
                 activeIcon: Icon(LucideIcons.briefcaseBusiness),
-                label: "Company Jobs",
+                label: "College Jobs",
               ),
               BottomNavigationBarItem(
                 icon: Icon(LucideIcons.trophy),
                 activeIcon: Icon(LucideIcons.trophy),
                 label: "Leaderboard",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(LucideIcons.settings2),
+                activeIcon: Icon(LucideIcons.settings2),
+                label: "Settings",
               ),
             ],
           ),
@@ -283,6 +296,7 @@ class _RecruiterDashboard extends ConsumerWidget {
       RecruiterDestination.overview,
       RecruiterDestination.companyJobs,
       RecruiterDestination.leaderboard,
+      RecruiterDestination.settings,
     ];
     final i = order.indexOf(dest);
     return i >= 0 ? i : 0;
@@ -293,6 +307,7 @@ class _RecruiterDashboard extends ConsumerWidget {
       RecruiterDestination.overview,
       RecruiterDestination.companyJobs,
       RecruiterDestination.leaderboard,
+      RecruiterDestination.settings,
     ];
     return order[index.clamp(0, order.length - 1)];
   }
@@ -301,12 +316,18 @@ class _RecruiterDashboard extends ConsumerWidget {
 class _CollegeDashboard extends ConsumerWidget {
   const _CollegeDashboard();
 
-  static const _collegeTitles = ["College Overview", "College Jobs", "Leaderboard"];
+  static const _collegeTitles = [
+    "College Overview",
+    "College Jobs",
+    "Leaderboard",
+    "College Settings",
+  ];
 
   static const _collegeScreens = [
     CollegeOverviewScreen(),
     CollegeJobsScreen(),
     LeaderboardScreen(),
+    CollegeSettingsPage(),
   ];
 
   @override
@@ -341,7 +362,7 @@ class _CollegeDashboard extends ConsumerWidget {
             height: 2,
             color: const Color(0xFFF0F0F0),
             child: Row(
-              children: List.generate(3, (index) {
+              children: List.generate(4, (index) {
                 return Expanded(
                   child: Center(
                     child: AnimatedContainer(
@@ -383,6 +404,11 @@ class _CollegeDashboard extends ConsumerWidget {
                 activeIcon: Icon(LucideIcons.trophy),
                 label: "Leaderboard",
               ),
+              BottomNavigationBarItem(
+                icon: Icon(LucideIcons.settings2),
+                activeIcon: Icon(LucideIcons.settings2),
+                label: "Settings",
+              ),
             ],
           ),
         ],
@@ -395,6 +421,7 @@ class _CollegeDashboard extends ConsumerWidget {
       CollegeDestination.overview,
       CollegeDestination.collegeJobs,
       CollegeDestination.leaderboard,
+      CollegeDestination.collegeSettings,
     ];
     final i = order.indexOf(dest);
     return i >= 0 ? i : 0;
@@ -405,6 +432,7 @@ class _CollegeDashboard extends ConsumerWidget {
       CollegeDestination.overview,
       CollegeDestination.collegeJobs,
       CollegeDestination.leaderboard,
+      CollegeDestination.collegeSettings,
     ];
     return order[index.clamp(0, order.length - 1)];
   }
