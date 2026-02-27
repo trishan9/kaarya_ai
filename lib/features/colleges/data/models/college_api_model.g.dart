@@ -31,65 +31,69 @@ Map<String, dynamic> _$CollegeApiModelToJson(CollegeApiModel instance) =>
     };
 
 CollegeWorkspaceApiModel _$CollegeWorkspaceApiModelFromJson(
-        Map<String, dynamic> json) =>
-    CollegeWorkspaceApiModel(
-      collegeId: json['collegeId'] as String,
-      collegeName: json['collegeName'] as String,
-      collegeLogo: json['collegeLogo'] as String?,
-      joinedAt: json['joinedAt'] as String,
-    );
+  Map<String, dynamic> json,
+) => CollegeWorkspaceApiModel(
+  collegeId: json['collegeId'] as String,
+  collegeName: json['collegeName'] as String,
+  collegeLogo: json['collegeLogo'] as String?,
+  joinedAt: json['joinedAt'] as String,
+);
 
 Map<String, dynamic> _$CollegeWorkspaceApiModelToJson(
-        CollegeWorkspaceApiModel instance) =>
-    <String, dynamic>{
-      'collegeId': instance.collegeId,
-      'collegeName': instance.collegeName,
-      'collegeLogo': instance.collegeLogo,
-      'joinedAt': instance.joinedAt,
-    };
+  CollegeWorkspaceApiModel instance,
+) => <String, dynamic>{
+  'collegeId': instance.collegeId,
+  'collegeName': instance.collegeName,
+  'collegeLogo': instance.collegeLogo,
+  'joinedAt': instance.joinedAt,
+};
 
 StudentMemberApiModel _$StudentMemberApiModelFromJson(
-        Map<String, dynamic> json) =>
-    StudentMemberApiModel(
-      userId: json['userId'] as String,
-      name: json['name'] as String,
-      email: json['email'] as String,
-      photo: json['photo'] as String?,
-      joinedAt: json['joinedAt'] as String,
-    );
+  Map<String, dynamic> json,
+) => StudentMemberApiModel(
+  userId: json['userId'] as String,
+  name: json['name'] as String,
+  email: json['email'] as String,
+  photo: json['photo'] as String?,
+  program: json['program'] as String?,
+  year: (json['year'] as num?)?.toInt(),
+  joinedAt: json['joinedAt'] as String,
+);
 
 Map<String, dynamic> _$StudentMemberApiModelToJson(
-        StudentMemberApiModel instance) =>
-    <String, dynamic>{
-      'userId': instance.userId,
-      'name': instance.name,
-      'email': instance.email,
-      'photo': instance.photo,
-      'joinedAt': instance.joinedAt,
-    };
+  StudentMemberApiModel instance,
+) => <String, dynamic>{
+  'userId': instance.userId,
+  'name': instance.name,
+  'email': instance.email,
+  'photo': instance.photo,
+  'program': instance.program,
+  'year': instance.year,
+  'joinedAt': instance.joinedAt,
+};
 
 CollegeMetricsApiModel _$CollegeMetricsApiModelFromJson(
-        Map<String, dynamic> json) =>
-    CollegeMetricsApiModel(
-      totalStudents: (json['totalStudents'] as num).toInt(),
-      totalJobs: (json['totalJobs'] as num).toInt(),
-      totalInterviews: (json['totalInterviews'] as num).toInt(),
-      totalApplications: (json['totalApplications'] as num).toInt(),
-      averageInterviewScore: (json['averageInterviewScore'] as num).toDouble(),
-      averageAtsScore: (json['averageAtsScore'] as num).toDouble(),
-      topStudents: (json['topStudents'] as List<dynamic>)
-          .map((e) => StudentMemberApiModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-    );
+  Map<String, dynamic> json,
+) => CollegeMetricsApiModel(
+  totalStudents: (json['totalStudents'] as num).toInt(),
+  totalJobs: (json['totalJobs'] as num).toInt(),
+  totalInterviews: (json['totalInterviews'] as num).toInt(),
+  totalApplications: (json['totalApplications'] as num).toInt(),
+  averageInterviewScore: (json['averageInterviewScore'] as num).toDouble(),
+  averageAtsScore: (json['averageAtsScore'] as num).toDouble(),
+  topStudents: (json['topStudents'] as List<dynamic>)
+      .map((e) => StudentMemberApiModel.fromJson(e as Map<String, dynamic>))
+      .toList(),
+);
 
 Map<String, dynamic> _$CollegeMetricsApiModelToJson(
-        CollegeMetricsApiModel instance) =>
-    <String, dynamic>{
-      'totalStudents': instance.totalStudents,
-      'totalJobs': instance.totalJobs,
-      'totalInterviews': instance.totalInterviews,
-      'totalApplications': instance.totalApplications,
-      'averageInterviewScore': instance.averageInterviewScore,
-      'averageAtsScore': instance.averageAtsScore,
-      'topStudents': instance.topStudents,
-    };
+  CollegeMetricsApiModel instance,
+) => <String, dynamic>{
+  'totalStudents': instance.totalStudents,
+  'totalJobs': instance.totalJobs,
+  'totalInterviews': instance.totalInterviews,
+  'totalApplications': instance.totalApplications,
+  'averageInterviewScore': instance.averageInterviewScore,
+  'averageAtsScore': instance.averageAtsScore,
+  'topStudents': instance.topStudents,
+};
