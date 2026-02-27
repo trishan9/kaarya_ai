@@ -146,10 +146,14 @@ class WorkspaceMemberApiModel {
   });
 
   factory WorkspaceMemberApiModel.fromApiResponse(Map<String, dynamic> json) {
-    final user = jsonAsMap(json['user']);
+    final user =
+        jsonAsMap(json['user']) ??
+        jsonAsMap(json['recruiter']) ??
+        jsonAsMap(json['recruiterId']);
     return WorkspaceMemberApiModel(
       userId: jsonString(
         json['userId'] ??
+            json['recruiterId'] ??
             user?['id'] ??
             user?['_id'] ??
             json['id'] ??
