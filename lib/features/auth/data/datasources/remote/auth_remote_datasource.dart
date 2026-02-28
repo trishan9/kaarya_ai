@@ -20,6 +20,11 @@ final authRemoteDataSourceProvider = Provider<IAuthRemoteDataSource>((ref) {
 });
 
 class AuthRemoteDatasource implements IAuthRemoteDataSource {
+  static const Map<String, dynamic> _passwordResetHeaders = {
+    'x-client-user-agent': 'kaarya-flutter',
+    'x-request-source': 'flutter-app',
+  };
+
   final ApiClient _apiClient;
   final UserSessionService _userSessionService;
   final TokenService _tokenService;
@@ -232,7 +237,7 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
   @override
   Future<bool> requestPasswordReset(String email) async {
-    final response = await _apiClient.post(
+    final response = await _postPasswordResetWithRetry(
       ApiEndpoints.requestPasswordReset,
       data: {'email': email},
     );
@@ -322,5 +327,42 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
     }
 
     return null;
+  }
+
+  Future<Response<dynamic>> _postPasswordResetWithRetry(
+    String path, {
+    required Map<String, dynamic> data,
+  }) async {
+    try {
+      return await _apiClient.post(
+        path,
+        data: data,
+        options: Options(headers: _passwordResetHeaders),
+      );
+    } on DioException catch (error) {
+      if (!_shouldRetryPasswordReset(error)) {
+        rethrow;
+      }
+
+      await Future<void>.delayed(const Duration(milliseconds: 700));
+
+      return _apiClient.post(
+        path,
+        data: data,
+        options: Options(headers: _passwordResetHeaders),
+      );
+    }
+  }
+
+  bool _shouldRetryPasswordReset(DioException error) {
+    final statusCode = error.response?.statusCode ?? 0;
+    if (statusCode >= 500 && statusCode < 600) {
+      return true;
+    }
+
+    return error.type == DioExceptionType.connectionTimeout ||
+        error.type == DioExceptionType.sendTimeout ||
+        error.type == DioExceptionType.receiveTimeout ||
+        error.type == DioExceptionType.connectionError;
   }
 }
