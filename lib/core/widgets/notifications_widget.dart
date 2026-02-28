@@ -372,22 +372,157 @@ class NotificationsWidget extends ConsumerStatefulWidget {
   const NotificationsWidget({super.key});
 
   @override
+  ConsumerState<NotificationsWidget> createState() =>
+      _NotificationsWidgetState();
+}
+
+class _NotificationsWidgetState extends ConsumerState<NotificationsWidget> {
+  bool _hasPrefetched = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || _hasPrefetched) return;
+      _hasPrefetched = true;
+      unawaited(_prepareNotificationData());
+    });
+  }
+
+  Future<void> _prepareNotificationData() async {
+    try {
+      final isRecruiter = ref.read(isRecruiterProvider);
+      final isCollege = ref.read(isCollegeProvider);
+
+      if (isRecruiter) {
+        final state = ref.read(recruiterViewModelProvider);
+        final vm = ref.read(recruiterViewModelProvider.notifier);
+        if (state.workspaces == null &&
+            state.workspacesStatus != RecruiterLoadStatus.loading) {
+          await vm.loadWorkspaces();
+        }
+        final refreshed = ref.read(recruiterViewModelProvider);
+        final workspace = refreshed.selectedWorkspace;
+        if (workspace != null &&
+            refreshed.companyJobs == null &&
+            refreshed.companyJobsStatus != RecruiterLoadStatus.loading) {
+          await vm.loadCompanyJobs(
+            companyId: workspace.companyId,
+            companyName: workspace.companyName,
+          );
+        }
+        return;
+      }
+
+      if (isCollege) {
+        final state = ref.read(collegeDashboardViewModelProvider);
+        final vm = ref.read(collegeDashboardViewModelProvider.notifier);
+        if (state.workspaces == null &&
+            state.workspacesStatus != CollegeDashboardLoadStatus.loading) {
+          await vm.loadWorkspaces();
+        }
+        final refreshed = ref.read(collegeDashboardViewModelProvider);
+        final workspace = refreshed.selectedWorkspace;
+        if (workspace != null &&
+            refreshed.collegeJobs == null &&
+            refreshed.collegeJobsStatus != CollegeDashboardLoadStatus.loading) {
+          await vm.loadCollegeJobs(collegeId: workspace.collegeId);
+        }
+        return;
+      }
+
+      final state = ref.read(dashboardViewModelProvider);
+      final vm = ref.read(dashboardViewModelProvider.notifier);
+      if (state.overviewData == null &&
+          state.overviewStatus != DashboardLoadStatus.loading) {
+        await vm.loadOverview();
+      }
+      final refreshed = ref.read(dashboardViewModelProvider);
+      if (refreshed.applicationsData == null &&
+          refreshed.applicationsStatus != DashboardLoadStatus.loading) {
+        await vm.loadMyApplications();
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _showNotificationsSurface() async {
+    if (!mounted) {
+      return;
+    }
+
+    final width = MediaQuery.sizeOf(context).width;
+    if (width < 640) {
+      await showModalBottomSheet<void>(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const _NotificationsSheet(),
+      );
+      return;
+    }
+
+    await showGeneralDialog<void>(
+      context: context,
+      barrierLabel: 'Notifications',
+      barrierDismissible: true,
+      barrierColor: Colors.black.withAlpha(25),
+      pageBuilder: (context, _, __) {
+        return const SafeArea(
+          child: Align(
+            alignment: Alignment.topRight,
+            child: Padding(
+              padding: EdgeInsets.only(top: 16, right: 16, left: 16),
+              child: _NotificationsPopover(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openNotifications() async {
+    unawaited(_prepareNotificationData());
+    await _showNotificationsSurface();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final items = ref.watch(appNotificationItemsProvider);
+    final isLoading = ref.watch(notificationPanelLoadingProvider);
+    final readIds = ref.watch(notificationReadIdsProvider);
+    final unreadCount = items
+        .where((item) => !readIds.contains(item.id))
+        .length;
+
     return Stack(
       alignment: Alignment.center,
+      clipBehavior: Clip.none,
       children: [
         IconButton(
-          icon: const Icon(LucideIcons.bell, size: 28),
-          onPressed: () {},
+          icon: const Icon(LucideIcons.bell, size: 24),
+          onPressed: _openNotifications,
         ),
-        Positioned(
-          right: 10,
-          top: 4,
-          child: Container(
-            padding: const EdgeInsets.all(2),
-            decoration: const BoxDecoration(
-              color: Colors.red,
-              shape: BoxShape.circle,
+        if (unreadCount > 0)
+          Positioned(
+            right: 8,
+            top: 6,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.error,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: Colors.white, width: 1.5),
+              ),
+              constraints: const BoxConstraints(minWidth: 18, minHeight: 18),
+              child: Text(
+                unreadCount > 9 ? '9+' : '$unreadCount',
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                ),
+                textAlign: TextAlign.center,
+              ),
             ),
             constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
             child: const Text(
