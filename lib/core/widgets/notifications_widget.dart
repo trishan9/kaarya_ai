@@ -524,15 +524,436 @@ class _NotificationsWidgetState extends ConsumerState<NotificationsWidget> {
                 textAlign: TextAlign.center,
               ),
             ),
-            constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-            child: const Text(
-              '3',
-              style: TextStyle(color: Colors.white, fontSize: 10),
-              textAlign: TextAlign.center,
+          ),
+        if (isLoading && unreadCount == 0)
+          Positioned(
+            right: 10,
+            top: 8,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: const BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
             ),
           ),
+      ],
+    );
+  }
+}
+
+class _NotificationsSheet extends StatelessWidget {
+  const _NotificationsSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    final height = MediaQuery.sizeOf(context).height;
+    return Container(
+      height: math.min(height * 0.8, 620),
+      decoration: const BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(22)),
+      ),
+      child: const _NotificationsPanel(isBottomSheet: true),
+    );
+  }
+}
+
+class _NotificationsPopover extends StatelessWidget {
+  const _NotificationsPopover();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: Container(
+        width: 360,
+        constraints: const BoxConstraints(maxHeight: 560),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: AppColors.borderStroke2),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(18),
+              blurRadius: 28,
+              offset: const Offset(0, 16),
+            ),
+          ],
+        ),
+        child: const _NotificationsPanel(),
+      ),
+    );
+  }
+}
+
+class _NotificationsPanel extends ConsumerWidget {
+  const _NotificationsPanel({this.isBottomSheet = false});
+
+  final bool isBottomSheet;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final items = ref.watch(appNotificationItemsProvider);
+    final isLoading = ref.watch(notificationPanelLoadingProvider);
+    final readIds = ref.watch(notificationReadIdsProvider);
+    final unreadCount = items
+        .where((item) => !readIds.contains(item.id))
+        .length;
+
+    return Column(
+      children: [
+        if (isBottomSheet)
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Container(
+              width: 42,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.borderStroke,
+                borderRadius: BorderRadius.circular(999),
+              ),
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Notifications',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textDark,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      unreadCount == 0
+                          ? 'Everything is caught up.'
+                          : '$unreadCount unread updates from live app activity.',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (items.isNotEmpty)
+                TextButton(
+                  onPressed: unreadCount == 0
+                      ? null
+                      : () {
+                          ref
+                              .read(notificationReadIdsProvider.notifier)
+                              .markAllRead(items.map((item) => item.id));
+                        },
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textLight,
+                  ),
+                  child: const Text('Mark all read'),
+                ),
+            ],
+          ),
+        ),
+        const Divider(height: 1, color: AppColors.borderStroke2),
+        Expanded(
+          child: isLoading && items.isEmpty
+              ? const _NotificationsLoadingState()
+              : items.isEmpty
+              ? const _NotificationsEmptyState()
+              : ListView.separated(
+                  padding: const EdgeInsets.all(14),
+                  itemCount: items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 10),
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    final isRead = readIds.contains(item.id);
+                    return _NotificationTile(item: item, isRead: isRead);
+                  },
+                ),
         ),
       ],
     );
+  }
+}
+
+class _NotificationsLoadingState extends StatelessWidget {
+  const _NotificationsLoadingState();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.separated(
+      padding: const EdgeInsets.all(14),
+      itemCount: 4,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.borderStroke2),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.bgSecondary,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 12,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgSecondary,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: 12,
+                      width: 210,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgTertiary,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Container(
+                      height: 12,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: AppColors.bgTertiary,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+class _NotificationsEmptyState extends StatelessWidget {
+  const _NotificationsEmptyState();
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 28),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: const [
+            Icon(LucideIcons.bellRing, size: 34, color: AppColors.textMedium),
+            SizedBox(height: 14),
+            Text(
+              'No notifications yet',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textDark,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Once interviews, deadlines, or application activity show up in the app, they will appear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: AppColors.textLight,
+                height: 1.45,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _NotificationTile extends ConsumerWidget {
+  const _NotificationTile({required this.item, required this.isRead});
+
+  final _AppNotificationItem item;
+  final bool isRead;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final accent = switch (item.kind) {
+      _NotificationKind.interview => AppColors.primary,
+      _NotificationKind.deadline => AppColors.warning,
+      _NotificationKind.application => AppColors.success2,
+      _NotificationKind.workspace => AppColors.textDark,
+    };
+
+    final icon = switch (item.kind) {
+      _NotificationKind.interview => LucideIcons.calendarClock,
+      _NotificationKind.deadline => LucideIcons.timerReset,
+      _NotificationKind.application => LucideIcons.briefcaseBusiness,
+      _NotificationKind.workspace => LucideIcons.users,
+    };
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(16),
+      onTap: () async {
+        await ref.read(notificationReadIdsProvider.notifier).markRead(item.id);
+        if (context.mounted) {
+          Navigator.of(context).pop();
+        }
+        if (!context.mounted) {
+          return;
+        }
+        _handleNotificationTap(context, ref, item);
+      },
+      child: Ink(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isRead ? Colors.white : accent.withAlpha(12),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isRead ? AppColors.borderStroke2 : accent.withAlpha(40),
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 42,
+              height: 42,
+              decoration: BoxDecoration(
+                color: accent.withAlpha(18),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, color: accent, size: 20),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: isRead
+                                ? FontWeight.w600
+                                : FontWeight.w700,
+                            color: AppColors.textDark,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        item.timeLabel,
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.message,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textLight,
+                      height: 1.45,
+                    ),
+                  ),
+                  if (item.emphasis != null &&
+                      item.emphasis!.trim().isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(999),
+                        border: Border.all(color: AppColors.borderStroke2),
+                      ),
+                      child: Text(
+                        item.emphasis!,
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: accent,
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            if (!isRead) ...[
+              const SizedBox(width: 10),
+              Container(
+                width: 9,
+                height: 9,
+                margin: const EdgeInsets.only(top: 4),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _handleNotificationTap(
+    BuildContext context,
+    WidgetRef ref,
+    _AppNotificationItem item,
+  ) {
+    final isRecruiter = ref.read(isRecruiterProvider);
+    final isCollege = ref.read(isCollegeProvider);
+
+    if (isRecruiter) {
+      ref.read(recruiterNavProvider.notifier).state =
+          RecruiterDestination.companyJobs;
+      return;
+    }
+    if (isCollege) {
+      ref.read(collegeNavProvider.notifier).state =
+          CollegeDestination.collegeJobs;
+      return;
+    }
+
+    if (item.kind == _NotificationKind.deadline) {
+      ref.read(bottomNavProvider.notifier).state = AppDestination.explore;
+      return;
+    }
+
+    AppRoutes.push(context, const MyApplicationsPage());
   }
 }
