@@ -29,6 +29,7 @@ abstract interface class IAuthRepository {
   Future<Either<Failure, bool>> confirmPasswordReset(
     String token,
     String password,
+    String confirmPassword,
   );
   Future<Either<Failure, List<LinkedAccountEntity>>> getLinkedAccounts();
   Future<Either<Failure, bool>> unlinkOAuth(String provider);

@@ -34,7 +34,11 @@ abstract interface class IAuthRemoteDataSource {
   );
   Future<bool> requestPasswordReset(String email);
   Future<String> verifyPasswordResetOtp(String email, String otp);
-  Future<bool> confirmPasswordReset(String token, String password);
+  Future<bool> confirmPasswordReset(
+    String token,
+    String password,
+    String confirmPassword,
+  );
   Future<List<LinkedAccountApiModel>> getLinkedAccounts();
   Future<bool> unlinkOAuth(String provider);
   Future<String> uploadCertification(String filePath);

@@ -241,22 +241,30 @@ class AuthRemoteDatasource implements IAuthRemoteDataSource {
 
   @override
   Future<String> verifyPasswordResetOtp(String email, String otp) async {
-    final response = await _apiClient.post(
+    final response = await _postPasswordResetWithRetry(
       ApiEndpoints.verifyPasswordResetOtp,
       data: {'email': email, 'otp': otp},
     );
     if (response.data['success'] == true) {
-      final data = response.data['data'] as Map<String, dynamic>;
-      return data['token'] as String? ?? '';
+      final data = response.data['data'] as Map<String, dynamic>? ?? const {};
+      return data['resetToken'] as String? ?? data['token'] as String? ?? '';
     }
     return '';
   }
 
   @override
-  Future<bool> confirmPasswordReset(String token, String password) async {
-    final response = await _apiClient.post(
+  Future<bool> confirmPasswordReset(
+    String token,
+    String password,
+    String confirmPassword,
+  ) async {
+    final response = await _postPasswordResetWithRetry(
       ApiEndpoints.confirmPasswordReset,
-      data: {'token': token, 'password': password},
+      data: {
+        'token': token,
+        'password': password,
+        'confirmPassword': confirmPassword,
+      },
     );
     return response.data['success'] == true;
   }

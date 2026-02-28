@@ -9,9 +9,14 @@ import 'package:kaarya/features/auth/domain/repositories/auth_repository.dart';
 class ConfirmResetParams extends Equatable {
   final String token;
   final String password;
-  const ConfirmResetParams({required this.token, required this.password});
+  final String confirmPassword;
+  const ConfirmResetParams({
+    required this.token,
+    required this.password,
+    required this.confirmPassword,
+  });
   @override
-  List<Object?> get props => [token, password];
+  List<Object?> get props => [token, password, confirmPassword];
 }
 
 final confirmResetUseCaseProvider = Provider<ConfirmResetUseCase>((ref) {
@@ -27,6 +32,10 @@ class ConfirmResetUseCase
 
   @override
   Future<Either<Failure, bool>> call(ConfirmResetParams params) {
-    return _authRepository.confirmPasswordReset(params.token, params.password);
+    return _authRepository.confirmPasswordReset(
+      params.token,
+      params.password,
+      params.confirmPassword,
+    );
   }
 }

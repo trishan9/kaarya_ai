@@ -342,12 +342,14 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, bool>> confirmPasswordReset(
     String token,
     String password,
+    String confirmPassword,
   ) async {
     if (await _networkInfo.isConnected) {
       try {
         final result = await _authRemoteDataSource.confirmPasswordReset(
           token,
           password,
+          confirmPassword,
         );
         return Right(result);
       } on DioException catch (e) {
