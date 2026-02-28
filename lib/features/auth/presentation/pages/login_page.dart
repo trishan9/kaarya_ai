@@ -4,6 +4,7 @@ import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/features/auth/presentation/state/auth_state.dart';
+import 'package:kaarya/features/auth/presentation/pages/forgot_password_page.dart';
 import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
@@ -46,7 +47,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _handleForgotPassword() async {
-    SnackbarUtils.showInfo(context, "Coming soon!");
+    AppRoutes.push(
+      context,
+      ForgotPasswordPage(initialEmail: _emailAddressController.text.trim()),
+    );
   }
 
   @override
