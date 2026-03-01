@@ -19,7 +19,6 @@ class OnboardingProgress extends StatelessWidget {
               duration: const Duration(milliseconds: 300),
               transitionBuilder: (child, anim) =>
                   ScaleTransition(scale: anim, child: child),
-
               child: Container(
                 key: ValueKey("bar_$i"),
                 height: 8,
@@ -36,7 +35,7 @@ class OnboardingProgress extends StatelessWidget {
             margin: const EdgeInsets.symmetric(horizontal: 4),
             height: 8,
             width: 8,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: Color(0xFFD1E4F2),
               shape: BoxShape.circle,
             ),
