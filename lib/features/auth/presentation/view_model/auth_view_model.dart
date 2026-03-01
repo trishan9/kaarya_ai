@@ -36,11 +36,19 @@ class AuthViewModel extends Notifier<AuthState> {
     required String name,
     required String email,
     required String password,
+    required String confirmPassword,
+    required String role,
   }) async {
     state = state.copyWith(status: AuthStatus.loading, errorMessage: null);
 
     final result = await _registerUseCase(
-      RegisterUseCaseParams(name: name, email: email, password: password),
+      RegisterUseCaseParams(
+        name: name,
+        email: email,
+        password: password,
+        confirmPassword: confirmPassword,
+        role: role,
+      ),
     );
 
     result.fold(
