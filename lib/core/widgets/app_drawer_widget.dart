@@ -8,9 +8,11 @@ import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
 import 'package:kaarya/features/auth/presentation/pages/settings_page.dart';
 import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:kaarya/features/billing/presentation/view_model/billing_view_model.dart';
 import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/my_applications_page.dart';
 import 'package:kaarya/features/bookmarks/presentation/pages/saved_page.dart';
+import 'package:kaarya/features/billing/presentation/pages/billing_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/interview_management_page.dart';
 import 'package:kaarya/features/interviews/presentation/pages/my_interviews_page.dart';
 import 'package:kaarya/features/resources/presentation/pages/resources_hub_screen.dart';
@@ -39,6 +41,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
       final isCollege = ref.read(isCollegeProvider);
       if (!isRecruiter && !isCollege) {
         ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
+        ref.read(billingViewModelProvider.notifier).loadSummary();
       }
     });
   }
@@ -214,7 +217,12 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     void Function(Widget) pushPage,
   ) {
     final collegeState = ref.watch(collegeDashboardViewModelProvider);
+    final billingState = ref.watch(billingViewModelProvider);
     final collegeWorkspaces = collegeState.workspaces ?? [];
+    final billingSummary = billingState.summary;
+    final billingTitle = billingSummary?.isPro == true
+        ? 'Billing'
+        : 'Upgrade to Pro';
     // Only show college switcher when we've loaded and user has joined colleges
     final hasCollegeWorkspaces =
         collegeState.workspacesStatus == CollegeDashboardLoadStatus.loaded &&
@@ -313,6 +321,21 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         title: 'Settings',
         onTap: () => pushPage(const SettingsPage()),
       ),
+      _navItem(
+        icon: LucideIcons.walletCards,
+        title: billingTitle,
+        selected: pushedPage == 'billing',
+        onTap: () {
+          ref.read(pushedPageProvider.notifier).state = 'billing';
+          AppRoutes.pop(context);
+          Navigator.of(context)
+              .push(MaterialPageRoute(builder: (_) => const BillingPage()))
+              .then((_) {
+                if (!mounted) return;
+                ref.read(pushedPageProvider.notifier).state = null;
+              });
+        },
+      ),
       const SizedBox(height: 20),
     ];
   }
@@ -327,6 +350,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     final userName = session.getCurrentUserFullName() ?? 'User';
     final userEmail = session.getCurrentUserEmail() ?? '';
     final userPhoto = session.getCurrentUserProfilePicture() ?? '';
+    final billingState = ref.watch(billingViewModelProvider);
+    final billingSummary = billingState.summary;
+    final isProPlan = billingSummary?.isPro == true;
+    final currentPlan = billingSummary?.currentPlanLabel ?? 'Free';
 
     void goToBottom(AppDestination dest) {
       ref.read(pushedPageProvider.notifier).state = null;
@@ -485,6 +512,36 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                                     fontSize: 10,
                                     fontWeight: FontWeight.w600,
                                     color: AppColors.primary,
+                                  ),
+                                ),
+                              ),
+                            ],
+                            if (!isRecruiter && !isCollege) ...[
+                              const SizedBox(width: 6),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: isProPlan
+                                      ? AppColors.bgSecondary
+                                      : Colors.white,
+                                  borderRadius: BorderRadius.circular(999),
+                                  border: Border.all(
+                                    color: isProPlan
+                                        ? AppColors.primary.withAlpha(90)
+                                        : AppColors.borderStroke,
+                                  ),
+                                ),
+                                child: Text(
+                                  '$currentPlan Plan',
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.w700,
+                                    color: isProPlan
+                                        ? AppColors.primary
+                                        : AppColors.textDark,
                                   ),
                                 ),
                               ),
