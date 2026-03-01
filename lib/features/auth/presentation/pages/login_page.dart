@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
-import 'package:kaarya/features/auth/presentation/state/auth_state.dart';
-import 'package:kaarya/features/auth/presentation/pages/forgot_password_page.dart';
-import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
-import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
-import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
 import 'package:kaarya/core/widgets/text_divider_widget.dart';
+import 'package:kaarya/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:kaarya/features/auth/presentation/state/auth_state.dart';
+import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:kaarya/features/auth/presentation/widgets/header_section_widget.dart';
+import 'package:kaarya/features/auth/presentation/widgets/heading_with_subheading_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/signup_text_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/dashboard_page.dart';
 import 'package:kaarya/features/dashboard/presentation/view_model/dashboard_view_model.dart';
@@ -26,6 +27,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailAddressController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
@@ -63,7 +71,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (next.status == AuthStatus.authenticated) {
         ref.read(dashboardViewModelProvider.notifier).resetState();
         ref.read(authViewModelProvider.notifier).resetState();
-        // Force session/role providers to refresh so dashboard shows correct view
         ref.invalidate(userSessionServiceProvider);
         AppRoutes.pushReplacement(context, const DashboardPage());
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
@@ -87,22 +94,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                HeaderSection(),
-
+                const HeaderSection(),
                 const SizedBox(height: 20),
-
                 Form(
                   key: _formKey,
                   child: Column(
                     children: [
-                      HeadingWithSubheadingWidget(
+                      const HeadingWithSubheadingWidget(
                         heading: "Welcome back to Kaarya!",
                         subheading:
                             "Enter your username and password to access your account",
                       ),
-
                       const SizedBox(height: 36),
-
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
@@ -116,9 +119,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                             validationErrorMessage: "Email address is required",
                           ),
-
                           const SizedBox(height: 14),
-
                           MyTextFormField(
                             controller: _passwordController,
                             inputType: TextInputType.visiblePassword,
@@ -130,40 +131,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             ),
                             validationErrorMessage: "Password is required",
                           ),
-
                           TextButton(
                             onPressed: _handleForgotPassword,
                             style: TextButton.styleFrom(
                               padding: EdgeInsets.zero,
+                              foregroundColor: AppColors.primary,
                             ),
-                            child: const Text(
+                            child: Text(
                               "Forgot Password?",
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: Color(0xFF0084D1),
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: AppColors.primary,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                             ),
                           ),
                         ],
                       ),
-
                       const SizedBox(height: 16),
-
                       MyButton(
                         text: "Login",
                         onPressed: _handleLogin,
                         isLoading: authState.status == AuthStatus.loading,
                       ),
-
                       const SizedBox(height: 24),
-
-                      TextDividerWidget(text: "Or"),
-
+                      const TextDividerWidget(text: "Or"),
                       const SizedBox(height: 24),
-
                       Column(
-                        spacing: 12,
+                        spacing: 8,
                         children: [
                           MyButton(
                             onPressed: _handleGoogleLogin,
@@ -171,7 +166,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             variant: ButtonVariant.secondary,
                             icon: Image.asset("assets/images/google_logo.png"),
                           ),
-
                           MyButton(
                             onPressed: _handleGithubLogin,
                             text: "Login with GitHub",
@@ -183,10 +177,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
-                SignupText(),
+                const SignupText(),
               ],
             ),
           ),
