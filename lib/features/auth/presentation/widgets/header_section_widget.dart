@@ -13,7 +13,10 @@ class HeaderSection extends StatelessWidget {
 
         Text(
           "Kaarya",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w600),
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ],
     );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
+import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/features/auth/presentation/pages/signup_page.dart';
 
 class SignupText extends StatelessWidget {
@@ -15,15 +16,14 @@ class SignupText extends StatelessWidget {
       child: RichText(
         text: TextSpan(
           text: "Don't have an account? ",
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.black,
-          ),
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(color: AppColors.textDark),
           children: [
             TextSpan(
               text: "Sign Up",
-              style: TextStyle(
-                color: Color(0xFF0084D1),
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.primary,
                 fontWeight: FontWeight.w500,
               ),
             ),
