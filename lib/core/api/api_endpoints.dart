@@ -142,6 +142,15 @@ class ApiEndpoints {
   static const String streamEnsureChannels = '/stream/ensure-channels';
   static const String streamEnsureChannelWith = '/stream/ensure-channel-with';
 
+  // ============ Payment Endpoints ============
+  static const String paymentBillingSummary = '/payments/billing-summary';
+  static const String paymentStripeCheckoutSession =
+      '/payments/stripe/checkout-session';
+  static const String paymentStripeVerifySession =
+      '/payments/stripe/verify-session';
+  static const String paymentStripePortalSession =
+      '/payments/stripe/portal-session';
+
   // ============ Admin Endpoints ============
   static const String adminUsers = '/admin/users';
   static const String adminUsersAnalytics = '/admin/users/analytics';
