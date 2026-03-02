@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/resume_builder/domain/entities/resume_draft_entity.dart';
 import 'package:kaarya/features/resume_builder/presentation/state/resume_builder_state.dart';
 import 'package:kaarya/features/resume_builder/presentation/view_model/resume_builder_view_model.dart';
@@ -121,7 +122,6 @@ const _stepLabels = [
   'Projects',
   'Finalize',
 ];
-
 
 const _templateOptions = [
   ('professional', 'Professional', 'Clean & Corporate', Color(0xFF0471B6)),
@@ -253,7 +253,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       'lastName': nameParts.length > 1 ? nameParts.skip(1).join(' ') : '',
       'email': d.personalInfo.email,
       'phone': d.personalInfo.phone,
-      'city': locationParts.isNotEmpty ? locationParts.first.trim() : d.personalInfo.location,
+      'city': locationParts.isNotEmpty
+          ? locationParts.first.trim()
+          : d.personalInfo.location,
       'country': locationParts.length > 1 ? locationParts.last.trim() : '',
       'linkedin': d.personalInfo.linkedinUrl ?? '',
       'github': d.personalInfo.githubUrl ?? '',
@@ -263,29 +265,41 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     if (_targetRoleCtrl.text.isEmpty == false) {
       _contentData['targetRole'] = _targetRoleCtrl.text.trim();
     }
-    _contentData['experience'] = d.experience.map((e) => {
-      'company': e.company,
-      'position': e.jobTitle,
-      'startDate': e.startDate,
-      'endDate': e.isCurrent ? '' : e.endDate,
-      'currentlyWorking': e.isCurrent,
-      'bulletPoints': e.bullets,
-    }).toList();
-    _contentData['education'] = d.education.map((e) => {
-      'school': e.institution,
-      'degree': e.degree,
-      'major': e.fieldOfStudy,
-      'startDate': e.startDate,
-      'endDate': e.endDate,
-      'coursework': e.description ?? '',
-    }).toList();
+    _contentData['experience'] = d.experience
+        .map(
+          (e) => {
+            'company': e.company,
+            'position': e.jobTitle,
+            'startDate': e.startDate,
+            'endDate': e.isCurrent ? '' : e.endDate,
+            'currentlyWorking': e.isCurrent,
+            'bulletPoints': e.bullets,
+          },
+        )
+        .toList();
+    _contentData['education'] = d.education
+        .map(
+          (e) => {
+            'school': e.institution,
+            'degree': e.degree,
+            'major': e.fieldOfStudy,
+            'startDate': e.startDate,
+            'endDate': e.endDate,
+            'coursework': e.description ?? '',
+          },
+        )
+        .toList();
     _contentData['skills'] = d.skills.map((s) => s.name).toList();
-    _contentData['projects'] = d.projects.map((p) => {
-      'name': p.name,
-      'description': p.description ?? '',
-      'url': p.url ?? '',
-      'technologies': p.technologies.join(', '),
-    }).toList();
+    _contentData['projects'] = d.projects
+        .map(
+          (p) => {
+            'name': p.name,
+            'description': p.description ?? '',
+            'url': p.url ?? '',
+            'technologies': p.technologies.join(', '),
+          },
+        )
+        .toList();
   }
 
   @override
@@ -301,10 +315,18 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     _summaryCtrl.dispose();
     _targetRoleCtrl.dispose();
     _skillInputCtrl.dispose();
-    for (final e in _experiences) { e.dispose(); }
-    for (final e in _educations) { e.dispose(); }
-    for (final p in _projects) { p.dispose(); }
-    for (final c in _techInputCtrls) { c.dispose(); }
+    for (final e in _experiences) {
+      e.dispose();
+    }
+    for (final e in _educations) {
+      e.dispose();
+    }
+    for (final p in _projects) {
+      p.dispose();
+    }
+    for (final c in _techInputCtrls) {
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -370,10 +392,7 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     switch (_step) {
       case 0:
         // Step 0 in edit mode: update title + template only (no content).
-        return {
-          'title': _titleCtrl.text.trim(),
-          'templateId': _template,
-        };
+        return {'title': _titleCtrl.text.trim(), 'templateId': _template};
       case 1:
         final nameParts = _nameCtrl.text.trim().split(' ');
         _contentData['personalInfo'] = {
@@ -399,33 +418,45 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           'content': Map<String, dynamic>.from(_contentData),
         };
       case 3:
-        _contentData['experience'] = _experiences.map((e) => {
-          'company': e.companyCtrl.text.trim(),
-          'position': e.jobTitleCtrl.text.trim(),
-          'startDate': e.startDateCtrl.text.trim(),
-          'endDate': e.isCurrent ? '' : e.endDateCtrl.text.trim(),
-          'currentlyWorking': e.isCurrent,
-          'bulletPoints': e.bullets,
-        }).toList();
+        _contentData['experience'] = _experiences
+            .map(
+              (e) => {
+                'company': e.companyCtrl.text.trim(),
+                'position': e.jobTitleCtrl.text.trim(),
+                'startDate': e.startDateCtrl.text.trim(),
+                'endDate': e.isCurrent ? '' : e.endDateCtrl.text.trim(),
+                'currentlyWorking': e.isCurrent,
+                'bulletPoints': e.bullets,
+              },
+            )
+            .toList();
         return {'content': Map<String, dynamic>.from(_contentData)};
       case 4:
-        _contentData['education'] = _educations.map((e) => {
-          'school': e.institutionCtrl.text.trim(),
-          'degree': e.degreeCtrl.text.trim(),
-          'major': e.fieldCtrl.text.trim(),
-          'startDate': e.startDateCtrl.text.trim(),
-          'endDate': e.endDateCtrl.text.trim(),
-          'coursework': e.gpaCtrl.text.trim(),
-        }).toList();
+        _contentData['education'] = _educations
+            .map(
+              (e) => {
+                'school': e.institutionCtrl.text.trim(),
+                'degree': e.degreeCtrl.text.trim(),
+                'major': e.fieldCtrl.text.trim(),
+                'startDate': e.startDateCtrl.text.trim(),
+                'endDate': e.endDateCtrl.text.trim(),
+                'coursework': e.gpaCtrl.text.trim(),
+              },
+            )
+            .toList();
         _contentData['skills'] = List<String>.from(_skills);
         return {'content': Map<String, dynamic>.from(_contentData)};
       case 5:
-        _contentData['projects'] = _projects.map((p) => {
-          'name': p.nameCtrl.text.trim(),
-          'description': p.descCtrl.text.trim(),
-          'url': p.urlCtrl.text.trim(),
-          'technologies': p.technologies.join(', '),
-        }).toList();
+        _contentData['projects'] = _projects
+            .map(
+              (p) => {
+                'name': p.nameCtrl.text.trim(),
+                'description': p.descCtrl.text.trim(),
+                'url': p.urlCtrl.text.trim(),
+                'technologies': p.technologies.join(', '),
+              },
+            )
+            .toList();
         return {'content': Map<String, dynamic>.from(_contentData)};
       default:
         return {};
@@ -435,10 +466,7 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   void _showError(String msg) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: AppColors.error,
-      ),
+      SnackBar(content: Text(msg), backgroundColor: AppColors.error),
     );
   }
 
@@ -511,7 +539,7 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
         ),
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: appSubtleBorderColor(context)),
         ),
       ),
       body: _isLoading && widget.draftId != null && _step == 0
@@ -545,7 +573,7 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
 
   Widget _buildStepIndicator() {
     return Container(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -560,7 +588,7 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                       height: 2,
                       color: i < _step
                           ? AppColors.primary
-                          : const Color(0xFFE5E7EB),
+                          : appBorderColor(context),
                     ),
                   ),
               ],
@@ -569,9 +597,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           const SizedBox(height: 8),
           Text(
             'Step ${_step + 1} of ${_stepLabels.length} — ${_stepLabels[_step]}',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textLight,
+              color: appTextSecondaryColor(context),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -587,7 +615,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       width: 26,
       height: 26,
       decoration: BoxDecoration(
-        color: isDone || isCurrent ? AppColors.primary : const Color(0xFFF3F4F6),
+        color: isDone || isCurrent
+            ? AppColors.primary
+            : appMutedSurfaceColor(context),
         shape: BoxShape.circle,
         border: isCurrent
             ? Border.all(color: AppColors.primary, width: 2)
@@ -603,7 +633,7 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                   fontWeight: FontWeight.w600,
                   color: isCurrent
                       ? Colors.white
-                      : const Color(0xFF9CA3AF),
+                      : appTextSecondaryColor(context),
                 ),
               ),
       ),
@@ -614,9 +644,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     final isLastStep = _step == _stepLabels.length - 1;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF0F0F0))),
+      decoration: BoxDecoration(
+        color: appSurfaceColor(context),
+        border: Border(top: BorderSide(color: appSubtleBorderColor(context))),
       ),
       child: Row(
         children: [
@@ -707,7 +737,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.fileText, 'Resume Setup', 'Start with a title and template'),
+        _sectionHeader(
+          LucideIcons.fileText,
+          'Resume Setup',
+          'Start with a title and template',
+        ),
         const SizedBox(height: 20),
         _label('Resume Title *'),
         const SizedBox(height: 6),
@@ -726,10 +760,12 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 duration: const Duration(milliseconds: 150),
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: isSelected ? color.withAlpha(12) : Colors.white,
+                  color: isSelected
+                      ? color.withAlpha(isDarkMode(context) ? 22 : 12)
+                      : appSurfaceColor(context),
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isSelected ? color : const Color(0xFFE5E7EB),
+                    color: isSelected ? color : appBorderColor(context),
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -758,14 +794,16 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: isSelected ? color : AppColors.textDark,
+                              color: isSelected
+                                  ? color
+                                  : appTextPrimaryColor(context),
                             ),
                           ),
                           Text(
                             desc,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 12,
-                              color: AppColors.textLight,
+                              color: appTextSecondaryColor(context),
                             ),
                           ),
                         ],
@@ -801,7 +839,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.user, 'Contact Information', 'How employers can reach you'),
+        _sectionHeader(
+          LucideIcons.user,
+          'Contact Information',
+          'How employers can reach you',
+        ),
         const SizedBox(height: 20),
         _label('Full Name *'),
         const SizedBox(height: 6),
@@ -815,7 +857,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 children: [
                   _label('Email *'),
                   const SizedBox(height: 6),
-                  _field(_emailCtrl, 'john@email.com', type: TextInputType.emailAddress),
+                  _field(
+                    _emailCtrl,
+                    'john@email.com',
+                    type: TextInputType.emailAddress,
+                  ),
                 ],
               ),
             ),
@@ -826,7 +872,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 children: [
                   _label('Phone'),
                   const SizedBox(height: 6),
-                  _field(_phoneCtrl, '+1 234 567 8900', type: TextInputType.phone),
+                  _field(
+                    _phoneCtrl,
+                    '+1 234 567 8900',
+                    type: TextInputType.phone,
+                  ),
                 ],
               ),
             ),
@@ -852,12 +902,17 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
 
   Widget _buildSummary() {
     final state = ref.watch(resumeBuilderViewModelProvider);
-    final isGenerating = state.aiSummaryStatus == ResumeBuilderLoadStatus.loading;
+    final isGenerating =
+        state.aiSummaryStatus == ResumeBuilderLoadStatus.loading;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.pencilLine, 'Professional Summary', 'A brief overview of your career'),
+        _sectionHeader(
+          LucideIcons.pencilLine,
+          'Professional Summary',
+          'A brief overview of your career',
+        ),
         const SizedBox(height: 20),
         _label('Target Role'),
         const SizedBox(height: 6),
@@ -868,12 +923,17 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           children: [
             _label('Professional Summary'),
             TextButton.icon(
-              onPressed: (isGenerating || _isGeneratingSummary) ? null : _generateSummary,
+              onPressed: (isGenerating || _isGeneratingSummary)
+                  ? null
+                  : _generateSummary,
               icon: (isGenerating || _isGeneratingSummary)
                   ? const SizedBox(
                       width: 14,
                       height: 14,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: AppColors.primary,
+                      ),
                     )
                   : const Icon(LucideIcons.sparkles, size: 14),
               label: const Text(
@@ -882,7 +942,10 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
               ),
               style: TextButton.styleFrom(
                 foregroundColor: AppColors.primary,
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
               ),
             ),
           ],
@@ -923,7 +986,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.briefcase, 'Work Experience', 'Your professional history'),
+        _sectionHeader(
+          LucideIcons.briefcase,
+          'Work Experience',
+          'Your professional history',
+        ),
         const SizedBox(height: 16),
         ..._experiences.asMap().entries.map(
           (entry) => _expCard(entry.key, entry.value),
@@ -997,7 +1064,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 ),
                 if (_experiences.length > 1)
                   IconButton(
-                    icon: const Icon(LucideIcons.trash2, size: 16, color: AppColors.error),
+                    icon: const Icon(
+                      LucideIcons.trash2,
+                      size: 16,
+                      color: AppColors.error,
+                    ),
                     onPressed: () => setState(() {
                       entry.dispose();
                       _experiences.removeAt(index);
@@ -1090,13 +1161,20 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                             ),
                           ),
                           child: entry.isCurrent
-                              ? const Icon(LucideIcons.check, size: 12, color: Colors.white)
+                              ? const Icon(
+                                  LucideIcons.check,
+                                  size: 12,
+                                  color: Colors.white,
+                                )
                               : null,
                         ),
                         const SizedBox(width: 8),
                         const Text(
                           'Currently working here',
-                          style: TextStyle(fontSize: 13, color: AppColors.textDark),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.textDark,
+                          ),
                         ),
                       ],
                     ),
@@ -1105,7 +1183,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 const SizedBox(height: 10),
                 _label('Description'),
                 const SizedBox(height: 4),
-                _field(entry.descCtrl, 'Describe your role and responsibilities...', maxLines: 3),
+                _field(
+                  entry.descCtrl,
+                  'Describe your role and responsibilities...',
+                  maxLines: 3,
+                ),
                 const SizedBox(height: 12),
                 // Bullets section
                 if (entry.bullets.isNotEmpty) ...[
@@ -1138,8 +1220,13 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                             ),
                           ),
                           GestureDetector(
-                            onTap: () => setState(() => entry.bullets.removeAt(b.key)),
-                            child: const Icon(LucideIcons.x, size: 14, color: AppColors.textLight),
+                            onTap: () =>
+                                setState(() => entry.bullets.removeAt(b.key)),
+                            child: const Icon(
+                              LucideIcons.x,
+                              size: 14,
+                              color: AppColors.textLight,
+                            ),
                           ),
                         ],
                       ),
@@ -1150,7 +1237,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: isGenerating ? null : () => _generateBullets(index),
+                    onPressed: isGenerating
+                        ? null
+                        : () => _generateBullets(index),
                     icon: isGenerating
                         ? const SizedBox(
                             width: 14,
@@ -1192,7 +1281,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.graduationCap, 'Education & Skills', 'Your academic background and skill set'),
+        _sectionHeader(
+          LucideIcons.graduationCap,
+          'Education & Skills',
+          'Your academic background and skill set',
+        ),
         const SizedBox(height: 16),
         ..._educations.asMap().entries.map((e) => _eduCard(e.key, e.value)),
         SizedBox(
@@ -1200,10 +1293,15 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           child: OutlinedButton.icon(
             onPressed: () => setState(() => _educations.add(_EduEntry())),
             icon: const Icon(LucideIcons.plus, size: 16),
-            label: const Text('Add Education', style: TextStyle(fontWeight: FontWeight.w600)),
+            label: const Text(
+              'Add Education',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -1214,14 +1312,21 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: _skills.asMap().entries.map((e) => _skillChip(e.key, e.value)).toList(),
+            children: _skills
+                .asMap()
+                .entries
+                .map((e) => _skillChip(e.key, e.value))
+                .toList(),
           ),
           const SizedBox(height: 12),
         ],
         Row(
           children: [
             Expanded(
-              child: _field(_skillInputCtrl, 'Add a skill (e.g. Flutter, Python...)'),
+              child: _field(
+                _skillInputCtrl,
+                'Add a skill (e.g. Flutter, Python...)',
+              ),
             ),
             const SizedBox(width: 10),
             ElevatedButton(
@@ -1229,11 +1334,19 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
                 elevation: 0,
               ),
-              child: const Text('Add', style: TextStyle(fontWeight: FontWeight.w600)),
+              child: const Text(
+                'Add',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
             ),
           ],
         ),
@@ -1256,7 +1369,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
             padding: const EdgeInsets.fromLTRB(14, 12, 8, 0),
             child: Row(
               children: [
-                const Icon(LucideIcons.graduationCap, size: 16, color: AppColors.primary),
+                const Icon(
+                  LucideIcons.graduationCap,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
@@ -1266,7 +1383,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 ),
                 if (_educations.length > 1)
                   IconButton(
-                    icon: const Icon(LucideIcons.trash2, size: 16, color: AppColors.error),
+                    icon: const Icon(
+                      LucideIcons.trash2,
+                      size: 16,
+                      color: AppColors.error,
+                    ),
                     onPressed: () => setState(() {
                       entry.dispose();
                       _educations.removeAt(index);
@@ -1376,7 +1497,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           const SizedBox(width: 6),
           GestureDetector(
             onTap: () => setState(() => _skills.removeAt(index)),
-            child: const Icon(LucideIcons.x, size: 13, color: AppColors.primary),
+            child: const Icon(
+              LucideIcons.x,
+              size: 13,
+              color: AppColors.primary,
+            ),
           ),
         ],
       ),
@@ -1398,7 +1523,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.folderOpen, 'Projects', 'Showcase your work (optional)'),
+        _sectionHeader(
+          LucideIcons.folderOpen,
+          'Projects',
+          'Showcase your work (optional)',
+        ),
         const SizedBox(height: 16),
         if (_projects.isEmpty)
           Container(
@@ -1411,7 +1540,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
             ),
             child: const Column(
               children: [
-                Icon(LucideIcons.folderOpen, size: 32, color: AppColors.textLight),
+                Icon(
+                  LucideIcons.folderOpen,
+                  size: 32,
+                  color: AppColors.textLight,
+                ),
                 SizedBox(height: 10),
                 Text(
                   'No projects added yet',
@@ -1439,10 +1572,15 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
               });
             },
             icon: const Icon(LucideIcons.plus, size: 16),
-            label: const Text('Add Project', style: TextStyle(fontWeight: FontWeight.w600)),
+            label: const Text(
+              'Add Project',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 12),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -1466,7 +1604,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
             padding: const EdgeInsets.fromLTRB(14, 12, 8, 0),
             child: Row(
               children: [
-                const Icon(LucideIcons.folderOpen, size: 16, color: Color(0xFF7C3AED)),
+                const Icon(
+                  LucideIcons.folderOpen,
+                  size: 16,
+                  color: Color(0xFF7C3AED),
+                ),
                 const SizedBox(width: 8),
                 const Expanded(
                   child: Text(
@@ -1475,7 +1617,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(LucideIcons.trash2, size: 16, color: AppColors.error),
+                  icon: const Icon(
+                    LucideIcons.trash2,
+                    size: 16,
+                    color: AppColors.error,
+                  ),
                   onPressed: () => setState(() {
                     entry.dispose();
                     _projects.removeAt(index);
@@ -1497,7 +1643,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 const SizedBox(height: 10),
                 _label('Description'),
                 const SizedBox(height: 4),
-                _field(entry.descCtrl, 'What does this project do?', maxLines: 3),
+                _field(
+                  entry.descCtrl,
+                  'What does this project do?',
+                  maxLines: 3,
+                ),
                 const SizedBox(height: 10),
                 _label('Project URL (optional)'),
                 const SizedBox(height: 4),
@@ -1511,11 +1661,16 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                     runSpacing: 6,
                     children: entry.technologies.asMap().entries.map((t) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
                         decoration: BoxDecoration(
                           color: const Color(0xFF7C3AED).withAlpha(15),
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(color: const Color(0xFF7C3AED).withAlpha(60)),
+                          border: Border.all(
+                            color: const Color(0xFF7C3AED).withAlpha(60),
+                          ),
                         ),
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
@@ -1530,8 +1685,14 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                             ),
                             const SizedBox(width: 4),
                             GestureDetector(
-                              onTap: () => setState(() => entry.technologies.removeAt(t.key)),
-                              child: const Icon(LucideIcons.x, size: 12, color: Color(0xFF7C3AED)),
+                              onTap: () => setState(
+                                () => entry.technologies.removeAt(t.key),
+                              ),
+                              child: const Icon(
+                                LucideIcons.x,
+                                size: 12,
+                                color: Color(0xFF7C3AED),
+                              ),
                             ),
                           ],
                         ),
@@ -1542,12 +1703,16 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                 ],
                 Row(
                   children: [
-                    Expanded(child: _field(techCtrl, 'Add technology (e.g. Flutter)')),
+                    Expanded(
+                      child: _field(techCtrl, 'Add technology (e.g. Flutter)'),
+                    ),
                     const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () {
                         final tech = techCtrl.text.trim();
-                        if (tech.isEmpty || entry.technologies.contains(tech)) return;
+                        if (tech.isEmpty || entry.technologies.contains(tech)) {
+                          return;
+                        }
                         setState(() {
                           entry.technologies.add(tech);
                           techCtrl.clear();
@@ -1556,11 +1721,22 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF7C3AED),
                         foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 14,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                         elevation: 0,
                       ),
-                      child: const Text('Add', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+                      child: const Text(
+                        'Add',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -1577,13 +1753,18 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   Widget _buildFinalize() {
     final state = ref.watch(resumeBuilderViewModelProvider);
     final vm = ref.read(resumeBuilderViewModelProvider.notifier);
-    final isGeneratingPdf = state.generatePdfStatus == ResumeBuilderLoadStatus.loading;
+    final isGeneratingPdf =
+        state.generatePdfStatus == ResumeBuilderLoadStatus.loading;
     final isSaving = state.saveResumeStatus == ResumeBuilderLoadStatus.loading;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _sectionHeader(LucideIcons.circleCheck, 'Finalize Resume', 'Review and export your resume'),
+        _sectionHeader(
+          LucideIcons.circleCheck,
+          'Finalize Resume',
+          'Review and export your resume',
+        ),
         const SizedBox(height: 16),
         // Summary cards
         _finalizeSummaryCard(
@@ -1595,7 +1776,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
         _finalizeSummaryCard(
           LucideIcons.pencilLine,
           'Summary',
-          _summaryCtrl.text.isNotEmpty ? '${_summaryCtrl.text.length} chars' : 'Not filled',
+          _summaryCtrl.text.isNotEmpty
+              ? '${_summaryCtrl.text.length} chars'
+              : 'Not filled',
           const Color(0xFF7C3AED),
         ),
         _finalizeSummaryCard(
@@ -1613,7 +1796,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
         _finalizeSummaryCard(
           LucideIcons.code,
           'Skills',
-          _skills.isNotEmpty ? '${_skills.length} skill(s): ${_skills.take(3).join(', ')}...' : 'None added',
+          _skills.isNotEmpty
+              ? '${_skills.length} skill(s): ${_skills.take(3).join(', ')}...'
+              : 'None added',
           const Color(0xFFEF4444),
         ),
         if (_projects.isNotEmpty)
@@ -1628,12 +1813,17 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
-            onPressed: (_draftId == null || isGeneratingPdf) ? null : () => _handleGeneratePdf(vm),
+            onPressed: (_draftId == null || isGeneratingPdf)
+                ? null
+                : () => _handleGeneratePdf(vm),
             icon: isGeneratingPdf
                 ? const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Icon(LucideIcons.fileDown, size: 18),
             label: Text(
@@ -1644,7 +1834,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -1653,12 +1845,17 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
-            onPressed: (_draftId == null || isSaving) ? null : () => _handleSaveAsResume(vm),
+            onPressed: (_draftId == null || isSaving)
+                ? null
+                : () => _handleSaveAsResume(vm),
             icon: isSaving
                 ? const SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(color: Color(0xFF059669), strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF059669),
+                      strokeWidth: 2,
+                    ),
                   )
                 : const Icon(LucideIcons.save, size: 18),
             label: Text(
@@ -1669,7 +1866,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
               foregroundColor: const Color(0xFF059669),
               side: const BorderSide(color: Color(0xFF059669)),
               padding: const EdgeInsets.symmetric(vertical: 14),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
             ),
           ),
         ),
@@ -1684,7 +1883,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
             ),
             child: Row(
               children: [
-                Icon(LucideIcons.circleCheck, size: 18, color: const Color(0xFF059669)),
+                Icon(
+                  LucideIcons.circleCheck,
+                  size: 18,
+                  color: const Color(0xFF059669),
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Column(
@@ -1736,7 +1939,12 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     );
   }
 
-  Widget _finalizeSummaryCard(IconData icon, String label, String value, Color color) {
+  Widget _finalizeSummaryCard(
+    IconData icon,
+    String label,
+    String value,
+    Color color,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.all(12),
@@ -1837,7 +2045,10 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
               ),
               Text(
                 subtitle,
-                style: const TextStyle(fontSize: 13, color: AppColors.textLight),
+                style: const TextStyle(
+                  fontSize: 13,
+                  color: AppColors.textLight,
+                ),
               ),
             ],
           ),
@@ -1849,10 +2060,10 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   Widget _subHeader(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
+        color: appTextPrimaryColor(context),
       ),
     );
   }
@@ -1860,10 +2071,10 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   Widget _label(String text) {
     return Text(
       text,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 13,
         fontWeight: FontWeight.w600,
-        color: AppColors.textDark,
+        color: appTextPrimaryColor(context),
       ),
     );
   }
@@ -1877,19 +2088,24 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: enabled ? Colors.white : AppColors.bgLight,
+        color: enabled
+            ? appSurfaceColor(context)
+            : appMutedSurfaceColor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: TextField(
         controller: ctrl,
         maxLines: maxLines,
         keyboardType: type,
         enabled: enabled,
-        style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+        style: TextStyle(fontSize: 14, color: appTextPrimaryColor(context)),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(color: AppColors.textMedium, fontSize: 14),
+          hintStyle: TextStyle(
+            color: appTextSecondaryColor(context),
+            fontSize: 14,
+          ),
           border: InputBorder.none,
           contentPadding: EdgeInsets.symmetric(
             horizontal: 12,
@@ -1903,23 +2119,29 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   Widget _iconField(IconData icon, TextEditingController ctrl, String hint) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: const Color(0xFFE5E7EB)),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Row(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Icon(icon, size: 18, color: AppColors.textLight),
+            child: Icon(icon, size: 18, color: appTextSecondaryColor(context)),
           ),
           Expanded(
             child: TextField(
               controller: ctrl,
-              style: const TextStyle(fontSize: 14, color: AppColors.textDark),
+              style: TextStyle(
+                fontSize: 14,
+                color: appTextPrimaryColor(context),
+              ),
               decoration: InputDecoration(
                 hintText: hint,
-                hintStyle: const TextStyle(color: AppColors.textMedium, fontSize: 14),
+                hintStyle: TextStyle(
+                  color: appTextSecondaryColor(context),
+                  fontSize: 14,
+                ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
