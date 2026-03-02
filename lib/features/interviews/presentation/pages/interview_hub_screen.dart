@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/interviews/domain/entities/interview_entity.dart';
@@ -229,7 +230,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                 _tabLabel(tab),
                 style: TextStyle(
                   fontSize: 13,
-                  color: selected ? Colors.white : AppColors.textDark,
+                  color: selected ? Colors.white : appTextPrimaryColor(context),
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
@@ -240,9 +241,9 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
               labelPadding: const EdgeInsets.symmetric(horizontal: 6),
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
               selectedColor: AppColors.primary,
-              backgroundColor: Colors.white,
+              backgroundColor: appSurfaceColor(context),
               side: BorderSide(
-                color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
+                color: selected ? AppColors.primary : appBorderColor(context),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
@@ -298,12 +299,12 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: appSurfaceColor(context),
           borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: const Color(0xFFF0F0F0)),
+          border: Border.all(color: appSubtleBorderColor(context)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(8),
+              color: Colors.black.withAlpha(isDarkMode(context) ? 18 : 8),
               blurRadius: 12,
               offset: const Offset(0, 2),
             ),
@@ -335,8 +336,8 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                 ),
                 Text(
                   "${interview.attemptsCount} people took this!",
-                  style: const TextStyle(
-                    color: AppColors.textMedium,
+                  style: TextStyle(
+                    color: appTextSecondaryColor(context),
                     fontSize: 13,
                   ),
                 ),
@@ -360,7 +361,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                       ),
                       Text(
                         "by ${interview.companyName}",
-                        style: const TextStyle(color: AppColors.textMedium),
+                        style: TextStyle(color: appTextSecondaryColor(context)),
                       ),
                     ],
                   ),
@@ -372,7 +373,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                           padding: const EdgeInsets.only(left: 6),
                           child: CircleAvatar(
                             radius: 15,
-                            backgroundColor: const Color(0xFFF3F4F6),
+                            backgroundColor: appMutedSurfaceColor(context),
                             child: SvgPicture.network(
                               url,
                               width: 16,
@@ -481,7 +482,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                       height: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                        border: Border.all(color: appBorderColor(context)),
                       ),
                       child: busySave
                           ? const Center(
@@ -528,10 +529,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
   }
 
   void _onRetake(InterviewEntity row) {
-    AppRoutes.push(
-      context,
-      InterviewDetailPage(interview: row),
-    );
+    AppRoutes.push(context, InterviewDetailPage(interview: row));
   }
 
   void _onAction(InterviewEntity row) {
@@ -546,10 +544,7 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
       return;
     }
 
-    AppRoutes.push(
-      context,
-      InterviewDetailPage(interview: row),
-    );
+    AppRoutes.push(context, InterviewDetailPage(interview: row));
   }
 
   void _snack(String message) {
@@ -689,7 +684,9 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                     label?.call(value) ?? value,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isSelected ? Colors.white : AppColors.textDark,
+                      color: isSelected
+                          ? Colors.white
+                          : appTextPrimaryColor(context),
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.w500,
@@ -705,11 +702,11 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
                     vertical: 4,
                   ),
                   selectedColor: AppColors.primary,
-                  backgroundColor: Colors.white,
+                  backgroundColor: appSurfaceColor(context),
                   side: BorderSide(
                     color: isSelected
                         ? AppColors.primary
-                        : const Color(0xFFE0E0E0),
+                        : appBorderColor(context),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
@@ -828,18 +825,18 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
+        color: appMutedSurfaceColor(context),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: AppColors.textLight),
+          Icon(icon, size: 14, color: appTextSecondaryColor(context)),
           const SizedBox(width: 4),
           Text(
             label,
-            style: const TextStyle(
-              color: AppColors.textLight,
+            style: TextStyle(
+              color: appTextSecondaryColor(context),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
