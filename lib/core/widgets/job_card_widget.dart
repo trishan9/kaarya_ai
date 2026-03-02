@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/jobs/presentation/pages/apply_to_job_page.dart';
 import 'package:kaarya/features/jobs/presentation/pages/job_detail_page.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
@@ -19,14 +20,15 @@ class JobCardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = isDarkMode(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: const Color(0xFFF0F0F0)),
+        border: Border.all(color: appSubtleBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(6),
+            color: Colors.black.withAlpha(isDark ? 18 : 6),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -37,13 +39,14 @@ class JobCardWidget extends StatelessWidget {
         children: [
           // Tappable body area — opens job detail
           InkWell(
-            onTap: onTap ??
+            onTap:
+                onTap ??
                 () => Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (_) =>
-                            JobDetailPage(jobId: job.id, jobTitle: job.title),
-                      ),
-                    ),
+                  MaterialPageRoute(
+                    builder: (_) =>
+                        JobDetailPage(jobId: job.id, jobTitle: job.title),
+                  ),
+                ),
             borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
             child: Padding(
               padding: const EdgeInsets.fromLTRB(14, 14, 14, 0),
@@ -79,7 +82,6 @@ class JobCardWidget extends StatelessWidget {
                               style: const TextStyle(
                                 fontSize: 15,
                                 fontWeight: FontWeight.w600,
-                                color: AppColors.textDark,
                               ),
                             ),
                             const SizedBox(height: 2),
@@ -87,8 +89,8 @@ class JobCardWidget extends StatelessWidget {
                               job.companyName,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(
-                                color: AppColors.textLight,
+                              style: TextStyle(
+                                color: appTextSecondaryColor(context),
                                 fontSize: 12,
                               ),
                             ),
@@ -106,10 +108,30 @@ class JobCardWidget extends StatelessWidget {
                         spacing: 6,
                         runSpacing: 6,
                         children: [
-                          _chip(LucideIcons.mapPin, job.location, maxW: full),
-                          _chip(LucideIcons.clock, job.employmentType, maxW: half),
-                          _chip(LucideIcons.building2, _formatWorkMode(job.workMode), maxW: half),
-                          _chip(LucideIcons.banknote, job.salaryRange, maxW: full),
+                          _chip(
+                            context,
+                            LucideIcons.mapPin,
+                            job.location,
+                            maxW: full,
+                          ),
+                          _chip(
+                            context,
+                            LucideIcons.clock,
+                            job.employmentType,
+                            maxW: half,
+                          ),
+                          _chip(
+                            context,
+                            LucideIcons.building2,
+                            _formatWorkMode(job.workMode),
+                            maxW: half,
+                          ),
+                          _chip(
+                            context,
+                            LucideIcons.banknote,
+                            job.salaryRange,
+                            maxW: full,
+                          ),
                         ],
                       );
                     },
@@ -130,19 +152,25 @@ class JobCardWidget extends StatelessWidget {
                     child: ElevatedButton(
                       onPressed: () {
                         if (job.hasApplied) {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => JobDetailPage(
-                                jobId: job.id, jobTitle: job.title),
-                          ));
-                        } else {
-                          Navigator.of(context).push(MaterialPageRoute(
-                            builder: (_) => ApplyToJobPage(
-                              jobId: job.id,
-                              jobTitle: job.title,
-                              companyName: job.companyName,
-                              companyLogo: job.companyLogo,
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => JobDetailPage(
+                                jobId: job.id,
+                                jobTitle: job.title,
+                              ),
                             ),
-                          ));
+                          );
+                        } else {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (_) => ApplyToJobPage(
+                                jobId: job.id,
+                                jobTitle: job.title,
+                                companyName: job.companyName,
+                                companyLogo: job.companyLogo,
+                              ),
+                            ),
+                          );
                         }
                       },
                       child: Text(
@@ -163,7 +191,7 @@ class JobCardWidget extends StatelessWidget {
                       width: 40,
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(6),
-                        border: Border.all(color: const Color(0xFFE5E7EB)),
+                        border: Border.all(color: appBorderColor(context)),
                       ),
                       child: Icon(
                         job.isSaved
@@ -243,28 +271,33 @@ class JobCardWidget extends StatelessWidget {
     );
   }
 
-  static Widget _chip(IconData icon, String label, {required double maxW}) {
+  static Widget _chip(
+    BuildContext context,
+    IconData icon,
+    String label, {
+    required double maxW,
+  }) {
     return ConstrainedBox(
       constraints: BoxConstraints(maxWidth: maxW),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         decoration: BoxDecoration(
-          color: const Color(0xFFF8F9FA),
+          color: appMutedSurfaceColor(context),
           borderRadius: BorderRadius.circular(4),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 12, color: AppColors.textLight),
+            Icon(icon, size: 12, color: appTextSecondaryColor(context)),
             const SizedBox(width: 4),
             Flexible(
               child: Text(
                 label,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 11,
-                  color: AppColors.textLight,
+                  color: appTextSecondaryColor(context),
                   fontWeight: FontWeight.w500,
                 ),
               ),

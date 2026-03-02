@@ -22,12 +22,14 @@ class WorkspaceSettingsSection extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: _surfaceColor(context),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: AppColors.borderStroke),
+        border: Border.all(color: _borderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(
+              alpha: _isDark(context) ? 0.0 : 0.03,
+            ),
             blurRadius: 12,
             offset: const Offset(0, 4),
           ),
@@ -40,14 +42,14 @@ class WorkspaceSettingsSection extends StatelessWidget {
             title,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
               fontWeight: FontWeight.w700,
-              color: AppColors.textDark,
+              color: _textPrimary(context),
             ),
           ),
           const SizedBox(height: 8),
           Text(
             description,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textLight,
+              color: _textSecondary(context),
               height: 1.45,
             ),
           ),
@@ -88,7 +90,7 @@ class WorkspaceSettingsField extends StatelessWidget {
           label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
+            color: _textPrimary(context),
           ),
         ),
         const SizedBox(height: 8),
@@ -97,7 +99,7 @@ class WorkspaceSettingsField extends StatelessWidget {
           keyboardType: keyboardType,
           maxLines: maxLines,
           validator: validator,
-          decoration: _inputDecoration(hintText: hintText),
+          decoration: _inputDecoration(context, hintText: hintText),
         ),
         if (helperText != null) ...[
           const SizedBox(height: 8),
@@ -105,7 +107,7 @@ class WorkspaceSettingsField extends StatelessWidget {
             helperText!,
             style: Theme.of(
               context,
-            ).textTheme.bodySmall?.copyWith(color: AppColors.textLight),
+            ).textTheme.bodySmall?.copyWith(color: _textSecondary(context)),
           ),
         ],
       ],
@@ -146,7 +148,7 @@ class WorkspaceLogoPicker extends StatelessWidget {
           label,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
             fontWeight: FontWeight.w600,
-            color: AppColors.textDark,
+            color: _textPrimary(context),
           ),
         ),
         const SizedBox(height: 8),
@@ -154,9 +156,9 @@ class WorkspaceLogoPicker extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(14),
           decoration: BoxDecoration(
-            color: AppColors.bgTertiary,
+            color: _surfaceMutedColor(context),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppColors.borderStroke),
+            border: Border.all(color: _borderColor(context)),
           ),
           child: LayoutBuilder(
             builder: (context, constraints) {
@@ -232,10 +234,10 @@ class WorkspaceInviteCodePanel extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.bgTertiary,
+        color: _surfaceMutedColor(context),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: AppColors.borderStroke,
+          color: _borderColor(context),
           style: BorderStyle.solid,
         ),
       ),
@@ -253,7 +255,7 @@ class WorkspaceInviteCodePanel extends StatelessWidget {
                   Text(
                     'INVITE CODE',
                     style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: AppColors.textLight,
+                      color: _textSecondary(context),
                       letterSpacing: 1,
                     ),
                   ),
@@ -262,7 +264,7 @@ class WorkspaceInviteCodePanel extends StatelessWidget {
                     code.isEmpty ? 'Unavailable' : code,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textDark,
+                      color: _textPrimary(context),
                     ),
                   ),
                 ],
@@ -318,9 +320,9 @@ class WorkspaceMemberTile extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.bgTertiary,
+        color: _surfaceMutedColor(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderStroke),
+        border: Border.all(color: _borderColor(context)),
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -337,14 +339,14 @@ class WorkspaceMemberTile extends StatelessWidget {
                       name,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textDark,
+                        color: _textPrimary(context),
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       email,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textLight,
+                        color: _textSecondary(context),
                       ),
                     ),
                   ],
@@ -365,6 +367,11 @@ class WorkspaceMemberTile extends StatelessWidget {
                 ),
                 decoration: BoxDecoration(
                   color: AppColors.bgSecondary,
+                  border: Border.all(
+                    color: _isDark(context)
+                        ? AppColors.primary.withValues(alpha: 0.2)
+                        : Colors.transparent,
+                  ),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
@@ -428,9 +435,9 @@ class WorkspaceMetricTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: AppColors.bgTertiary,
+        color: _surfaceMutedColor(context),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: AppColors.borderStroke),
+        border: Border.all(color: _borderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,13 +446,13 @@ class WorkspaceMetricTile extends StatelessWidget {
             label,
             style: Theme.of(
               context,
-            ).textTheme.labelMedium?.copyWith(color: AppColors.textLight),
+            ).textTheme.labelMedium?.copyWith(color: _textSecondary(context)),
           ),
           const SizedBox(height: 8),
           Text(
             value,
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              color: AppColors.textDark,
+              color: _textPrimary(context),
               fontWeight: FontWeight.w800,
             ),
           ),
@@ -479,14 +486,14 @@ class WorkspaceEmptyState extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(icon, size: 52, color: AppColors.textMedium),
+              Icon(icon, size: 52, color: _textSecondary(context)),
               const SizedBox(height: 16),
               Text(
                 title,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w700,
-                  color: AppColors.textDark,
+                  color: _textPrimary(context),
                 ),
               ),
               const SizedBox(height: 8),
@@ -494,7 +501,7 @@ class WorkspaceEmptyState extends StatelessWidget {
                 description,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textLight,
+                  color: _textSecondary(context),
                   height: 1.45,
                 ),
               ),
@@ -507,19 +514,19 @@ class WorkspaceEmptyState extends StatelessWidget {
   }
 }
 
-InputDecoration _inputDecoration({String? hintText}) {
+InputDecoration _inputDecoration(BuildContext context, {String? hintText}) {
   return InputDecoration(
     hintText: hintText,
     filled: true,
-    fillColor: Colors.white,
+    fillColor: _surfaceColor(context),
     contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
     border: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.borderStroke),
+      borderSide: BorderSide(color: _borderColor(context)),
     ),
     enabledBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
-      borderSide: const BorderSide(color: AppColors.borderStroke),
+      borderSide: BorderSide(color: _borderColor(context)),
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.circular(12),
@@ -613,7 +620,7 @@ class _LogoActions extends StatelessWidget {
               label: const Text('Upload Logo'),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textDark,
-                side: const BorderSide(color: AppColors.borderStroke),
+                side: BorderSide(color: _borderColor(context)),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
                   vertical: 12,
@@ -627,7 +634,7 @@ class _LogoActions extends StatelessWidget {
               TextButton(
                 onPressed: onResetTap,
                 style: TextButton.styleFrom(
-                  foregroundColor: AppColors.textLight,
+                  foregroundColor: _textSecondary(context),
                   textStyle: Theme.of(
                     context,
                   ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
@@ -702,13 +709,31 @@ class _InviteActionButton extends StatelessWidget {
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           padding: EdgeInsets.zero,
-          side: const BorderSide(color: AppColors.borderStroke),
+          side: BorderSide(color: _borderColor(context)),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        child: Icon(icon, size: 18, color: AppColors.textDark),
+        child: Icon(icon, size: 18, color: _textPrimary(context)),
       ),
     );
   }
 }
+
+bool _isDark(BuildContext context) =>
+    Theme.of(context).brightness == Brightness.dark;
+
+Color _surfaceColor(BuildContext context) =>
+    _isDark(context) ? const Color(0xFF0F141B) : Colors.white;
+
+Color _surfaceMutedColor(BuildContext context) =>
+    _isDark(context) ? const Color(0xFF111922) : AppColors.bgTertiary;
+
+Color _borderColor(BuildContext context) =>
+    _isDark(context) ? const Color(0xFF263446) : AppColors.borderStroke;
+
+Color _textPrimary(BuildContext context) =>
+    Theme.of(context).colorScheme.onSurface;
+
+Color _textSecondary(BuildContext context) =>
+    _isDark(context) ? const Color(0xFF8DA1B5) : AppColors.textLight;
