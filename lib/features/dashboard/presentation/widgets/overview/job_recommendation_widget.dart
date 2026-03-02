@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 import 'package:kaarya/features/jobs/domain/entities/jobs_section_entity.dart'
     show JobsBucketEntity;
@@ -44,12 +45,12 @@ class _JobRecommendationWidgetState extends State<JobRecommendationWidget> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: const EdgeInsets.all(0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.all(12),
@@ -94,7 +95,7 @@ class _JobRecommendationWidgetState extends State<JobRecommendationWidget> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   "No jobs found for this filter.",
-                  style: TextStyle(color: AppColors.textMedium),
+                  style: TextStyle(color: appTextSecondaryColor(context)),
                 ),
               )
             else

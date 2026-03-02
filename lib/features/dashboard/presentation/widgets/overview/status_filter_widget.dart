@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/dashboard/presentation/widgets/overview/summary_card_widget.dart';
 
 class StatusFilterWidget extends StatelessWidget {
@@ -31,7 +32,7 @@ class StatusFilterWidget extends StatelessWidget {
               _buildLabel(status),
               style: TextStyle(
                 fontSize: 13,
-                color: selected ? Colors.white : AppColors.textDark,
+                color: selected ? Colors.white : appTextPrimaryColor(context),
                 fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
@@ -42,9 +43,9 @@ class StatusFilterWidget extends StatelessWidget {
             labelPadding: const EdgeInsets.symmetric(horizontal: 6),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             selectedColor: AppColors.primary,
-            backgroundColor: Colors.white,
+            backgroundColor: appSurfaceColor(context),
             side: BorderSide(
-              color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
+              color: selected ? AppColors.primary : appBorderColor(context),
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(6),

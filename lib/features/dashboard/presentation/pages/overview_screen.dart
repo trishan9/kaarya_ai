@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/core/utils/navigation_provider.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/state/dashboard_state.dart';
@@ -230,6 +231,13 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
   }
 
   Color _interviewBadgeBackground(double rating) {
+    if (isDarkMode(context)) {
+      if (rating >= 80) return const Color(0xFF12261C);
+      if (rating >= 65) return const Color(0xFF102233);
+      if (rating >= 50) return const Color(0xFF2A1E12);
+      if (rating > 0) return const Color(0xFF2C1518);
+      return const Color(0xFF1B2430);
+    }
     if (rating >= 80) return const Color(0xFFECFDF3);
     if (rating >= 65) return AppColors.bgSecondary;
     if (rating >= 50) return const Color(0xFFFFF7ED);

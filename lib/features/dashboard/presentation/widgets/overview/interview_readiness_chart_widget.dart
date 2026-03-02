@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/dashboard/domain/entities/dashboard_overview_entity.dart';
 
 class InterviewReadinessChartWidget extends StatelessWidget {
@@ -18,12 +19,12 @@ class InterviewReadinessChartWidget extends StatelessWidget {
     final growth = _growthPercent();
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -65,7 +66,7 @@ class InterviewReadinessChartWidget extends StatelessWidget {
                       drawVerticalLine: false,
                       horizontalInterval: 20,
                       getDrawingHorizontalLine: (value) => FlLine(
-                        color: AppColors.borderStroke2,
+                        color: appSubtleBorderColor(context),
                         strokeWidth: 1,
                       ),
                     ),
@@ -78,9 +79,9 @@ class InterviewReadinessChartWidget extends StatelessWidget {
                           getTitlesWidget: (value, _) {
                             return Text(
                               "${value.toInt()}%",
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textMedium,
+                                color: appTextSecondaryColor(context),
                               ),
                             );
                           },
@@ -99,9 +100,9 @@ class InterviewReadinessChartWidget extends StatelessWidget {
 
                             return Text(
                               label,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 11,
-                                color: AppColors.textMedium,
+                                color: appTextSecondaryColor(context),
                               ),
                             );
                           },

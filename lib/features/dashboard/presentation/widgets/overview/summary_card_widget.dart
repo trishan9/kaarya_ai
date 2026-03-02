@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/dashboard/domain/entities/dashboard_overview_entity.dart';
 import 'package:kaarya/features/dashboard/presentation/widgets/overview/status_filter_widget.dart';
 
@@ -59,12 +60,12 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
     final recentCompanies = widget.summary.recentCompanies;
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: const EdgeInsets.all(0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
@@ -85,11 +86,11 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
                             ?.copyWith(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 2),
-                      const Text(
+                      Text(
                         "Live application pipeline snapshot.",
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textMedium,
+                          color: appTextSecondaryColor(context),
                         ),
                       ),
                     ],
@@ -101,8 +102,8 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   elevation: 4,
-                  color: Colors.white,
-                  surfaceTintColor: Colors.white,
+                  color: appSurfaceColor(context),
+                  surfaceTintColor: appSurfaceColor(context),
                   itemBuilder: (_) => monthOptions
                       .map(
                         (item) => PopupMenuItem<String>(
@@ -120,7 +121,7 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
                       vertical: 6,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.borderStroke2,
+                      color: appMutedSurfaceColor(context),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
@@ -174,7 +175,6 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textMedium,
                 ),
                 children: [
                   TextSpan(
@@ -199,9 +199,9 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFAFAFA),
+                  color: appMutedSurfaceColor(context),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.borderStroke2),
+                  border: Border.all(color: appSubtleBorderColor(context)),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -226,10 +226,10 @@ class SummaryCardWidgetState extends State<SummaryCardWidget> {
                                 vertical: 5,
                               ),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: appSurfaceColor(context),
                                 borderRadius: BorderRadius.circular(4),
                                 border: Border.all(
-                                  color: AppColors.borderStroke2,
+                                  color: appSubtleBorderColor(context),
                                 ),
                               ),
                               child: Text(
@@ -402,7 +402,7 @@ class _CompanyAvatar extends StatelessWidget {
   Widget build(BuildContext context) {
     return CircleAvatar(
       radius: size / 2,
-      backgroundColor: Colors.white,
+      backgroundColor: appSurfaceColor(context),
       child: ClipOval(
         child: SizedBox(
           width: size,

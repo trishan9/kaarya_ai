@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/core/utils/build_icon.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 
@@ -13,12 +14,12 @@ class DeadlineCardWidget extends StatelessWidget {
     final deadlineJob = job;
     if (deadlineJob == null) {
       return Card(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         elevation: 0,
         margin: const EdgeInsets.all(0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: Colors.grey.shade300),
+          side: BorderSide(color: appBorderColor(context)),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -31,12 +32,12 @@ class DeadlineCardWidget extends StatelessWidget {
               ),
               SizedBox(height: 12),
               Card(
-                color: AppColors.bgTertiary,
+                color: appMutedSurfaceColor(context),
                 elevation: 0,
                 margin: const EdgeInsets.all(0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
-                  side: BorderSide(color: AppColors.borderStroke2),
+                  side: BorderSide(color: appSubtleBorderColor(context)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
@@ -102,12 +103,12 @@ class DeadlineCardWidget extends StatelessWidget {
     }
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: const EdgeInsets.all(0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -125,12 +126,12 @@ class DeadlineCardWidget extends StatelessWidget {
             ),
             SizedBox(height: 18),
             Card(
-              color: AppColors.bgTertiary,
+              color: appMutedSurfaceColor(context),
               elevation: 0,
               margin: const EdgeInsets.all(0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
-                side: BorderSide(color: AppColors.borderStroke2),
+                side: BorderSide(color: appSubtleBorderColor(context)),
               ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
@@ -163,7 +164,7 @@ class DeadlineCardWidget extends StatelessWidget {
                             Text(
                               deadlineJob.companyName,
                               style: TextStyle(
-                                color: AppColors.textMedium,
+                                color: appTextSecondaryColor(context),
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
@@ -185,7 +186,7 @@ class DeadlineCardWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textMedium,
+                  color: appTextSecondaryColor(context),
                 ),
                 children: [
                   TextSpan(
