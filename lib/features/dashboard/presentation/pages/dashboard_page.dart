@@ -50,6 +50,7 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isRecruiter = ref.watch(isRecruiterProvider);
     final isCollege = ref.watch(isCollegeProvider);
+    final dividerColor = Theme.of(context).dividerColor;
 
     if (isRecruiter) {
       return const _RecruiterDashboard();
@@ -70,12 +71,12 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
+            child: const NotificationsWidget(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: dividerColor),
         ),
       ),
 
@@ -88,7 +89,7 @@ class DashboardPage extends ConsumerWidget {
         children: [
           Container(
             height: 2,
-            color: const Color(0xFFF0F0F0),
+            color: dividerColor,
             child: Row(
               children: List.generate(5, (index) {
                 return Expanded(
@@ -210,6 +211,7 @@ class _RecruiterDashboard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final destination = ref.watch(recruiterNavProvider);
     final selectedIndex = _recruiterIndexFromDest(destination);
+    final dividerColor = Theme.of(context).dividerColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -220,12 +222,12 @@ class _RecruiterDashboard extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
+            child: const NotificationsWidget(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: dividerColor),
         ),
       ),
       drawer: AppDrawerWidget(),
@@ -235,7 +237,7 @@ class _RecruiterDashboard extends ConsumerWidget {
         children: [
           Container(
             height: 2,
-            color: const Color(0xFFF0F0F0),
+            color: dividerColor,
             child: Row(
               children: List.generate(4, (index) {
                 return Expanded(
@@ -334,6 +336,7 @@ class _CollegeDashboard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final destination = ref.watch(collegeNavProvider);
     final selectedIndex = _collegeIndexFromDest(destination);
+    final dividerColor = Theme.of(context).dividerColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -344,12 +347,12 @@ class _CollegeDashboard extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
+            child: const NotificationsWidget(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: dividerColor),
         ),
       ),
       drawer: AppDrawerWidget(),
@@ -360,7 +363,7 @@ class _CollegeDashboard extends ConsumerWidget {
         children: [
           Container(
             height: 2,
-            color: const Color(0xFFF0F0F0),
+            color: dividerColor,
             child: Row(
               children: List.generate(4, (index) {
                 return Expanded(
