@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/resume_builder/domain/entities/ats_scan_result_entity.dart';
 import 'package:kaarya/features/resume_builder/domain/entities/resume_draft_entity.dart';
 import 'package:kaarya/features/resume_builder/presentation/pages/resume_editor_page.dart';
@@ -49,11 +50,11 @@ class _ResumeBuilderScreenState extends ConsumerState<ResumeBuilderScreen>
     return Column(
       children: [
         Container(
-          color: Colors.white,
+          color: appSurfaceColor(context),
           child: TabBar(
             controller: _tabController,
             labelColor: AppColors.primary,
-            unselectedLabelColor: AppColors.textLight,
+            unselectedLabelColor: appTextSecondaryColor(context),
             indicatorColor: AppColors.primary,
             indicatorWeight: 2,
             labelStyle: const TextStyle(
@@ -74,9 +75,7 @@ class _ResumeBuilderScreenState extends ConsumerState<ResumeBuilderScreen>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _AiBuilderTab(
-                onSwitchToAts: () => _tabController.animateTo(1),
-              ),
+              _AiBuilderTab(onSwitchToAts: () => _tabController.animateTo(1)),
               const _AtsScannerTab(),
             ],
           ),
@@ -115,11 +114,11 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
     final filtered = _searchQuery.isEmpty
         ? drafts
         : drafts
-            .where(
-              (d) =>
-                  d.title.toLowerCase().contains(_searchQuery.toLowerCase()),
-            )
-            .toList();
+              .where(
+                (d) =>
+                    d.title.toLowerCase().contains(_searchQuery.toLowerCase()),
+              )
+              .toList();
 
     return Stack(
       children: [
@@ -132,24 +131,24 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
               Container(
                 height: 44,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: appSurfaceColor(context),
                   borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.borderStroke),
+                  border: Border.all(color: appBorderColor(context)),
                 ),
                 child: TextField(
                   controller: _searchCtrl,
                   onChanged: (v) => setState(() => _searchQuery = v),
-                  decoration: const InputDecoration(
+                  decoration: InputDecoration(
                     hintText: 'Search resumes...',
                     prefixIcon: Icon(
                       LucideIcons.search,
                       size: 18,
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                     ),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.symmetric(vertical: 12),
                     hintStyle: TextStyle(
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                       fontSize: 14,
                     ),
                   ),
@@ -246,7 +245,10 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: Colors.white.withAlpha(30),
                   borderRadius: BorderRadius.circular(20),
@@ -280,7 +282,11 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
               const Text(
                 'Create ATS-optimized resumes with AI. Get smart suggestions, '
                 'beautiful templates, and instant feedback.',
-                style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 13,
+                  height: 1.4,
+                ),
               ),
               const SizedBox(height: 16),
               Row(
@@ -425,9 +431,9 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
       MaterialPageRoute(builder: (_) => ResumeEditorPage(draftId: draftId)),
     );
     if (result == true && mounted) {
-      ref.read(resumeBuilderViewModelProvider.notifier).loadDrafts(
-        forceRefresh: true,
-      );
+      ref
+          .read(resumeBuilderViewModelProvider.notifier)
+          .loadDrafts(forceRefresh: true);
     }
   }
 
@@ -493,7 +499,10 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
                         onPressed: () {
                           Clipboard.setData(ClipboardData(text: result.pdfUrl));
                           Navigator.pop(context);
-                          SnackbarUtils.showSuccess(context, 'Link copied to clipboard!');
+                          SnackbarUtils.showSuccess(
+                            context,
+                            'Link copied to clipboard!',
+                          );
                         },
                         icon: const Icon(LucideIcons.copy, size: 15),
                         label: const Text('Copy'),
@@ -512,7 +521,10 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
                           Navigator.pop(context);
                           final uri = Uri.tryParse(result.pdfUrl);
                           if (uri != null && await canLaunchUrl(uri)) {
-                            await launchUrl(uri, mode: LaunchMode.externalApplication);
+                            await launchUrl(
+                              uri,
+                              mode: LaunchMode.externalApplication,
+                            );
                           }
                         },
                         icon: const Icon(LucideIcons.download, size: 15),
@@ -676,8 +688,7 @@ class _DraftCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final templateColor =
-        _templateColors[draft.template] ?? AppColors.primary;
+    final templateColor = _templateColors[draft.template] ?? AppColors.primary;
 
     return Container(
       decoration: BoxDecoration(
@@ -699,8 +710,9 @@ class _DraftCard extends StatelessWidget {
             height: 6,
             decoration: BoxDecoration(
               color: templateColor,
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(12)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(12),
+              ),
             ),
           ),
           Padding(
@@ -1032,7 +1044,10 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                     SizedBox(height: 2),
                     Text(
                       'Upload a PDF or select a draft resume to get an instant ATS score.',
-                      style: TextStyle(fontSize: 12, color: AppColors.textLight),
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textLight,
+                      ),
                     ),
                   ],
                 ),
@@ -1051,7 +1066,10 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text(
                   'or upload a PDF',
-                  style: const TextStyle(fontSize: 12, color: AppColors.textLight),
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: AppColors.textLight,
+                  ),
                 ),
               ),
               const Expanded(child: Divider()),
@@ -1062,15 +1080,13 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
         _buildUploadSection(),
         const SizedBox(height: 12),
         _buildOptionsToggle(),
-        if (_showOptions) ...[
-          const SizedBox(height: 12),
-          _buildOptions(),
-        ],
+        if (_showOptions) ...[const SizedBox(height: 12), _buildOptions()],
         const SizedBox(height: 16),
         SizedBox(
           height: 50,
           child: ElevatedButton.icon(
-            onPressed: ((_filePath == null && _selectedDraftId == null) ||
+            onPressed:
+                ((_filePath == null && _selectedDraftId == null) ||
                     isScanning ||
                     _isPreparingDraft)
                 ? null
@@ -1265,7 +1281,10 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
         children: [
           _label('Target Role (optional)'),
           const SizedBox(height: 6),
-          _input(controller: _targetRoleCtrl, hint: 'e.g. Senior Frontend Engineer'),
+          _input(
+            controller: _targetRoleCtrl,
+            hint: 'e.g. Senior Frontend Engineer',
+          ),
           const SizedBox(height: 14),
           _label('Experience Level'),
           const SizedBox(height: 8),
@@ -1294,9 +1313,7 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                     _capitalize(lvl),
                     style: TextStyle(
                       fontSize: 13,
-                      fontWeight: selected
-                          ? FontWeight.w600
-                          : FontWeight.w400,
+                      fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                       color: selected ? Colors.white : AppColors.textDark,
                     ),
                   ),
@@ -1381,13 +1398,20 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
             ),
             child: Row(
               children: [
-                const Icon(LucideIcons.circleAlert, size: 16, color: AppColors.error),
+                const Icon(
+                  LucideIcons.circleAlert,
+                  size: 16,
+                  color: AppColors.error,
+                ),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     result.classificationReason ??
                         'This document does not appear to be a resume.',
-                    style: const TextStyle(color: AppColors.error, fontSize: 13),
+                    style: const TextStyle(
+                      color: AppColors.error,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
               ],
@@ -1398,11 +1422,29 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
         // ── Stats row ─────────────────────────────────────────────────────
         Row(
           children: [
-            Expanded(child: _statsBox('Overall', '$scoreInt/100', const Color(0xFF0471B6))),
+            Expanded(
+              child: _statsBox(
+                'Overall',
+                '$scoreInt/100',
+                const Color(0xFF0471B6),
+              ),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: _statsBox('Strengths', '${result.totalStrengths}', const Color(0xFF10B981))),
+            Expanded(
+              child: _statsBox(
+                'Strengths',
+                '${result.totalStrengths}',
+                const Color(0xFF10B981),
+              ),
+            ),
             const SizedBox(width: 8),
-            Expanded(child: _statsBox('To Improve', '${result.totalImprovements}', const Color(0xFFF59E0B))),
+            Expanded(
+              child: _statsBox(
+                'To Improve',
+                '${result.totalImprovements}',
+                const Color(0xFFF59E0B),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -1477,18 +1519,26 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                         const SizedBox(height: 10),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFECFDF5),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFF10B981).withAlpha(60)),
+                            border: Border.all(
+                              color: const Color(0xFF10B981).withAlpha(60),
+                            ),
                           ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
                                   'Strengths',
-                                  style: TextStyle(fontSize: 12, color: const Color(0xFF059669)),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: const Color(0xFF059669),
+                                  ),
                                 ),
                               ),
                               Text(
@@ -1505,18 +1555,26 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                         const SizedBox(height: 8),
                         Container(
                           width: double.infinity,
-                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: const Color(0xFFFFFBEB),
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFF59E0B).withAlpha(60)),
+                            border: Border.all(
+                              color: const Color(0xFFF59E0B).withAlpha(60),
+                            ),
                           ),
                           child: Row(
                             children: [
                               Expanded(
                                 child: Text(
                                   'To Improve',
-                                  style: TextStyle(fontSize: 12, color: const Color(0xFFB45309)),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: const Color(0xFFB45309),
+                                  ),
                                 ),
                               ),
                               Text(
@@ -1565,7 +1623,9 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                   style: TextStyle(fontSize: 13, color: Color(0xFF6B7280)),
                 )
               else
-                ...categories.map((c) => _scoreBar(c.$1, c.$2.score, _scoreColor(c.$2.score))),
+                ...categories.map(
+                  (c) => _scoreBar(c.$1, c.$2.score, _scoreColor(c.$2.score)),
+                ),
             ],
           ),
         ),
@@ -1741,8 +1801,9 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 1),
+                                          padding: const EdgeInsets.only(
+                                            top: 1,
+                                          ),
                                           child: Icon(
                                             isGood
                                                 ? LucideIcons.circleCheck
@@ -1768,7 +1829,8 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                                                 ),
                                               ),
                                               if (tip.explanation != null &&
-                                                  tip.explanation!
+                                                  tip
+                                                      .explanation!
                                                       .isNotEmpty) ...[
                                                 const SizedBox(height: 3),
                                                 Text(
@@ -1826,10 +1888,7 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
         style: const TextStyle(fontSize: 14, color: AppColors.textDark),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(
-            color: AppColors.textMedium,
-            fontSize: 14,
-          ),
+          hintStyle: const TextStyle(color: AppColors.textMedium, fontSize: 14),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(12),
         ),
@@ -1979,7 +2038,10 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
       if (!mounted) return;
       if (pdfFailure != null || pdfResult == null) {
         setState(() => _isPreparingDraft = false);
-        SnackbarUtils.showError(context, pdfFailure?.message ?? 'Failed to generate PDF');
+        SnackbarUtils.showError(
+          context,
+          pdfFailure?.message ?? 'Failed to generate PDF',
+        );
         return;
       }
       scanPath = await _downloadPdfToTemp(pdfResult.pdfUrl);
@@ -2008,8 +2070,7 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
   Future<String?> _downloadPdfToTemp(String url) async {
     try {
       final tempDir = await getTemporaryDirectory();
-      final fileName =
-          'ats_scan_${DateTime.now().millisecondsSinceEpoch}.pdf';
+      final fileName = 'ats_scan_${DateTime.now().millisecondsSinceEpoch}.pdf';
       final filePath = '${tempDir.path}/$fileName';
       await Dio().download(url, filePath);
       return File(filePath).existsSync() ? filePath : null;
@@ -2046,7 +2107,10 @@ class _ScoreArcPainter extends CustomPainter {
       ..strokeCap = StrokeCap.round;
     canvas.drawArc(
       Rect.fromCircle(center: center, radius: radius),
-      startAngle, totalSweep, false, bgPaint,
+      startAngle,
+      totalSweep,
+      false,
+      bgPaint,
     );
 
     if (progress > 0) {
@@ -2057,7 +2121,10 @@ class _ScoreArcPainter extends CustomPainter {
         ..strokeCap = StrokeCap.round;
       canvas.drawArc(
         Rect.fromCircle(center: center, radius: radius),
-        startAngle, totalSweep * progress, false, fgPaint,
+        startAngle,
+        totalSweep * progress,
+        false,
+        fgPaint,
       );
     }
   }
