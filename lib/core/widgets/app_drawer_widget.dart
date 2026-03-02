@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_mode_controller.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/navigation_provider.dart';
 import 'package:kaarya/core/utils/user_role_provider.dart';
@@ -344,6 +345,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   Widget build(BuildContext context) {
     final isRecruiter = ref.watch(isRecruiterProvider);
     final isCollege = ref.watch(isCollegeProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final current = ref.watch(bottomNavProvider);
     final pushedPage = ref.watch(pushedPageProvider);
     final session = ref.watch(userSessionServiceProvider);
@@ -380,7 +382,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
 
     return Drawer(
       elevation: 0,
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).drawerTheme.backgroundColor,
       child: SafeArea(
         child: Column(
           children: [
@@ -390,9 +392,13 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                 children: [
                   Image.asset('assets/images/kaarya_logo.png', width: 36),
                   const SizedBox(width: 10),
-                  const Text(
+                  Text(
                     'Kaarya',
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700),
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
                   ),
                 ],
               ),
@@ -401,23 +407,36 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8F9FA),
+                  color: isDark
+                      ? const Color(0xFF111922)
+                      : const Color(0xFFF8F9FA),
                   borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: isDark
+                        ? const Color(0xFF263446)
+                        : Colors.transparent,
+                  ),
                 ),
                 child: TextField(
                   decoration: InputDecoration(
                     hintText: 'Quick search...',
-                    hintStyle: const TextStyle(
-                      color: AppColors.textMedium,
+                    hintStyle: TextStyle(
+                      color: isDark
+                          ? const Color(0xFF8DA1B5)
+                          : AppColors.textMedium,
                       fontSize: 14,
                     ),
-                    prefixIcon: const Icon(
+                    prefixIcon: Icon(
                       LucideIcons.search,
                       size: 18,
-                      color: AppColors.textMedium,
+                      color: isDark
+                          ? const Color(0xFF8DA1B5)
+                          : AppColors.textMedium,
                     ),
                     filled: true,
-                    fillColor: const Color(0xFFF8F9FA),
+                    fillColor: isDark
+                        ? const Color(0xFF111922)
+                        : const Color(0xFFF8F9FA),
                     contentPadding: const EdgeInsets.symmetric(vertical: 12),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -450,8 +469,13 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
               margin: const EdgeInsets.fromLTRB(16, 0, 16, 8),
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFFF8F9FA),
+                color: isDark
+                    ? const Color(0xFF17212C)
+                    : const Color(0xFFF8F9FA),
                 borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isDark ? const Color(0xFF263446) : Colors.transparent,
+                ),
               ),
               child: Row(
                 children: [
@@ -466,9 +490,12 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                             Flexible(
                               child: Text(
                                 userName,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 14,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -526,7 +553,9 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                                 decoration: BoxDecoration(
                                   color: isProPlan
                                       ? AppColors.bgSecondary
-                                      : Colors.white,
+                                      : (isDark
+                                            ? const Color(0xFF0F141B)
+                                            : Colors.white),
                                   borderRadius: BorderRadius.circular(999),
                                   border: Border.all(
                                     color: isProPlan
@@ -541,7 +570,9 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                                     fontWeight: FontWeight.w700,
                                     color: isProPlan
                                         ? AppColors.primary
-                                        : AppColors.textDark,
+                                        : Theme.of(
+                                            context,
+                                          ).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -551,27 +582,33 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                         const SizedBox(height: 1),
                         Text(
                           userEmail,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textMedium,
+                            color: isDark
+                                ? const Color(0xFF8DA1B5)
+                                : AppColors.textMedium,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         if (isRecruiter)
-                          const Text(
+                          Text(
                             'Recruiter access',
                             style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textMedium,
+                              color: isDark
+                                  ? const Color(0xFF8DA1B5)
+                                  : AppColors.textMedium,
                             ),
                           ),
                         if (isCollege)
-                          const Text(
+                          Text(
                             'College access',
                             style: TextStyle(
                               fontSize: 11,
-                              color: AppColors.textMedium,
+                              color: isDark
+                                  ? const Color(0xFF8DA1B5)
+                                  : AppColors.textMedium,
                             ),
                           ),
                       ],
@@ -596,6 +633,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
                   ),
                 ],
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: _themeToggle(context),
             ),
             const SizedBox(height: 8),
           ],
@@ -629,13 +670,14 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   }
 
   Widget _sectionLabel(String title) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.fromLTRB(8, 4, 8, 6),
       child: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
-          color: AppColors.textMedium,
+          color: isDark ? const Color(0xFF8DA1B5) : AppColors.textMedium,
           fontWeight: FontWeight.w600,
           letterSpacing: 0.8,
         ),
@@ -649,6 +691,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     bool selected = false,
     required VoidCallback onTap,
   }) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       margin: const EdgeInsets.only(bottom: 2),
       decoration: BoxDecoration(
@@ -662,13 +705,17 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         leading: Icon(
           icon,
           size: 20,
-          color: selected ? Colors.white : AppColors.textLight,
+          color: selected
+              ? Colors.white
+              : (isDark ? const Color(0xFF9BA9BA) : AppColors.textLight),
         ),
         title: Text(
           title,
           style: TextStyle(
             fontSize: 14,
-            color: selected ? Colors.white : AppColors.textDark,
+            color: selected
+                ? Colors.white
+                : Theme.of(context).colorScheme.onSurface,
             fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
           ),
         ),
@@ -679,12 +726,13 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   }
 
   void _showLogoutDialog(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       barrierDismissible: true,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(ctx).dialogTheme.backgroundColor,
         surfaceTintColor: Colors.transparent,
         contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
         content: Column(
@@ -694,7 +742,9 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: const Color(0xFFFFF1F2),
+                color: isDark
+                    ? AppColors.error.withValues(alpha: 0.16)
+                    : const Color(0xFFFFF1F2),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: const Icon(
@@ -766,6 +816,81 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _themeToggle(BuildContext context) {
+    final themeMode = ref.watch(themeModeControllerProvider);
+    final isDark = themeMode == ThemeMode.dark;
+    final background = isDark
+        ? const Color(0xFF111922)
+        : const Color(0xFFefefef);
+    final border = isDark ? const Color(0xFF263446) : AppColors.borderStroke;
+
+    Widget option({
+      required ThemeMode mode,
+      required IconData icon,
+      required String label,
+    }) {
+      final selected = themeMode == mode;
+      return Expanded(
+        child: TextButton.icon(
+          onPressed: () =>
+              ref.read(themeModeControllerProvider.notifier).setThemeMode(mode),
+          icon: Icon(
+            icon,
+            size: 16,
+            color: selected
+                ? (mode == ThemeMode.dark ? Colors.white : AppColors.textDark)
+                : Theme.of(context).textTheme.bodySmall?.color,
+          ),
+          label: Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w700,
+              color: selected
+                  ? (mode == ThemeMode.dark ? Colors.white : AppColors.textDark)
+                  : Theme.of(context).textTheme.bodySmall?.color,
+            ),
+          ),
+          style: TextButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            backgroundColor: selected
+                ? (mode == ThemeMode.dark
+                      ? const Color(0xFF0B121A)
+                      : Colors.white)
+                : Colors.transparent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: border),
+      ),
+      padding: const EdgeInsets.all(4),
+      child: Row(
+        children: [
+          option(
+            mode: ThemeMode.light,
+            icon: Icons.light_mode_outlined,
+            label: 'Light',
+          ),
+          const SizedBox(width: 6),
+          option(
+            mode: ThemeMode.dark,
+            icon: Icons.dark_mode_outlined,
+            label: 'Dark',
+          ),
+        ],
       ),
     );
   }
