@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/core/services/auth/biometric_login_service.dart';
 import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
@@ -27,6 +28,16 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailAddressController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  bool _canUseBiometricLogin = false;
+  bool _isCheckingBiometricLogin = true;
+  bool _pendingBiometricLogin = false;
+  String? _savedBiometricEmail;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadBiometricAvailability();
+  }
 
   @override
   void dispose() {
@@ -35,8 +46,27 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
+  Future<void> _loadBiometricAvailability() async {
+    final availability = await ref
+        .read(biometricLoginServiceProvider)
+        .getAvailability();
+    if (!mounted) return;
+
+    setState(() {
+      _canUseBiometricLogin = availability.isReadyForLogin;
+      _savedBiometricEmail = availability.savedEmail;
+      _isCheckingBiometricLogin = false;
+    });
+
+    if ((_emailAddressController.text.trim().isEmpty) &&
+        availability.savedEmail != null) {
+      _emailAddressController.text = availability.savedEmail!;
+    }
+  }
+
   Future<void> _handleLogin() async {
     if (_formKey.currentState!.validate()) {
+      _pendingBiometricLogin = false;
       await ref
           .read(authViewModelProvider.notifier)
           .loginUser(
@@ -44,6 +74,29 @@ class _LoginPageState extends ConsumerState<LoginPage> {
             password: _passwordController.text.trim(),
           );
     }
+  }
+
+  Future<void> _handleBiometricLogin() async {
+    final credentials = await ref
+        .read(biometricLoginServiceProvider)
+        .authenticateAndGetCredentials();
+
+    if (!mounted) return;
+
+    if (credentials == null) {
+      SnackbarUtils.showInfo(
+        context,
+        'Biometric authentication was cancelled or is not available.',
+      );
+      return;
+    }
+
+    _pendingBiometricLogin = true;
+    _emailAddressController.text = credentials.email;
+
+    await ref
+        .read(authViewModelProvider.notifier)
+        .loginUser(email: credentials.email, password: credentials.password);
   }
 
   Future<void> _handleGoogleLogin() async {
@@ -69,11 +122,26 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (next.status == previous?.status) return;
 
       if (next.status == AuthStatus.authenticated) {
+        _pendingBiometricLogin = false;
         ref.read(dashboardViewModelProvider.notifier).resetState();
         ref.read(authViewModelProvider.notifier).resetState();
         ref.invalidate(userSessionServiceProvider);
         AppRoutes.pushReplacement(context, const DashboardPage());
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        if (_pendingBiometricLogin) {
+          _pendingBiometricLogin = false;
+          ref.read(biometricLoginServiceProvider).clearCredentials();
+          setState(() {
+            _canUseBiometricLogin = false;
+            _savedBiometricEmail = null;
+          });
+          ref.read(authViewModelProvider.notifier).resetState();
+          SnackbarUtils.showError(
+            context,
+            'Biometric login data expired. Please sign in manually once to re-enable it.',
+          );
+          return;
+        }
         ref.read(authViewModelProvider.notifier).resetState();
         SnackbarUtils.showError(context, next.errorMessage!);
       }
@@ -154,6 +222,30 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         onPressed: _handleLogin,
                         isLoading: authState.status == AuthStatus.loading,
                       ),
+                      if (_canUseBiometricLogin) ...[
+                        const SizedBox(height: 12),
+                        MyButton(
+                          text: _savedBiometricEmail == null
+                              ? "Login with Fingerprint"
+                              : "Use Fingerprint for $_savedBiometricEmail",
+                          onPressed: _handleBiometricLogin,
+                          isLoading:
+                              authState.status == AuthStatus.loading &&
+                              _pendingBiometricLogin,
+                          variant: ButtonVariant.secondary,
+                          icon: const Icon(
+                            Icons.fingerprint_rounded,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ] else if (_isCheckingBiometricLogin) ...[
+                        const SizedBox(height: 12),
+                        const SizedBox(
+                          height: 18,
+                          width: 18,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                      ],
                       const SizedBox(height: 24),
                       const TextDividerWidget(text: "Or"),
                       const SizedBox(height: 24),
