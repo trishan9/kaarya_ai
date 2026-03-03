@@ -12,6 +12,7 @@ import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dar
 import 'package:kaarya/features/auth/data/services/candidate_profile_service.dart';
 import 'package:kaarya/features/auth/presentation/widgets/candidate_profile_form_card_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/change_password_form_card_widget.dart';
+import 'package:kaarya/features/auth/presentation/widgets/biometric_login_form_card_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/profile_overview_card_widget.dart';
 import 'package:kaarya/features/auth/presentation/widgets/update_profile_form_card_widget.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/resume_builder_screen.dart';
@@ -258,9 +259,11 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 ),
               ],
             ] else ...[
-              if (hasEmailCredentials)
-                ChangePasswordFormCard()
-              else
+              if (hasEmailCredentials) ...[
+                const ChangePasswordFormCard(),
+                const SizedBox(height: 18),
+                const BiometricLoginFormCard(),
+              ] else
                 _buildNoPasswordMessage(),
             ],
           ],
