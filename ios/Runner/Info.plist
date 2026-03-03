@@ -43,6 +43,10 @@
 	</array>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Kaarya needs location access to let you pick a job location on the map.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Use Face ID to sign in to your Kaarya account faster and securely.</string>
+	<key>NSMotionUsageDescription</key>
+	<string>Kaarya uses motion sensors for shake shortcuts and interview device stability guidance.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
