@@ -821,7 +821,8 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   }
 
   Widget _themeToggle(BuildContext context) {
-    final themeMode = ref.watch(themeModeControllerProvider);
+    final themeMode = ref.watch(appThemeModeProvider);
+    final themePreference = ref.watch(themePreferenceProvider);
     final isDark = themeMode == ThemeMode.dark;
     final background = isDark
         ? const Color(0xFF111922)
@@ -829,20 +830,32 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
     final border = isDark ? const Color(0xFF263446) : AppColors.borderStroke;
 
     Widget option({
-      required ThemeMode mode,
+      required AppThemePreference preference,
       required IconData icon,
       required String label,
     }) {
-      final selected = themeMode == mode;
+      final selected = themePreference == preference;
       return Expanded(
         child: TextButton.icon(
-          onPressed: () =>
-              ref.read(themeModeControllerProvider.notifier).setThemeMode(mode),
+          onPressed: () {
+            final controller = ref.read(themeModeControllerProvider.notifier);
+            if (preference == AppThemePreference.auto) {
+              controller.setAutoMode();
+              return;
+            }
+            controller.setThemeMode(
+              preference == AppThemePreference.dark
+                  ? ThemeMode.dark
+                  : ThemeMode.light,
+            );
+          },
           icon: Icon(
             icon,
             size: 16,
             color: selected
-                ? (mode == ThemeMode.dark ? Colors.white : AppColors.textDark)
+                ? (preference == AppThemePreference.dark
+                      ? Colors.white
+                      : AppColors.textDark)
                 : Theme.of(context).textTheme.bodySmall?.color,
           ),
           label: Text(
@@ -851,14 +864,16 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
               fontSize: 12,
               fontWeight: FontWeight.w700,
               color: selected
-                  ? (mode == ThemeMode.dark ? Colors.white : AppColors.textDark)
+                  ? (preference == AppThemePreference.dark
+                        ? Colors.white
+                        : AppColors.textDark)
                   : Theme.of(context).textTheme.bodySmall?.color,
             ),
           ),
           style: TextButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 12),
             backgroundColor: selected
-                ? (mode == ThemeMode.dark
+                ? (preference == AppThemePreference.dark
                       ? const Color(0xFF0B121A)
                       : Colors.white)
                 : Colors.transparent,
@@ -880,13 +895,19 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
       child: Row(
         children: [
           option(
-            mode: ThemeMode.light,
+            preference: AppThemePreference.light,
             icon: Icons.light_mode_outlined,
             label: 'Light',
           ),
           const SizedBox(width: 6),
           option(
-            mode: ThemeMode.dark,
+            preference: AppThemePreference.auto,
+            icon: Icons.brightness_auto_outlined,
+            label: 'Auto',
+          ),
+          const SizedBox(width: 6),
+          option(
+            preference: AppThemePreference.dark,
             icon: Icons.dark_mode_outlined,
             label: 'Dark',
           ),
