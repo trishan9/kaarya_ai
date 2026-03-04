@@ -87,6 +87,7 @@ class _BaseButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: backgroundColor,
           elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           side: backgroundColor == Colors.transparent ? BorderSide.none : null,
         ),
         child: isLoading

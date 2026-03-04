@@ -3,7 +3,7 @@ import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Job card for recruiter views - shows Manage Job instead of Apply.
+/// Job card for recruiter and college job lists - shows Manage Job instead of Apply.
 class RecruiterJobCardWidget extends StatelessWidget {
   const RecruiterJobCardWidget({
     super.key,
@@ -37,10 +37,12 @@ class RecruiterJobCardWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 6,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     _badge(),
-                    const Spacer(),
                     Text(
                       _relativeTime(job.createdAt),
                       style: const TextStyle(
@@ -91,7 +93,10 @@ class RecruiterJobCardWidget extends StatelessWidget {
                   children: [
                     _chip(LucideIcons.mapPin, job.location),
                     _chip(LucideIcons.clock, job.employmentType),
-                    _chip(LucideIcons.building2, _formatWorkMode(job.workMode)),
+                    _chip(
+                      LucideIcons.building2,
+                      _formatWorkMode(job.workMode),
+                    ),
                     _chip(LucideIcons.banknote, job.salaryRange),
                   ],
                 ),
@@ -195,28 +200,33 @@ class RecruiterJobCardWidget extends StatelessWidget {
   }
 
   Widget _chip(IconData icon, String label) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF8F9FA),
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 12, color: AppColors.textLight),
-          const SizedBox(width: 4),
-          Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              fontSize: 11,
-              color: AppColors.textLight,
-              fontWeight: FontWeight.w500,
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 220),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF8F9FA),
+          borderRadius: BorderRadius.circular(4),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 12, color: AppColors.textLight),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textLight,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

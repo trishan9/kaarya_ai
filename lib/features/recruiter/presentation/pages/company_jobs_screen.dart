@@ -87,28 +87,60 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const Text(
-                  'Company Jobs',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8),
-                  child: MyButton(
-                    onPressed: () => _pushPostNewJob(context),
-                    text: 'Create Job Posting',
-                    btnWidth: 160,
-                    icon: const Icon(LucideIcons.plus, size: 18, color: Colors.white),
-                  ),
-                ),
-              ],
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 430;
+                if (isNarrow) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Company Jobs',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      MyButton(
+                        onPressed: () => _pushPostNewJob(context),
+                        text: 'Create Job Posting',
+                        icon: const Icon(
+                          LucideIcons.plus,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    const Expanded(
+                      child: Text(
+                        'Company Jobs',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    MyButton(
+                      onPressed: () => _pushPostNewJob(context),
+                      text: 'Create Job Posting',
+                      btnWidth: 170,
+                      icon: const Icon(
+                        LucideIcons.plus,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 12),
             Container(
@@ -143,39 +175,74 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
               ),
             ),
             const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _searchController,
-                    decoration: InputDecoration(
-                      hintText: 'Search your company jobs...',
-                      prefixIcon: const Icon(LucideIcons.search, size: 18),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 430;
+                if (isNarrow) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search your company jobs...',
+                          prefixIcon: const Icon(LucideIcons.search, size: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                        ),
+                        onSubmitted: (_) => _refreshWithFilters(workspace.companyId, workspace.companyName),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 12,
+                      const SizedBox(height: 12),
+                      MyButton(
+                        onPressed: () => _refreshWithFilters(workspace.companyId, workspace.companyName),
+                        text: 'Find Job',
+                        icon: const Icon(
+                          LucideIcons.search,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Search your company jobs...',
+                          prefixIcon: const Icon(LucideIcons.search, size: 18),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 14,
+                            vertical: 12,
+                          ),
+                        ),
+                        onSubmitted: (_) => _refreshWithFilters(workspace.companyId, workspace.companyName),
                       ),
                     ),
-                    onSubmitted: (_) => _refreshWithFilters(workspace.companyId, workspace.companyName),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
-                  child: SizedBox(
-                    width: 100,
-                    child: MyButton(
+                    const SizedBox(width: 12),
+                    MyButton(
                       onPressed: () => _refreshWithFilters(workspace.companyId, workspace.companyName),
                       text: 'Find Job',
-                      btnWidth: 100,
-                      icon: const Icon(LucideIcons.search, size: 18, color: Colors.white),
+                      btnWidth: 116,
+                      icon: const Icon(
+                        LucideIcons.search,
+                        size: 18,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                ),
-              ],
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             SizedBox(
