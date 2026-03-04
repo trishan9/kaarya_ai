@@ -136,42 +136,53 @@ class DeadlineCardWidget extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: deadlineJob.companyLogo != null
-                              ? Image.network(
-                                  deadlineJob.companyLogo!,
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      _logoFallback(deadlineJob.companyName),
-                                )
-                              : _logoFallback(deadlineJob.companyName),
-                        ),
-                        SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              deadlineJob.title,
-                              style: Theme.of(context).textTheme.titleMedium,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: deadlineJob.companyLogo != null
+                                ? Image.network(
+                                    deadlineJob.companyLogo!,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        _logoFallback(deadlineJob.companyName),
+                                  )
+                                : _logoFallback(deadlineJob.companyName),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  deadlineJob.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                Text(
+                                  deadlineJob.companyName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: appTextSecondaryColor(context),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              deadlineJob.companyName,
-                              style: TextStyle(
-                                color: appTextSecondaryColor(context),
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 10),
                     buildIcon(
                       assetPath: "assets/icons/bookmark.svg",
                       isActive: deadlineJob.isSaved,
