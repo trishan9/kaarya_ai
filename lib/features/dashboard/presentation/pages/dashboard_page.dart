@@ -93,18 +93,24 @@ class DashboardPage extends ConsumerWidget {
             child: Row(
               children: List.generate(5, (index) {
                 return Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 2,
-                      width: selectedIndex == index ? double.infinity : 0,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == index
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(end: selectedIndex == index ? 1 : 0),
+                    duration: const Duration(milliseconds: 200),
+                    builder: (context, value, _) {
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: FractionallySizedBox(
+                          widthFactor: value,
+                          child: Container(
+                            height: 2,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               }),
@@ -115,6 +121,7 @@ class DashboardPage extends ConsumerWidget {
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (i) {
+              ref.read(pushedPageProvider.notifier).state = null;
               ref.read(bottomNavProvider.notifier).state =
                   _destinationFromIndex(i);
             },
@@ -207,6 +214,34 @@ class _RecruiterDashboard extends ConsumerWidget {
     CompanySettingsPage(),
   ];
 
+  Widget _buildIndicatorBar(int count, int selectedIndex) {
+    return Row(
+      children: List.generate(count, (index) {
+        return Expanded(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(end: selectedIndex == index ? 1 : 0),
+            duration: const Duration(milliseconds: 200),
+            builder: (context, value, _) {
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: value,
+                  child: Container(
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final destination = ref.watch(recruiterNavProvider);
@@ -238,30 +273,13 @@ class _RecruiterDashboard extends ConsumerWidget {
           Container(
             height: 2,
             color: dividerColor,
-            child: Row(
-              children: List.generate(4, (index) {
-                return Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 2,
-                      width: selectedIndex == index ? double.infinity : 0,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == index
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
+            child: _buildIndicatorBar(4, selectedIndex),
           ),
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (i) {
+              ref.read(pushedPageProvider.notifier).state = null;
               ref.read(recruiterNavProvider.notifier).state =
                   _recruiterDestFromIndex(i);
             },
@@ -332,6 +350,34 @@ class _CollegeDashboard extends ConsumerWidget {
     CollegeSettingsPage(),
   ];
 
+  Widget _buildIndicatorBar(int count, int selectedIndex) {
+    return Row(
+      children: List.generate(count, (index) {
+        return Expanded(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(end: selectedIndex == index ? 1 : 0),
+            duration: const Duration(milliseconds: 200),
+            builder: (context, value, _) {
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: value,
+                  child: Container(
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final destination = ref.watch(collegeNavProvider);
@@ -364,30 +410,13 @@ class _CollegeDashboard extends ConsumerWidget {
           Container(
             height: 2,
             color: dividerColor,
-            child: Row(
-              children: List.generate(4, (index) {
-                return Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 2,
-                      width: selectedIndex == index ? double.infinity : 0,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == index
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
+            child: _buildIndicatorBar(4, selectedIndex),
           ),
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (i) {
+              ref.read(pushedPageProvider.notifier).state = null;
               ref.read(collegeNavProvider.notifier).state =
                   _collegeDestFromIndex(i);
             },

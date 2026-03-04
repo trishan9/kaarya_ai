@@ -101,6 +101,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               suggestionBody: _profileSuggestion(overviewData.profileRating),
               actionLabel: "Improve Profile",
               onActionTap: () {
+                ref.read(pushedPageProvider.notifier).state = null;
                 ref.read(bottomNavProvider.notifier).state =
                     AppDestination.resumeBuilder;
               },
@@ -127,6 +128,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               ),
               actionLabel: "Take an Interview",
               onActionTap: () {
+                ref.read(pushedPageProvider.notifier).state = null;
                 ref.read(bottomNavProvider.notifier).state =
                     AppDestination.interviewHub;
               },
@@ -135,6 +137,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
             JobRecommendationWidget(
               jobsBucket: overviewData.jobs,
               onSeeAllTap: () {
+                ref.read(pushedPageProvider.notifier).state = null;
                 ref.read(bottomNavProvider.notifier).state =
                     AppDestination.explore;
               },

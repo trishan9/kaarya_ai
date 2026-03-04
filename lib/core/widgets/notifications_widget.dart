@@ -939,17 +939,20 @@ class _NotificationTile extends ConsumerWidget {
     final isCollege = ref.read(isCollegeProvider);
 
     if (isRecruiter) {
+      ref.read(pushedPageProvider.notifier).state = null;
       ref.read(recruiterNavProvider.notifier).state =
           RecruiterDestination.companyJobs;
       return;
     }
     if (isCollege) {
+      ref.read(pushedPageProvider.notifier).state = null;
       ref.read(collegeNavProvider.notifier).state =
           CollegeDestination.collegeJobs;
       return;
     }
 
     if (item.kind == _NotificationKind.deadline) {
+      ref.read(pushedPageProvider.notifier).state = null;
       ref.read(bottomNavProvider.notifier).state = AppDestination.explore;
       return;
     }
