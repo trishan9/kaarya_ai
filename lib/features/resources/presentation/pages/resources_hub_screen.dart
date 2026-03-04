@@ -32,7 +32,7 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     super.initState();
     Future.microtask(() {
       if (!mounted) return;
-      ref.read(pushedPageProvider.notifier).state = 'resources';
+      ref.read(pushedPageProvider.notifier).state = PushedPageKeys.resources;
       ref.read(resourceViewModelProvider.notifier).loadCourses();
     });
   }
