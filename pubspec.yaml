@@ -99,6 +99,7 @@ dependencies:
   webview_flutter: ^4.10.0
   open_filex: ^4.5.0
   vapi: ^0.1.0
+  stream_chat_flutter: ^9.23.0
 
   # Map & Location (Leaflet-style with OpenStreetMap)
   location_picker_flutter_map: ^4.1.0
