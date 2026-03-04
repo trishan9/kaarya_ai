@@ -18,7 +18,6 @@ class SignupText extends StatelessWidget {
           style: TextStyle(
             fontSize: 14,
             color: Colors.black,
-            fontFamily: "GeneralSans",
           ),
           children: [
             TextSpan(

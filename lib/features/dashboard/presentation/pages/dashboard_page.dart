@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/core/utils/build_icon.dart';
 import 'package:kaarya/core/utils/navigation_provider.dart';
-import 'package:kaarya/features/dashboard/presentation/pages/explore_screen.dart';
-import 'package:kaarya/features/dashboard/presentation/pages/interview_hub_screen.dart';
+import 'package:kaarya/features/jobs/presentation/pages/explore_screen.dart';
+import 'package:kaarya/features/interviews/presentation/pages/interview_hub_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/leaderboard_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/overview_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/resume_builder_screen.dart';
@@ -45,13 +45,20 @@ class DashboardPage extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_titles[selectedIndex]),
+        title: Text(
+          _titles[selectedIndex],
+          style: const TextStyle(fontWeight: FontWeight.w600),
+        ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 14),
+            padding: const EdgeInsets.only(right: 16),
             child: NotificationsWidget(),
           ),
         ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(1),
+          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+        ),
       ),
 
       drawer: AppDrawerWidget(),
@@ -62,16 +69,23 @@ class DashboardPage extends ConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Container(
-            height: 1,
-            color: Colors.grey.shade300,
+            height: 2,
+            color: const Color(0xFFF0F0F0),
             child: Row(
               children: List.generate(5, (index) {
                 return Expanded(
-                  child: Container(
-                    height: 3,
-                    color: selectedIndex == index
-                        ? AppColors.primary
-                        : Colors.transparent,
+                  child: Center(
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      height: 2,
+                      width: selectedIndex == index ? double.infinity : 0,
+                      decoration: BoxDecoration(
+                        color: selectedIndex == index
+                            ? AppColors.primary
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
                   ),
                 );
               }),

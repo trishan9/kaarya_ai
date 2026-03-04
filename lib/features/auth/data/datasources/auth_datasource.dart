@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:kaarya/features/auth/data/models/auth_api_model.dart';
 import 'package:kaarya/features/auth/data/models/auth_hive_model.dart';
+import 'package:kaarya/features/auth/data/models/linked_account_api_model.dart';
 
 abstract interface class IAuthLocalDataSource {
   Future<AuthHiveModel> registerUser(AuthHiveModel user);
@@ -21,4 +22,11 @@ abstract interface class IAuthRemoteDataSource {
   Future<bool> logoutUser();
 
   Future<AuthApiModel?> updateProfile(String? name, String? email, File? photo);
+  Future<bool> changePassword(String currentPassword, String newPassword);
+  Future<bool> requestPasswordReset(String email);
+  Future<String> verifyPasswordResetOtp(String email, String otp);
+  Future<bool> confirmPasswordReset(String token, String password);
+  Future<List<LinkedAccountApiModel>> getLinkedAccounts();
+  Future<bool> unlinkOAuth(String provider);
+  Future<String> uploadCertification(String filePath);
 }

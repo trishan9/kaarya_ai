@@ -39,6 +39,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
       keyboardType: widget.inputType,
       obscureText: widget.obscureText ? _isObscured : false,
       onChanged: widget.onChanged,
+      style: const TextStyle(letterSpacing: 0),
 
       validator:
           widget.validator ??
@@ -51,6 +52,7 @@ class _MyTextFormFieldState extends State<MyTextFormField> {
 
       decoration: InputDecoration(
         hintText: widget.text,
+        hintStyle: const TextStyle(letterSpacing: 0),
         prefixIcon: widget.prefixIcon,
         suffixIcon: widget.obscureText
             ? IconButton(

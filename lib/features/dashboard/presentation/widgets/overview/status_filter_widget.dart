@@ -7,10 +7,12 @@ class StatusFilterWidget extends StatelessWidget {
     super.key,
     required this.selectedStatus,
     required this.onChanged,
+    this.countResolver,
   });
 
   final ApplicationStatus selectedStatus;
   final ValueChanged<ApplicationStatus> onChanged;
+  final int Function(ApplicationStatus status)? countResolver;
 
   @override
   Widget build(BuildContext context) {
@@ -22,29 +24,32 @@ class StatusFilterWidget extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (context, index) {
           final status = ApplicationStatus.values[index];
-          final bool isSelected = status == selectedStatus;
+          final selected = status == selectedStatus;
 
           return ChoiceChip(
             label: Text(
-              _labelForStatus(status),
+              _buildLabel(status),
               style: TextStyle(
                 fontSize: 13,
-                fontWeight: FontWeight.w500,
-                color: isSelected ? Colors.white : AppColors.textMedium,
+                color: selected ? Colors.white : AppColors.textDark,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
               ),
             ),
-            selected: isSelected,
-            onSelected: (_) => onChanged(status),
+            selected: selected,
             showCheckmark: false,
-            backgroundColor: Colors.white,
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            visualDensity: VisualDensity.compact,
+            labelPadding: const EdgeInsets.symmetric(horizontal: 6),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
             selectedColor: AppColors.primary,
+            backgroundColor: Colors.white,
             side: BorderSide(
-              color: isSelected ? AppColors.primary : AppColors.borderStroke,
+              color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
             ),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(6),
             ),
-            padding: EdgeInsets.all(1),
+            onSelected: (_) => onChanged(status),
           );
         },
       ),
@@ -55,12 +60,27 @@ class StatusFilterWidget extends StatelessWidget {
     switch (status) {
       case ApplicationStatus.all:
         return 'All Applications';
-      case ApplicationStatus.mock:
-        return 'Mock Interviews';
-      case ApplicationStatus.screening:
-        return 'Accepted';
+      case ApplicationStatus.applied:
+        return 'Applied';
+      case ApplicationStatus.reviewing:
+        return 'Reviewing';
+      case ApplicationStatus.shortlisted:
+        return 'Shortlisted';
       case ApplicationStatus.interview:
+        return 'Interview';
+      case ApplicationStatus.accepted:
+        return 'Accepted';
+      case ApplicationStatus.rejected:
         return 'Rejected';
     }
+  }
+
+  String _buildLabel(ApplicationStatus status) {
+    final count = countResolver?.call(status);
+    if (count == null) {
+      return _labelForStatus(status);
+    }
+
+    return '${_labelForStatus(status)} ($count)';
   }
 }

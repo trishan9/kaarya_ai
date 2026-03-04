@@ -13,11 +13,17 @@ class TokenService {
   TokenService({required SharedPreferences prefs}) : _prefs = prefs;
 
   Future<void> saveToken(String token) async {
+    if (token.trim().isEmpty) return;
     await _prefs.setString(_tokenKey, token);
   }
 
   Future<String?> getToken() async {
-    return _prefs.getString(_tokenKey);
+    final primary = _prefs.getString(_tokenKey);
+    if (primary != null && primary.trim().isNotEmpty) {
+      return primary;
+    }
+
+    return null;
   }
 
   Future<void> removeToken() async {

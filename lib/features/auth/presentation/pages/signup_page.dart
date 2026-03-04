@@ -83,115 +83,127 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(30.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              HeaderSection(),
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight:
+                  MediaQuery.of(context).size.height -
+                  MediaQuery.of(context).padding.top -
+                  MediaQuery.of(context).padding.bottom -
+                  48,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                HeaderSection(),
 
-              Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    HeadingWithSubheadingWidget(
-                      heading: "Create Your Account",
-                      subheading:
-                          "Welcome to Kaarya! Let's get started by creating your account.",
-                    ),
+                const SizedBox(height: 20),
 
-                    SizedBox(height: 36),
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      HeadingWithSubheadingWidget(
+                        heading: "Create Your Account",
+                        subheading:
+                            "Welcome to Kaarya! Let's get started by creating your account.",
+                      ),
 
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      spacing: 14,
-                      children: [
-                        MyTextFormField(
-                          controller: _fullNameController,
-                          text: "Enter your full name",
-                          inputType: TextInputType.emailAddress,
-                          prefixIcon: Icon(
-                            Icons.person_outline_rounded,
-                            color: Colors.grey,
+                      const SizedBox(height: 36),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        spacing: 14,
+                        children: [
+                          MyTextFormField(
+                            controller: _fullNameController,
+                            text: "Enter your full name",
+                            inputType: TextInputType.name,
+                            prefixIcon: const Icon(
+                              Icons.person_outline_rounded,
+                              color: Colors.grey,
+                            ),
+                            validationErrorMessage: "Full name is required",
                           ),
-                          validationErrorMessage: "Full name is required",
-                        ),
 
-                        MyTextFormField(
-                          controller: _emailAddressController,
-                          text: "Enter your email address",
-                          inputType: TextInputType.emailAddress,
-                          prefixIcon: Icon(
-                            Icons.mail_outline_rounded,
-                            color: Colors.grey,
+                          MyTextFormField(
+                            controller: _emailAddressController,
+                            text: "Enter your email address",
+                            inputType: TextInputType.emailAddress,
+                            prefixIcon: const Icon(
+                              Icons.mail_outline_rounded,
+                              color: Colors.grey,
+                            ),
+                            validationErrorMessage: "Email address is required",
                           ),
-                          validationErrorMessage: "Email address is required",
-                        ),
 
-                        MyTextFormField(
-                          controller: _passwordController,
-                          text: "Enter your password",
-                          obscureText: true,
-                          prefixIcon: Icon(
-                            Icons.lock_outline_rounded,
-                            color: Colors.grey,
+                          MyTextFormField(
+                            controller: _passwordController,
+                            text: "Enter your password",
+                            obscureText: true,
+                            prefixIcon: const Icon(
+                              Icons.lock_outline_rounded,
+                              color: Colors.grey,
+                            ),
+                            validationErrorMessage: "Password is required",
                           ),
-                          validationErrorMessage: "Password is required",
-                        ),
 
-                        MyTextFormField(
-                          controller: _confirmPasswordController,
-                          text: "Confirm your password",
-                          obscureText: true,
-                          prefixIcon: Icon(
-                            Icons.lock_outline_rounded,
-                            color: Colors.grey,
+                          MyTextFormField(
+                            controller: _confirmPasswordController,
+                            text: "Confirm your password",
+                            obscureText: true,
+                            prefixIcon: const Icon(
+                              Icons.lock_outline_rounded,
+                              color: Colors.grey,
+                            ),
+                            validationErrorMessage:
+                                "Confirm Password is required",
                           ),
-                          validationErrorMessage:
-                              "Confirm Password is required",
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    MyButton(
-                      text: "Sign Up",
-                      onPressed: _handleSignup,
-                      isLoading: authState.status == AuthStatus.loading,
-                    ),
+                      MyButton(
+                        text: "Sign Up",
+                        onPressed: _handleSignup,
+                        isLoading: authState.status == AuthStatus.loading,
+                      ),
 
-                    SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    TextDividerWidget(text: "Or"),
+                      TextDividerWidget(text: "Or"),
 
-                    SizedBox(height: 24),
+                      const SizedBox(height: 24),
 
-                    // Social logins
-                    Column(
-                      spacing: 12,
-                      children: [
-                        MyButton(
-                          onPressed: _handleGoogleSignup,
-                          text: "Signup with Google",
-                          variant: ButtonVariant.secondary,
-                          icon: Image.asset("assets/images/google_logo.png"),
-                        ),
+                      Column(
+                        spacing: 12,
+                        children: [
+                          MyButton(
+                            onPressed: _handleGoogleSignup,
+                            text: "Signup with Google",
+                            variant: ButtonVariant.secondary,
+                            icon: Image.asset("assets/images/google_logo.png"),
+                          ),
 
-                        MyButton(
-                          onPressed: _handleGithubSignup,
-                          text: "Signup with GitHub",
-                          variant: ButtonVariant.secondary,
-                          icon: Image.asset("assets/images/github_logo.png"),
-                        ),
-                      ],
-                    ),
-                  ],
+                          MyButton(
+                            onPressed: _handleGithubSignup,
+                            text: "Signup with GitHub",
+                            variant: ButtonVariant.secondary,
+                            icon: Image.asset("assets/images/github_logo.png"),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-              ),
 
-              LoginText(),
-            ],
+                const SizedBox(height: 20),
+
+                LoginText(),
+              ],
+            ),
           ),
         ),
       ),

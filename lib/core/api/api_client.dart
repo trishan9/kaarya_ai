@@ -2,18 +2,25 @@ import 'package:dio/dio.dart';
 import 'package:dio_smart_retry/dio_smart_retry.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kaarya/core/api/api_endpoints.dart';
+import 'package:kaarya/core/services/storage/token_service.dart';
+import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
 final apiClientProvider = Provider<ApiClient>((ref) {
-  return ApiClient();
+  return ApiClient(
+    tokenService: ref.read(tokenServiceProvider),
+    userSessionService: ref.read(userSessionServiceProvider),
+  );
 });
 
 class ApiClient {
   late final Dio _dio;
 
-  ApiClient() {
+  ApiClient({
+    required TokenService tokenService,
+    required UserSessionService userSessionService,
+  }) {
     _dio = Dio(
       BaseOptions(
         baseUrl: ApiEndpoints.baseUrl,
@@ -26,7 +33,12 @@ class ApiClient {
       ),
     );
 
-    _dio.interceptors.add(_AuthInterceptor());
+    _dio.interceptors.add(
+      _AuthInterceptor(
+        tokenService: tokenService,
+        userSessionService: userSessionService,
+      ),
+    );
 
     // Auto retry on network failures
     _dio.interceptors.add(
@@ -130,27 +142,27 @@ class ApiClient {
 }
 
 class _AuthInterceptor extends Interceptor {
-  final _storage = const FlutterSecureStorage();
-  static const String _tokenKey = 'auth_token';
+  final TokenService _tokenService;
+  final UserSessionService _userSessionService;
+
+  _AuthInterceptor({
+    required TokenService tokenService,
+    required UserSessionService userSessionService,
+  }) : _tokenService = tokenService,
+       _userSessionService = userSessionService;
 
   @override
   void onRequest(
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    final publicEndpoints = [ApiEndpoints.userLogin, ApiEndpoints.userSignup];
-
-    final isPublicGet =
-        options.method == 'GET' &&
-        publicEndpoints.any((endpoint) => options.path.startsWith(endpoint));
-
     final isAuthEndpoint =
         options.path == ApiEndpoints.userLogin ||
         options.path == ApiEndpoints.userSignup;
 
-    if (!isPublicGet && !isAuthEndpoint) {
-      final token = await _storage.read(key: _tokenKey);
-      if (token != null) {
+    if (!isAuthEndpoint) {
+      final token = await _tokenService.getToken();
+      if (token != null && token.isNotEmpty) {
         options.headers['Authorization'] = 'Bearer $token';
       }
     }
@@ -159,9 +171,10 @@ class _AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      _storage.delete(key: _tokenKey);
+      await _tokenService.removeToken();
+      await _userSessionService.clearSession();
     }
     handler.next(err);
   }

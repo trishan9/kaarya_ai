@@ -11,6 +11,7 @@ import 'package:kaarya/features/auth/data/datasources/remote/auth_remote_datasou
 import 'package:kaarya/features/auth/data/models/auth_api_model.dart';
 import 'package:kaarya/features/auth/data/models/auth_hive_model.dart';
 import 'package:kaarya/features/auth/domain/entities/auth_entity.dart';
+import 'package:kaarya/features/auth/domain/entities/linked_account_entity.dart';
 import 'package:kaarya/features/auth/domain/repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
@@ -240,6 +241,204 @@ class AuthRepository implements IAuthRepository {
         NetworkFailure(
           message:
               "You need to be connected to internet, to perform this action!",
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> changePassword(
+    String currentPassword,
+    String newPassword,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _authRemoteDataSource.changePassword(
+          currentPassword,
+          newPassword,
+        );
+        return Right(result);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? "Failed to change password!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: "Internet connection required to change password.",
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> requestPasswordReset(String email) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _authRemoteDataSource.requestPasswordReset(email);
+        return Right(result);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ??
+                "Failed to request password reset!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: "Internet connection required to reset password.",
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> verifyPasswordResetOtp(
+    String email,
+    String otp,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final token = await _authRemoteDataSource.verifyPasswordResetOtp(
+          email,
+          otp,
+        );
+        return Right(token);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? "Failed to verify OTP!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(message: "Internet connection required to verify OTP."),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> confirmPasswordReset(
+    String token,
+    String password,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _authRemoteDataSource.confirmPasswordReset(
+          token,
+          password,
+        );
+        return Right(result);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? "Failed to reset password!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: "Internet connection required to reset password.",
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<LinkedAccountEntity>>> getLinkedAccounts() async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final models = await _authRemoteDataSource.getLinkedAccounts();
+        final entities = models.map((m) => m.toEntity()).toList();
+        return Right(entities);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? "Failed to get linked accounts!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: "Internet connection required to get linked accounts.",
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> unlinkOAuth(String provider) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final result = await _authRemoteDataSource.unlinkOAuth(provider);
+        return Right(result);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message: e.response?.data['message'] ?? "Failed to unlink account!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: "Internet connection required to unlink account.",
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, String>> uploadCertification(String filePath) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final url = await _authRemoteDataSource.uploadCertification(filePath);
+        return Right(url);
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ??
+                "Failed to upload certification!",
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    } else {
+      return const Left(
+        NetworkFailure(
+          message: "Internet connection required to upload certification.",
         ),
       );
     }
