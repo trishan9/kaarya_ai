@@ -27,17 +27,51 @@ class ApiEndpoints {
   static const String userSignup = '/auth/signup';
   static const String userLogin = '/auth/login';
   static const String me = '/auth/me';
+  static const String googleStatus = '/auth/google/status';
+  static const String githubStatus = '/auth/github/status';
+  static const String googleMobileLogin = '/auth/google/mobile';
   static const String updateProfile = '/auth/update-me';
   static const String changePassword = '/auth/change-password';
   static const String requestPasswordReset = '/auth/password-reset/request';
   static const String verifyPasswordResetOtp = '/auth/password-reset/verify';
   static const String confirmPasswordReset = '/auth/password-reset/confirm';
+  static String oauthAuthorize(String provider) =>
+      '/auth/oauth/$provider/authorize';
   static const String linkedAccounts = '/auth/oauth/accounts';
   static String oauthLinkAuthorize(String provider) =>
       '/auth/oauth/$provider/link/authorize';
   static const String oauthExchange = '/auth/oauth/exchange';
   static const String oauthLinkComplete = '/auth/oauth/link/complete';
   static String oauthUnlink(String provider) => '/auth/oauth/$provider/unlink';
+  static String oauthStatus(String provider) {
+    switch (provider.toLowerCase()) {
+      case 'google':
+        return googleStatus;
+      case 'github':
+        return githubStatus;
+      default:
+        throw ArgumentError.value(
+          provider,
+          'provider',
+          'Unsupported OAuth provider.',
+        );
+    }
+  }
+
+  static String oauthRedirectUri(String provider) =>
+      'kaarya://oauth/${provider.toLowerCase()}';
+
+  static String oauthAuthorizeUrl(
+    String provider, {
+    required String redirectUri,
+    String intent = 'login',
+  }) {
+    final query = Uri(
+      queryParameters: {'redirectUri': redirectUri, 'intent': intent},
+    ).query;
+    return '$baseUrl${oauthAuthorize(provider)}?$query';
+  }
+
   static const String uploadCertification =
       '/auth/candidate-profile/certifications/upload';
 
