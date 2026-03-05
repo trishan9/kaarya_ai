@@ -31,6 +31,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _canUseBiometricLogin = false;
   bool _isCheckingBiometricLogin = true;
   bool _pendingBiometricLogin = false;
+  bool _isGoogleLoginInProgress = false;
   String? _savedBiometricEmail;
 
   @override
@@ -100,11 +101,18 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _handleGoogleLogin() async {
-    SnackbarUtils.showSuccess(context, "Login with Google Successful");
-  }
+    if (_isGoogleLoginInProgress) return;
 
-  Future<void> _handleGithubLogin() async {
-    SnackbarUtils.showSuccess(context, "Login with GitHub Successful");
+    setState(() {
+      _isGoogleLoginInProgress = true;
+    });
+
+    await ref.read(authViewModelProvider.notifier).loginWithGoogle();
+
+    if (!mounted) return;
+    setState(() {
+      _isGoogleLoginInProgress = false;
+    });
   }
 
   Future<void> _handleForgotPassword() async {
@@ -123,11 +131,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
       if (next.status == AuthStatus.authenticated) {
         _pendingBiometricLogin = false;
+        _isGoogleLoginInProgress = false;
         ref.read(dashboardViewModelProvider.notifier).resetState();
         ref.read(authViewModelProvider.notifier).resetState();
         ref.invalidate(userSessionServiceProvider);
         AppRoutes.pushReplacement(context, const DashboardPage());
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
+        _isGoogleLoginInProgress = false;
         if (_pendingBiometricLogin) {
           _pendingBiometricLogin = false;
           ref.read(biometricLoginServiceProvider).clearCredentials();
@@ -220,7 +230,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       MyButton(
                         text: "Login",
                         onPressed: _handleLogin,
-                        isLoading: authState.status == AuthStatus.loading,
+                        isLoading:
+                            authState.status == AuthStatus.loading &&
+                            !_pendingBiometricLogin &&
+                            !_isGoogleLoginInProgress,
                       ),
                       if (_canUseBiometricLogin) ...[
                         const SizedBox(height: 12),
@@ -257,12 +270,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                             text: "Login with Google",
                             variant: ButtonVariant.secondary,
                             icon: Image.asset("assets/images/google_logo.png"),
-                          ),
-                          MyButton(
-                            onPressed: _handleGithubLogin,
-                            text: "Login with GitHub",
-                            variant: ButtonVariant.secondary,
-                            icon: Image.asset("assets/images/github_logo.png"),
+                            isLoading: _isGoogleLoginInProgress,
                           ),
                         ],
                       ),
