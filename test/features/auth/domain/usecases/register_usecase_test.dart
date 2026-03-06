@@ -30,6 +30,7 @@ void main() {
   const tName = 'Test User';
   const tEmail = 'test@example.com';
   const tPassword = 'password123';
+  const tRole = 'candidate';
 
   group('RegisterUseCase', () {
     test('Should return true when registration is successful', () async {
@@ -42,6 +43,8 @@ void main() {
           name: tName,
           email: tEmail,
           password: tPassword,
+          confirmPassword: tPassword,
+          role: tRole,
         ),
       );
 
@@ -62,12 +65,16 @@ void main() {
           name: tName,
           email: tEmail,
           password: tPassword,
+          confirmPassword: tPassword,
+          role: tRole,
         ),
       );
 
       expect(capturedEntity?.name, tName);
       expect(capturedEntity?.email, tEmail);
       expect(capturedEntity?.password, tPassword);
+      expect(capturedEntity?.confirmPassword, tPassword);
+      expect(capturedEntity?.role, tRole);
     });
 
     test('Should return failure when registration fails', () async {
@@ -81,6 +88,8 @@ void main() {
           name: tName,
           email: tEmail,
           password: tPassword,
+          confirmPassword: tPassword,
+          role: tRole,
         ),
       );
 
@@ -100,6 +109,8 @@ void main() {
           name: tName,
           email: tEmail,
           password: tPassword,
+          confirmPassword: tPassword,
+          role: tRole,
         ),
       );
 
@@ -114,9 +125,11 @@ void main() {
         name: tName,
         email: tEmail,
         password: tPassword,
+        confirmPassword: tPassword,
+        role: tRole,
       );
 
-      expect(params.props, [tName, tEmail, tPassword]);
+      expect(params.props, [tName, tEmail, tPassword, tPassword, tRole]);
     });
 
     test('Two params with same values should be equal', () {
@@ -124,11 +137,15 @@ void main() {
         name: tName,
         email: tEmail,
         password: tPassword,
+        confirmPassword: tPassword,
+        role: tRole,
       );
       const params2 = RegisterUseCaseParams(
         name: tName,
         email: tEmail,
         password: tPassword,
+        confirmPassword: tPassword,
+        role: tRole,
       );
 
       expect(params1, params2);
