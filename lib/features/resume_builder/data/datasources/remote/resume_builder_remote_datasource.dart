@@ -38,7 +38,7 @@ class ResumeBuilderRemoteDataSource implements IResumeBuilderRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final draft = _asMap(data['draft']) ?? data;
-    return ResumeDraftApiModel.fromJson(draft);
+    return ResumeDraftApiModel.fromApiResponse(draft);
   }
 
   @override
@@ -61,7 +61,7 @@ class ResumeBuilderRemoteDataSource implements IResumeBuilderRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final draft = _asMap(data['draft']) ?? data;
-    return ResumeDraftApiModel.fromJson(draft);
+    return ResumeDraftApiModel.fromApiResponse(draft);
   }
 
   @override
@@ -75,7 +75,7 @@ class ResumeBuilderRemoteDataSource implements IResumeBuilderRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final draft = _asMap(data['draft']) ?? data;
-    return ResumeDraftApiModel.fromJson(draft);
+    return ResumeDraftApiModel.fromApiResponse(draft);
   }
 
   @override
@@ -170,7 +170,7 @@ class ResumeBuilderRemoteDataSource implements IResumeBuilderRemoteDataSource {
     String? jobDescription,
   }) async {
     final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath),
+      'resume': await MultipartFile.fromFile(filePath),
       if (targetRole != null && targetRole.isNotEmpty) 'targetRole': targetRole,
       if (experienceLevel != null && experienceLevel.isNotEmpty)
         'experienceLevel': experienceLevel,
@@ -184,7 +184,7 @@ class ResumeBuilderRemoteDataSource implements IResumeBuilderRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final result = _asMap(data['result']) ?? data;
-    return AtsScanResultApiModel.fromJson(result);
+    return AtsScanResultApiModel.fromApiResponse(result);
   }
 
   Map<String, dynamic> _extractDataMap(Response response) {

@@ -31,6 +31,8 @@ abstract interface class IInterviewRepository {
     List<String>? tags,
     String? instructions,
     bool? generateQuestions,
+    String? companyId,
+    String? collegeId,
   });
 
   Future<Either<Failure, InterviewEntity>> updateInterview({
@@ -48,9 +50,11 @@ abstract interface class IInterviewRepository {
     required String interviewId,
     required String sessionId,
     required String status,
-    String? transcript,
+    List<Map<String, dynamic>>? transcript,
     String? recordingUrl,
     int? durationSeconds,
+    String? vapiCallId,
+    bool generateEvaluation = true,
   });
 
   Future<Either<Failure, List<InterviewSessionEntity>>> listMySessions(

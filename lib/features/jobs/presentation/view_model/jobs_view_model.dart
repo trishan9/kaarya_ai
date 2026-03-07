@@ -24,6 +24,7 @@ class JobsViewModel extends Notifier<JobsState> {
     String? engagementType,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
+
     final result = await _repo.getJobsSection(
       searchQuery: searchQuery,
       locationQuery: locationQuery,
@@ -32,11 +33,17 @@ class JobsViewModel extends Notifier<JobsState> {
       engagementType: engagementType,
     );
     result.fold(
-      (f) => state = state.copyWith(
-        isLoading: false,
-        error: f.message,
-        section: null,
-      ),
+      (f) {
+        if (state.section == null) {
+          state = state.copyWith(
+            isLoading: false,
+            error: f.message,
+            section: null,
+          );
+        } else {
+          state = state.copyWith(isLoading: false);
+        }
+      },
       (section) => state = state.copyWith(
         isLoading: false,
         error: null,
@@ -84,6 +91,20 @@ class JobsViewModel extends Notifier<JobsState> {
   Future<bool?> toggleBookmark(String jobId, bool save) async {
     final result = await _repo.toggleJobBookmark(jobId, save);
     return result.fold((_) => null, (ok) => ok);
+  }
+
+  /// Optimistically update job bookmark state in UI without refetching.
+  void updateJobBookmarkState(String jobId, bool isSaved) {
+    final section = state.section;
+    if (section == null) return;
+    final newBucket = section.jobs.copyWithJobBookmark(jobId, isSaved);
+    state = state.copyWith(
+      section: JobsSectionEntity(
+        searchQuery: section.searchQuery,
+        locationQuery: section.locationQuery,
+        jobs: newBucket,
+      ),
+    );
   }
 
   Future<JobEntity?> createJob(Map<String, dynamic> data) async {

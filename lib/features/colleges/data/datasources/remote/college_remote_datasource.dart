@@ -121,7 +121,7 @@ class CollegeRemoteDataSource implements ICollegeRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final college = jsonAsMap(data['college']) ?? data;
-    return CollegeApiModel.fromJson(college);
+    return CollegeApiModel.fromApiResponse(_castMap(college));
   }
 
   @override

@@ -6,6 +6,11 @@ class InterviewFeedbackEntity extends Equatable {
   final double? totalScore;
   final String? finalAssessment;
   final List<InterviewCategoryScoreEntity> categoryScores;
+  final List<String> strengths;
+  final List<String> areasForImprovement;
+  final String? interviewId;
+  final String? interviewLevel;
+  final int? durationSeconds;
 
   const InterviewFeedbackEntity({
     required this.sessionId,
@@ -13,6 +18,11 @@ class InterviewFeedbackEntity extends Equatable {
     required this.totalScore,
     required this.finalAssessment,
     required this.categoryScores,
+    this.strengths = const [],
+    this.areasForImprovement = const [],
+    this.interviewId,
+    this.interviewLevel,
+    this.durationSeconds,
   });
 
   @override
@@ -22,6 +32,11 @@ class InterviewFeedbackEntity extends Equatable {
     totalScore,
     finalAssessment,
     categoryScores,
+    strengths,
+    areasForImprovement,
+    interviewId,
+    interviewLevel,
+    durationSeconds,
   ];
 }
 

@@ -43,7 +43,7 @@ class CompanyRemoteDataSource implements ICompanyRemoteDataSource {
     final response = await _apiClient.get(ApiEndpoints.companyById(companyId));
     final data = _extractDataMap(response);
     final company = jsonAsMap(data['company']) ?? data;
-    return CompanyApiModel.fromJson(company);
+    return CompanyApiModel.fromApiResponse(jsonCastMap(company));
   }
 
   @override
@@ -82,7 +82,7 @@ class CompanyRemoteDataSource implements ICompanyRemoteDataSource {
 
     final data = _extractDataMap(response);
     final company = jsonAsMap(data['company']) ?? data;
-    return CompanyApiModel.fromJson(company);
+    return CompanyApiModel.fromApiResponse(jsonCastMap(company));
   }
 
   @override
@@ -116,7 +116,7 @@ class CompanyRemoteDataSource implements ICompanyRemoteDataSource {
 
     final data = _extractDataMap(response);
     final company = jsonAsMap(data['company']) ?? data;
-    return CompanyApiModel.fromJson(company);
+    return CompanyApiModel.fromApiResponse(jsonCastMap(company));
   }
 
   @override
@@ -142,7 +142,7 @@ class CompanyRemoteDataSource implements ICompanyRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final company = jsonAsMap(data['company']) ?? data;
-    return CompanyApiModel.fromJson(company);
+    return CompanyApiModel.fromApiResponse(jsonCastMap(company));
   }
 
   @override
@@ -152,7 +152,7 @@ class CompanyRemoteDataSource implements ICompanyRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final company = jsonAsMap(data['company']) ?? data;
-    return CompanyApiModel.fromJson(company);
+    return CompanyApiModel.fromApiResponse(jsonCastMap(company));
   }
 
   @override

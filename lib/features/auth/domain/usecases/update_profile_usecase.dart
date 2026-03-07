@@ -13,11 +13,17 @@ class UpdateProfileUsecaseParams extends Equatable {
   final String? name;
   final String? email;
   final File? photo;
+  final Map<String, dynamic>? candidateProfile;
 
-  const UpdateProfileUsecaseParams({this.name, this.email, this.photo});
+  const UpdateProfileUsecaseParams({
+    this.name,
+    this.email,
+    this.photo,
+    this.candidateProfile,
+  });
 
   @override
-  List<Object?> get props => [name, email, photo];
+  List<Object?> get props => [name, email, photo, candidateProfile];
 }
 
 final updateProfileUseCaseProvider = Provider<UpdateProfileUsecase>((ref) {
@@ -38,6 +44,7 @@ class UpdateProfileUsecase
       params.name,
       params.email,
       params.photo,
+      params.candidateProfile,
     );
   }
 }

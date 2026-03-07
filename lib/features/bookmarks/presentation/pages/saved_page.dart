@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/job_card_widget.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/core/widgets/notifications_widget.dart';
@@ -258,12 +259,12 @@ class _SavedPageState extends ConsumerState<SavedPage> {
                 ),
                 onBookmark: () async {
                   final vm = ref.read(bookmarkViewModelProvider.notifier);
-                  if (job.isSaved) {
-                    await vm.unsaveJobBookmark(job.id);
-                  } else {
-                    await vm.saveJobBookmark(job.id);
+                  vm.removeJobFromBookmarks(job.id);
+                  final ok = await vm.unsaveJobBookmark(job.id);
+                  if (ok != true && mounted) {
+                    vm.addJobBackToBookmarks(job);
+                    SnackbarUtils.showError(context, 'Failed to update bookmark');
                   }
-                  await vm.loadBookmarks();
                 },
               ),
             ),
@@ -463,12 +464,12 @@ class _SavedPageState extends ConsumerState<SavedPage> {
                   child: InkWell(
                     onTap: () async {
                       final vm = ref.read(bookmarkViewModelProvider.notifier);
-                      if (interview.isSaved) {
-                        await vm.unsaveInterviewBookmark(interview.id);
-                      } else {
-                        await vm.saveInterviewBookmark(interview.id);
+                      vm.removeInterviewFromBookmarks(interview.id);
+                      final ok = await vm.unsaveInterviewBookmark(interview.id);
+                      if (ok != true && mounted) {
+                        vm.addInterviewBackToBookmarks(interview);
+                        SnackbarUtils.showError(context, 'Failed to update bookmark');
                       }
-                      await vm.loadBookmarks();
                     },
                     borderRadius: BorderRadius.circular(6),
                     child: Container(

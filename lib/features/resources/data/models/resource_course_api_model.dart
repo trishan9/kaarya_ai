@@ -19,6 +19,8 @@ class ResourceCourseApiModel {
   final int chaptersCount;
   final String createdAt;
   final String updatedAt;
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  final String? createdBy;
 
   const ResourceCourseApiModel({
     required this.id,
@@ -34,10 +36,16 @@ class ResourceCourseApiModel {
     required this.chaptersCount,
     required this.createdAt,
     required this.updatedAt,
+    this.createdBy,
   });
 
   factory ResourceCourseApiModel.fromApiResponse(Map<String, dynamic> json) {
     final chaptersRaw = jsonAsList(json['chapters']);
+    // createdBy can be a Map (populated user object) or a plain String ID
+    final createdByRaw = json['createdBy'];
+    final createdById = createdByRaw is Map
+        ? jsonString(createdByRaw['_id'] ?? createdByRaw['id'])
+        : jsonNullableString(createdByRaw);
     return ResourceCourseApiModel(
       id: jsonString(json['_id'] ?? json['id']),
       title: jsonString(json['title']),
@@ -49,11 +57,12 @@ class ResourceCourseApiModel {
       source: jsonString(json['source']),
       generationMode: jsonString(json['generationMode']),
       chapters: chaptersRaw
-          .map((e) => CourseChapterApiModel.fromJson(e))
+          .map((e) => CourseChapterApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
           .toList(),
       chaptersCount: jsonInt(json['chaptersCount']),
       createdAt: jsonString(json['createdAt']),
       updatedAt: jsonString(json['updatedAt']),
+      createdBy: createdById,
     );
   }
 
@@ -77,6 +86,7 @@ class ResourceCourseApiModel {
       chaptersCount: chaptersCount,
       createdAt: createdAt,
       updatedAt: updatedAt,
+      createdBy: createdBy,
     );
   }
 
@@ -111,6 +121,25 @@ class CourseChapterApiModel {
     required this.practicePrompts,
   });
 
+  factory CourseChapterApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return CourseChapterApiModel(
+      title: jsonString(json['title']),
+      sections: jsonAsList(json['sections'])
+          .map((e) => ChapterSectionApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
+          .toList(),
+      videos: jsonAsList(json['videos'])
+          .map((e) => ChapterVideoApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
+          .toList(),
+      coreConcepts: jsonAsList(json['coreConcepts'])
+          .map((e) => CoreConceptApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
+          .toList(),
+      interviewQuestions: jsonAsList(json['interviewQuestions'])
+          .map((e) => InterviewQuestionApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
+          .toList(),
+      practicePrompts: jsonStringList(json['practicePrompts']),
+    );
+  }
+
   factory CourseChapterApiModel.fromJson(Map<String, dynamic> json) =>
       _$CourseChapterApiModelFromJson(json);
 
@@ -138,6 +167,13 @@ class ChapterSectionApiModel {
     required this.subheadings,
   });
 
+  factory ChapterSectionApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ChapterSectionApiModel(
+      heading: jsonString(json['heading']),
+      subheadings: jsonStringList(json['subheadings']),
+    );
+  }
+
   factory ChapterSectionApiModel.fromJson(Map<String, dynamic> json) =>
       _$ChapterSectionApiModelFromJson(json);
 
@@ -160,6 +196,14 @@ class ChapterVideoApiModel {
     required this.thumbnail,
   });
 
+  factory ChapterVideoApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return ChapterVideoApiModel(
+      title: jsonString(json['title']),
+      url: jsonString(json['url']),
+      thumbnail: jsonString(json['thumbnail']),
+    );
+  }
+
   factory ChapterVideoApiModel.fromJson(Map<String, dynamic> json) =>
       _$ChapterVideoApiModelFromJson(json);
 
@@ -176,6 +220,13 @@ class CoreConceptApiModel {
   final String explanation;
 
   const CoreConceptApiModel({required this.title, required this.explanation});
+
+  factory CoreConceptApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return CoreConceptApiModel(
+      title: jsonString(json['title']),
+      explanation: jsonString(json['explanation']),
+    );
+  }
 
   factory CoreConceptApiModel.fromJson(Map<String, dynamic> json) =>
       _$CoreConceptApiModelFromJson(json);
@@ -196,6 +247,13 @@ class InterviewQuestionApiModel {
     required this.question,
     required this.sampleAnswer,
   });
+
+  factory InterviewQuestionApiModel.fromApiResponse(Map<String, dynamic> json) {
+    return InterviewQuestionApiModel(
+      question: jsonString(json['question']),
+      sampleAnswer: jsonString(json['sampleAnswer']),
+    );
+  }
 
   factory InterviewQuestionApiModel.fromJson(Map<String, dynamic> json) =>
       _$InterviewQuestionApiModelFromJson(json);

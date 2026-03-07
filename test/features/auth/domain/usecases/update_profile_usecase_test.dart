@@ -34,7 +34,7 @@ void main() {
   group('UpdateProfileUsecase', () {
     test('Should return AuthEntity when update succeeds', () async {
       when(
-        () => mockRepository.updateProfile(tName, tEmail, tPhoto),
+        () => mockRepository.updateProfile(tName, tEmail, tPhoto, null),
       ).thenAnswer((_) async => const Right(tUpdatedUser));
 
       final result = await usecase(
@@ -43,7 +43,7 @@ void main() {
 
       expect(result, const Right(tUpdatedUser));
       verify(
-        () => mockRepository.updateProfile(tName, tEmail, tPhoto),
+        () => mockRepository.updateProfile(tName, tEmail, tPhoto, null),
       ).called(1);
       verifyNoMoreInteractions(mockRepository);
     });
@@ -57,6 +57,7 @@ void main() {
           any<String?>(),
           any<String?>(),
           any<File?>(),
+          any<Map<String, dynamic>?>(),
         ),
       ).thenAnswer((invocation) {
         capturedName = invocation.positionalArguments[0] as String?;
@@ -76,19 +77,21 @@ void main() {
 
     test('Should allow null optional parameters', () async {
       when(
-        () => mockRepository.updateProfile(null, null, null),
+        () => mockRepository.updateProfile(null, null, null, null),
       ).thenAnswer((_) async => const Right(tUpdatedUser));
 
       final result = await usecase(const UpdateProfileUsecaseParams());
 
       expect(result, const Right(tUpdatedUser));
-      verify(() => mockRepository.updateProfile(null, null, null)).called(1);
+      verify(
+        () => mockRepository.updateProfile(null, null, null, null),
+      ).called(1);
     });
 
     test('Should return failure when update fails', () async {
       const failure = ApiFailure(message: 'Update failed');
       when(
-        () => mockRepository.updateProfile(any(), any(), any()),
+        () => mockRepository.updateProfile(any(), any(), any(), any()),
       ).thenAnswer((_) async => const Left(failure));
 
       final result = await usecase(
@@ -97,14 +100,14 @@ void main() {
 
       expect(result, const Left(failure));
       verify(
-        () => mockRepository.updateProfile(tName, tEmail, tPhoto),
+        () => mockRepository.updateProfile(tName, tEmail, tPhoto, null),
       ).called(1);
     });
 
     test('Should return NetworkFailure when there is no internet', () async {
       const failure = NetworkFailure();
       when(
-        () => mockRepository.updateProfile(any(), any(), any()),
+        () => mockRepository.updateProfile(any(), any(), any(), any()),
       ).thenAnswer((_) async => const Left(failure));
 
       final result = await usecase(
@@ -113,7 +116,7 @@ void main() {
 
       expect(result, const Left(failure));
       verify(
-        () => mockRepository.updateProfile(tName, tEmail, tPhoto),
+        () => mockRepository.updateProfile(tName, tEmail, tPhoto, null),
       ).called(1);
     });
 
@@ -126,6 +129,7 @@ void main() {
           any<String?>(),
           any<String?>(),
           any<File?>(),
+          any<Map<String, dynamic>?>(),
         ),
       ).thenAnswer((invocation) {
         capturedName = invocation.positionalArguments[0] as String?;
@@ -150,7 +154,7 @@ void main() {
         photo: tPhoto,
       );
 
-      expect(params.props, [tName, tEmail, tPhoto]);
+      expect(params.props, [tName, tEmail, tPhoto, null]);
     });
 
     test('Two params with same values should be equal', () {

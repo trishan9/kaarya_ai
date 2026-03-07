@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
+import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/features/auth/presentation/state/auth_state.dart';
 import 'package:kaarya/features/auth/presentation/view_model/auth_view_model.dart';
@@ -58,6 +59,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       if (next.status == AuthStatus.authenticated) {
         ref.read(dashboardViewModelProvider.notifier).resetState();
         ref.read(authViewModelProvider.notifier).resetState();
+        // Force session/role providers to refresh so dashboard shows correct view
+        ref.invalidate(userSessionServiceProvider);
         AppRoutes.pushReplacement(context, const DashboardPage());
       } else if (next.status == AuthStatus.error && next.errorMessage != null) {
         ref.read(authViewModelProvider.notifier).resetState();

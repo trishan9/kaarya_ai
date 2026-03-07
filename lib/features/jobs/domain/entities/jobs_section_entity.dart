@@ -31,6 +31,19 @@ class JobsBucketEntity extends Equatable {
     required this.urgent,
   });
 
+  JobsBucketEntity copyWithJobBookmark(String jobId, bool isSaved) {
+    List<JobEntity> mapList(List<JobEntity> list) => list
+        .map((j) => j.id == jobId ? j.copyWith(isSaved: isSaved) : j)
+        .toList();
+    return JobsBucketEntity(
+      forYou: mapList(forYou),
+      trending: mapList(trending),
+      newThisWeek: mapList(newThisWeek),
+      remote: mapList(remote),
+      urgent: mapList(urgent),
+    );
+  }
+
   @override
   List<Object?> get props => [forYou, trending, newThisWeek, remote, urgent];
 }

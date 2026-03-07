@@ -42,8 +42,11 @@ class UserSessionService {
       await _prefs.setString(_keyName, name);
     }
 
-    if (role != null) {
-      await _prefs.setString(_keyRole, role);
+    // Always update role - never leave stale value from previous session
+    if (role != null && role.trim().isNotEmpty) {
+      await _prefs.setString(_keyRole, role.trim());
+    } else {
+      await _prefs.remove(_keyRole);
     }
 
     if (provider != null) {

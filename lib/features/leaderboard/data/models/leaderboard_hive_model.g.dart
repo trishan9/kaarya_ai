@@ -26,13 +26,15 @@ class LeaderboardEntryHiveModelAdapter
       level: fields[5] as String,
       college: fields[6] as String?,
       isCurrentUser: fields[7] as bool,
+      score: (fields[8] as num?)?.toInt() ?? 0,
+      kRank: (fields[9] as num?)?.toInt() ?? 0,
     );
   }
 
   @override
   void write(BinaryWriter writer, LeaderboardEntryHiveModel obj) {
     writer
-      ..writeByte(8)
+      ..writeByte(10)
       ..writeByte(0)
       ..write(obj.rank)
       ..writeByte(1)
@@ -48,7 +50,11 @@ class LeaderboardEntryHiveModelAdapter
       ..writeByte(6)
       ..write(obj.college)
       ..writeByte(7)
-      ..write(obj.isCurrentUser);
+      ..write(obj.isCurrentUser)
+      ..writeByte(8)
+      ..write(obj.score)
+      ..writeByte(9)
+      ..write(obj.kRank);
   }
 
   @override

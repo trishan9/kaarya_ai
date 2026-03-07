@@ -36,6 +36,16 @@ class DashboardRepository implements IDashboardRepository {
        _networkInfo = networkInfo;
 
   @override
+  Future<DashboardOverviewEntity?> getOverviewFromCache({
+    String? monthKey,
+  }) async {
+    final cached = await _localDatasource.getOverviewData(
+      monthKey: monthKey,
+    );
+    return cached?.toApiModel().toEntity();
+  }
+
+  @override
   Future<Either<Failure, DashboardOverviewEntity>> getOverviewData({
     String? monthKey,
   }) async {

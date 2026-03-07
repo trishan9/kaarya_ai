@@ -26,6 +26,8 @@ class CompleteSessionUseCase
       transcript: params.transcript,
       recordingUrl: params.recordingUrl,
       durationSeconds: params.durationSeconds,
+      vapiCallId: params.vapiCallId,
+      generateEvaluation: params.generateEvaluation,
     );
   }
 }
@@ -34,9 +36,11 @@ class CompleteSessionUseCaseParams {
   final String interviewId;
   final String sessionId;
   final String status;
-  final String? transcript;
+  final List<Map<String, dynamic>>? transcript;
   final String? recordingUrl;
   final int? durationSeconds;
+  final String? vapiCallId;
+  final bool generateEvaluation;
 
   const CompleteSessionUseCaseParams({
     required this.interviewId,
@@ -45,5 +49,7 @@ class CompleteSessionUseCaseParams {
     this.transcript,
     this.recordingUrl,
     this.durationSeconds,
+    this.vapiCallId,
+    this.generateEvaluation = true,
   });
 }

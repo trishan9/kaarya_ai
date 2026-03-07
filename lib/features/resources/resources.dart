@@ -1,0 +1,12 @@
+export 'domain/entities/resource_course_entity.dart';
+export 'domain/repositories/resource_repository.dart';
+export 'domain/usecases/create_course_usecase.dart';
+export 'domain/usecases/delete_course_usecase.dart';
+export 'domain/usecases/get_course_by_id_usecase.dart';
+export 'domain/usecases/list_courses_usecase.dart';
+export 'domain/usecases/update_course_usecase.dart';
+export 'presentation/pages/resources_hub_screen.dart';
+export 'presentation/pages/resource_course_detail_page.dart';
+export 'presentation/state/resource_state.dart';
+export 'presentation/view_model/resource_view_model.dart';
+export 'presentation/widgets/create_course_sheet.dart';

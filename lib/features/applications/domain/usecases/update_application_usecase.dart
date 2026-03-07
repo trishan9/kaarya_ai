@@ -16,18 +16,21 @@ final updateApplicationUseCaseProvider = Provider<UpdateApplicationUseCase>((
 class UpdateApplicationUseCaseParams extends Equatable {
   final String jobId;
   final String applicationId;
-  final String status;
-  final Map<String, dynamic>? interviewMetadata;
+  final String? status;
+  final DateTime? interviewScheduledAt;
+  final String? interviewNote;
 
   const UpdateApplicationUseCaseParams({
     required this.jobId,
     required this.applicationId,
-    required this.status,
-    this.interviewMetadata,
+    this.status,
+    this.interviewScheduledAt,
+    this.interviewNote,
   });
 
   @override
-  List<Object?> get props => [jobId, applicationId, status, interviewMetadata];
+  List<Object?> get props =>
+      [jobId, applicationId, status, interviewScheduledAt, interviewNote];
 }
 
 class UpdateApplicationUseCase
@@ -43,7 +46,8 @@ class UpdateApplicationUseCase
       jobId: params.jobId,
       applicationId: params.applicationId,
       status: params.status,
-      interviewMetadata: params.interviewMetadata,
+      interviewScheduledAt: params.interviewScheduledAt,
+      interviewNote: params.interviewNote,
     );
   }
 }

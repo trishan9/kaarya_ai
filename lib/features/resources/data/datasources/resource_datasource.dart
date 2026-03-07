@@ -56,9 +56,12 @@ class ResourceCoursesListApiResponse {
   });
 
   factory ResourceCoursesListApiResponse.fromJson(Map<String, dynamic> json) {
+    // Support multiple possible keys for the courses list
+    final raw = json['resources'] ?? json['courses'] ?? json['data'] ?? [];
+    final total = json['totalCount'] ?? json['total'] ?? json['count'] ?? 0;
     return ResourceCoursesListApiResponse(
-      courses: ResourceCourseApiModel.fromApiList(json['resources']),
-      totalCount: json['totalCount'] is int ? json['totalCount'] as int : 0,
+      courses: ResourceCourseApiModel.fromApiList(raw),
+      totalCount: total is int ? total : 0,
       page: json['page'] is int ? json['page'] as int : 1,
       size: json['size'] is int ? json['size'] as int : 20,
     );

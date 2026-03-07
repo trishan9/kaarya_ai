@@ -30,6 +30,12 @@ class LeaderboardEntryHiveModel extends HiveObject {
   @HiveField(7)
   final bool isCurrentUser;
 
+  @HiveField(8)
+  final int score;
+
+  @HiveField(9)
+  final int kRank;
+
   LeaderboardEntryHiveModel({
     required this.rank,
     required this.userId,
@@ -39,6 +45,8 @@ class LeaderboardEntryHiveModel extends HiveObject {
     required this.level,
     this.college,
     required this.isCurrentUser,
+    this.score = 0,
+    this.kRank = 0,
   });
 
   factory LeaderboardEntryHiveModel.fromApiModel(
@@ -52,6 +60,8 @@ class LeaderboardEntryHiveModel extends HiveObject {
     level: model.level,
     college: model.college,
     isCurrentUser: model.isCurrentUser,
+    score: model.score,
+    kRank: model.kRank,
   );
 
   LeaderboardEntryApiModel toApiModel() => LeaderboardEntryApiModel(
@@ -60,6 +70,8 @@ class LeaderboardEntryHiveModel extends HiveObject {
     name: name,
     photo: photo,
     xp: xp,
+    score: score,
+    kRank: kRank,
     level: level,
     college: college,
     isCurrentUser: isCurrentUser,

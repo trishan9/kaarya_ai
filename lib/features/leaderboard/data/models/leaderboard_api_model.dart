@@ -11,6 +11,10 @@ class LeaderboardEntryApiModel {
   final String name;
   final String? photo;
   final int xp;
+  @JsonKey(defaultValue: 0)
+  final int score;
+  @JsonKey(defaultValue: 0)
+  final int kRank;
   final String level;
   final String? college;
   final bool isCurrentUser;
@@ -21,6 +25,8 @@ class LeaderboardEntryApiModel {
     required this.name,
     required this.photo,
     required this.xp,
+    this.score = 0,
+    this.kRank = 0,
     required this.level,
     required this.college,
     required this.isCurrentUser,
@@ -29,21 +35,27 @@ class LeaderboardEntryApiModel {
   factory LeaderboardEntryApiModel.fromJson(Map<String, dynamic> json) =>
       _$LeaderboardEntryApiModelFromJson(json);
 
-  factory LeaderboardEntryApiModel.fromApiResponse(Map<String, dynamic> json) {
-    final user = jsonAsMap(json['user']) ?? const <String, dynamic>{};
-    final gamification =
-        jsonAsMap(json['gamification']) ?? const <String, dynamic>{};
-    final collegeData = jsonAsMap(json['college']);
+  factory LeaderboardEntryApiModel.fromApiResponse(
+    Map<String, dynamic> json, {
+    bool isCurrentUser = false,
+  }) {
+    final student = jsonAsMap(json['student']) ?? const <String, dynamic>{};
+    final xp = jsonInt(json['xp']);
+    final apiLevelRaw = json['level'];
+    final apiLevel = apiLevelRaw != null ? jsonInt(apiLevelRaw) : 0;
+    final levelStr = apiLevel > 0 ? '$apiLevel' : '${(xp ~/ 250) + 1}';
 
     return LeaderboardEntryApiModel(
       rank: jsonString(json['rank']?.toString()),
-      userId: jsonString(user['id']),
-      name: jsonString(user['name'], fallback: 'Unknown'),
-      photo: jsonNullableString(user['photo']),
-      xp: jsonInt(gamification['xp']),
-      level: jsonString(gamification['level'], fallback: 'Beginner'),
-      college: jsonNullableString(collegeData?['name']),
-      isCurrentUser: jsonBool(json['isCurrentUser']),
+      userId: jsonString(student['id']),
+      name: jsonString(student['name'], fallback: 'Unknown'),
+      photo: jsonNullableString(student['photo']),
+      xp: xp,
+      score: jsonInt(json['score']),
+      kRank: jsonInt(json['total']),
+      level: levelStr,
+      college: null,
+      isCurrentUser: isCurrentUser || jsonBool(json['isCurrentUser']),
     );
   }
 
@@ -56,20 +68,29 @@ class LeaderboardEntryApiModel {
       name: name,
       photo: photo,
       xp: xp,
+      score: score,
+      kRank: kRank,
       level: level,
       college: college,
       isCurrentUser: isCurrentUser,
     );
   }
 
-  static List<LeaderboardEntryApiModel> fromApiList(dynamic items) {
+  static List<LeaderboardEntryApiModel> fromApiList(
+    dynamic items, {
+    String currentUserId = '',
+  }) {
     if (items is! List) return const <LeaderboardEntryApiModel>[];
-    return items
-        .whereType<Map>()
-        .map(
-          (item) => LeaderboardEntryApiModel.fromApiResponse(jsonCastMap(item)),
-        )
-        .toList();
+    return items.whereType<Map>().map((item) {
+      final map = jsonCastMap(item);
+      final student = jsonAsMap(map['student']) ?? const <String, dynamic>{};
+      final studentId = jsonString(student['id']);
+      return LeaderboardEntryApiModel.fromApiResponse(
+        map,
+        isCurrentUser:
+            currentUserId.isNotEmpty && studentId == currentUserId,
+      );
+    }).toList();
   }
 
   static List<LeaderboardEntryApiModel> fromCacheList(dynamic items) {
@@ -95,11 +116,25 @@ class LeaderboardApiModel {
       _$LeaderboardApiModelFromJson(json);
 
   factory LeaderboardApiModel.fromApiResponse(Map<String, dynamic> data) {
-    final entries = LeaderboardEntryApiModel.fromApiList(data['data']);
+    // Extract current user ID from 'me' to mark the matching row
+    final meMap = jsonAsMap(data['me']);
+    String currentUserId = '';
+
+    if (meMap != null) {
+      final meStudent =
+          jsonAsMap(meMap['student']) ?? const <String, dynamic>{};
+      currentUserId = jsonString(meStudent['id']);
+    }
+
+    final entries = LeaderboardEntryApiModel.fromApiList(
+      data['rows'],
+      currentUserId: currentUserId,
+    );
+
     final meta = jsonAsMap(data['meta']) ?? const <String, dynamic>{};
     return LeaderboardApiModel(
       entries: entries,
-      totalEntries: jsonInt(meta['total']),
+      totalEntries: jsonInt(meta['totalItems']),
     );
   }
 

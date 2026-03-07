@@ -14,10 +14,12 @@ abstract interface class IAuthRepository {
     String? name,
     String? email,
     File? photo,
+    Map<String, dynamic>? candidateProfile,
   );
   Future<Either<Failure, bool>> changePassword(
     String currentPassword,
     String newPassword,
+    String confirmNewPassword,
   );
   Future<Either<Failure, bool>> requestPasswordReset(String email);
   Future<Either<Failure, String>> verifyPasswordResetOtp(

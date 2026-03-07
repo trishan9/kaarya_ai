@@ -202,32 +202,4 @@ Map<String, dynamic> _$ResumeAchievementApiModelToJson(
       'date': instance.date,
     };
 
-AtsScanResultApiModel _$AtsScanResultApiModelFromJson(
-        Map<String, dynamic> json) =>
-    AtsScanResultApiModel(
-      overallScore: (json['overallScore'] as num).toDouble(),
-      atsScore: (json['atsScore'] as num).toDouble(),
-      toneStyleScore: (json['toneStyleScore'] as num).toDouble(),
-      contentScore: (json['contentScore'] as num).toDouble(),
-      structureScore: (json['structureScore'] as num).toDouble(),
-      skillsScore: (json['skillsScore'] as num).toDouble(),
-      suggestions: (json['suggestions'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-      improvements: (json['improvements'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
-    );
-
-Map<String, dynamic> _$AtsScanResultApiModelToJson(
-        AtsScanResultApiModel instance) =>
-    <String, dynamic>{
-      'overallScore': instance.overallScore,
-      'atsScore': instance.atsScore,
-      'toneStyleScore': instance.toneStyleScore,
-      'contentScore': instance.contentScore,
-      'structureScore': instance.structureScore,
-      'skillsScore': instance.skillsScore,
-      'suggestions': instance.suggestions,
-      'improvements': instance.improvements,
-    };
+// AtsScanResultApiModel uses manual fromApiResponse — no generated code needed.

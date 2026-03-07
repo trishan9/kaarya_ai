@@ -14,6 +14,7 @@ class ResourceCourseEntity extends Equatable {
   final int chaptersCount;
   final String createdAt;
   final String updatedAt;
+  final String? createdBy;
 
   const ResourceCourseEntity({
     required this.id,
@@ -29,6 +30,7 @@ class ResourceCourseEntity extends Equatable {
     required this.chaptersCount,
     required this.createdAt,
     required this.updatedAt,
+    this.createdBy,
   });
 
   @override
@@ -46,6 +48,7 @@ class ResourceCourseEntity extends Equatable {
     chaptersCount,
     createdAt,
     updatedAt,
+    createdBy,
   ];
 }
 

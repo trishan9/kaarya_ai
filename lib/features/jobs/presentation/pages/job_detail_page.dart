@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_html/flutter_html.dart';
+import 'package:kaarya/app/routes/app_routes.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/job_card_widget.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
+import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_detail_entity.dart';
+import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 import 'package:kaarya/features/jobs/presentation/pages/apply_to_job_page.dart';
 import 'package:kaarya/features/jobs/presentation/view_model/jobs_view_model.dart';
+import 'package:kaarya/features/recruiter/presentation/pages/applicants_pipeline_page.dart';
+import 'package:kaarya/features/recruiter/presentation/pages/post_new_job_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class JobDetailPage extends ConsumerStatefulWidget {
   final String jobId;
   final String? jobTitle;
+  final bool isRecruiterManageView;
 
-  const JobDetailPage({super.key, required this.jobId, this.jobTitle});
+  const JobDetailPage({
+    super.key,
+    required this.jobId,
+    this.jobTitle,
+    this.isRecruiterManageView = false,
+  });
 
   @override
   ConsumerState<JobDetailPage> createState() => _JobDetailPageState();
@@ -39,7 +50,7 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.jobTitle ?? 'Job Details'),
+        title: Text(job?.title ?? widget.jobTitle ?? 'Job Details'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
@@ -101,7 +112,8 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
                     const SizedBox(height: 24),
                     _buildCompanySection(job.company!),
                   ],
-                  if (job.similarJobs.isNotEmpty) ...[
+                  if (!widget.isRecruiterManageView &&
+                      _similarJobsForDisplay(job).isNotEmpty) ...[
                     const SizedBox(height: 24),
                     _buildSimilarJobs(job),
                   ],
@@ -530,7 +542,20 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
     );
   }
 
+  List<JobEntity> _similarJobsForDisplay(JobDetailEntity job) {
+    if (widget.isRecruiterManageView) {
+      return job.similarJobs
+          .where((j) =>
+              j.companyName.toLowerCase() == job.companyName.toLowerCase())
+          .toList();
+    }
+    return job.similarJobs;
+  }
+
   Widget _buildSimilarJobs(JobDetailEntity job) {
+    final similarJobs = _similarJobsForDisplay(job);
+    if (similarJobs.isEmpty) return const SizedBox.shrink();
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -548,7 +573,7 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
           ],
         ),
         const SizedBox(height: 8),
-        ...job.similarJobs.map(
+        ...similarJobs.map(
           (j) => Padding(
             padding: const EdgeInsets.only(bottom: 12),
             child: JobCardWidget(
@@ -569,6 +594,71 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
   }
 
   Widget _buildBottomBar(JobDetailEntity job) {
+    if (widget.isRecruiterManageView) {
+      return Container(
+        padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(14)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(10),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: double.infinity,
+              height: 48,
+              child: MyButton(
+                onPressed: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => ApplicantsPipelinePage(
+                        jobId: job.id,
+                        jobTitle: job.title,
+                      ),
+                    ),
+                  );
+                },
+                text: 'Manage Applicants',
+              ),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      await AppRoutes.pushNoTransition(
+                        context,
+                        PostNewJobPage(jobId: job.id, job: job),
+                      );
+                      if (context.mounted) {
+                        ref.read(jobsViewModelProvider.notifier).loadJobDetail(widget.jobId);
+                      }
+                    },
+                    icon: const Icon(LucideIcons.pencil, size: 18),
+                    label: const Text('Edit Job'),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Back to Jobs'),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
       decoration: BoxDecoration(

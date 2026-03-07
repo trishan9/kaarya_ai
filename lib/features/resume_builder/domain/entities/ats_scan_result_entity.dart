@@ -1,35 +1,81 @@
 import 'package:equatable/equatable.dart';
 
+class AtsScanTipEntity extends Equatable {
+  final String type; // "good" or "improve"
+  final String tip;
+  final String? explanation;
+
+  const AtsScanTipEntity({
+    required this.type,
+    required this.tip,
+    this.explanation,
+  });
+
+  bool get isGood => type == 'good';
+
+  @override
+  List<Object?> get props => [type, tip, explanation];
+}
+
+class AtsScanCategoryEntity extends Equatable {
+  final double score;
+  final List<AtsScanTipEntity> tips;
+
+  const AtsScanCategoryEntity({required this.score, required this.tips});
+
+  int get strengthsCount => tips.where((t) => t.isGood).length;
+  int get improvementsCount => tips.where((t) => !t.isGood).length;
+
+  @override
+  List<Object?> get props => [score, tips];
+}
+
 class AtsScanResultEntity extends Equatable {
   final double overallScore;
-  final double atsScore;
-  final double toneStyleScore;
-  final double contentScore;
-  final double structureScore;
-  final double skillsScore;
-  final List<String> suggestions;
-  final List<String> improvements;
+  final String? documentType;
+  final String? classificationReason;
+  final AtsScanCategoryEntity? ats;
+  final AtsScanCategoryEntity? toneAndStyle;
+  final AtsScanCategoryEntity? content;
+  final AtsScanCategoryEntity? structure;
+  final AtsScanCategoryEntity? skills;
 
   const AtsScanResultEntity({
     required this.overallScore,
-    required this.atsScore,
-    required this.toneStyleScore,
-    required this.contentScore,
-    required this.structureScore,
-    required this.skillsScore,
-    required this.suggestions,
-    required this.improvements,
+    this.documentType,
+    this.classificationReason,
+    this.ats,
+    this.toneAndStyle,
+    this.content,
+    this.structure,
+    this.skills,
   });
+
+  bool get isNotResume => documentType == 'not_resume';
+
+  List<AtsScanCategoryEntity> get categories => [
+    if (ats != null) ats!,
+    if (toneAndStyle != null) toneAndStyle!,
+    if (content != null) content!,
+    if (structure != null) structure!,
+    if (skills != null) skills!,
+  ];
+
+  int get totalStrengths =>
+      categories.fold(0, (sum, c) => sum + c.strengthsCount);
+
+  int get totalImprovements =>
+      categories.fold(0, (sum, c) => sum + c.improvementsCount);
 
   @override
   List<Object?> get props => [
     overallScore,
-    atsScore,
-    toneStyleScore,
-    contentScore,
-    structureScore,
-    skillsScore,
-    suggestions,
-    improvements,
+    documentType,
+    classificationReason,
+    ats,
+    toneAndStyle,
+    content,
+    structure,
+    skills,
   ];
 }

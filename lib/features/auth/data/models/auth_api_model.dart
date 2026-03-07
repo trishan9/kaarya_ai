@@ -25,8 +25,27 @@ class AuthApiModel {
     this.photo,
   });
 
-  factory AuthApiModel.fromJson(Map<String, dynamic> json) =>
-      _$AuthApiModelFromJson(json);
+  factory AuthApiModel.fromJson(Map<String, dynamic> json) {
+    final model = _$AuthApiModelFromJson(json);
+    // Parse role from multiple possible API response keys (role, userRole, user_role)
+    final role = _parseRole(json) ?? model.role;
+    return AuthApiModel(
+      id: model.id,
+      name: model.name,
+      email: model.email,
+      password: model.password,
+      provider: model.provider,
+      socialId: model.socialId,
+      role: role,
+      photo: model.photo,
+    );
+  }
+
+  static String? _parseRole(Map<String, dynamic> json) {
+    final v = json['role'] ?? json['userRole'] ?? json['user_role'];
+    if (v is String && v.trim().isNotEmpty) return v.trim();
+    return null;
+  }
 
   Map<String, dynamic> toJson() => _$AuthApiModelToJson(this);
 

@@ -33,12 +33,12 @@ class CollegeApiModel {
     return CollegeApiModel(
       id: jsonString(json['_id'] ?? json['id']),
       name: jsonString(json['name']),
-      institutionType: jsonString(json['institutionType']),
+      institutionType: jsonString(json['institutionType'] ?? json['institution_type'], fallback: 'Other'),
       location: jsonString(json['location']),
       logo: jsonNullableString(json['logo']),
-      inviteCode: jsonNullableString(json['inviteCode']),
-      studentsCount: jsonInt(json['studentsCount']),
-      createdAt: jsonString(json['createdAt']),
+      inviteCode: jsonNullableString(json['inviteCode'] ?? json['invite_code']),
+      studentsCount: jsonInt(json['studentsCount'] ?? json['students_count']),
+      createdAt: jsonString(json['createdAt'] ?? json['created_at']),
     );
   }
 
