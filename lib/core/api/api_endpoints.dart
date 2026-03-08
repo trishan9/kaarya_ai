@@ -9,7 +9,6 @@ class ApiEndpoints {
   static const String _ipAddress = '192.168.1.73';
   static const int _port = 3000;
 
-  // Base URLs
   static String get _host {
     if (isPhysicalDevice) return _ipAddress;
     if (kIsWeb || Platform.isIOS) return 'localhost';
@@ -23,35 +22,65 @@ class ApiEndpoints {
   static const Duration connectionTimeout = Duration(seconds: 30);
   static const Duration receiveTimeout = Duration(seconds: 30);
 
-  // ============ Auth Endpoints ============
   static const String userSignup = '/auth/signup';
   static const String userLogin = '/auth/login';
   static const String me = '/auth/me';
+  static const String googleStatus = '/auth/google/status';
+  static const String githubStatus = '/auth/github/status';
+  static const String googleMobileLogin = '/auth/google/mobile';
   static const String updateProfile = '/auth/update-me';
   static const String changePassword = '/auth/change-password';
   static const String requestPasswordReset = '/auth/password-reset/request';
   static const String verifyPasswordResetOtp = '/auth/password-reset/verify';
   static const String confirmPasswordReset = '/auth/password-reset/confirm';
+  static String oauthAuthorize(String provider) =>
+      '/auth/oauth/$provider/authorize';
   static const String linkedAccounts = '/auth/oauth/accounts';
   static String oauthLinkAuthorize(String provider) =>
       '/auth/oauth/$provider/link/authorize';
   static const String oauthExchange = '/auth/oauth/exchange';
   static const String oauthLinkComplete = '/auth/oauth/link/complete';
   static String oauthUnlink(String provider) => '/auth/oauth/$provider/unlink';
+  static String oauthStatus(String provider) {
+    switch (provider.toLowerCase()) {
+      case 'google':
+        return googleStatus;
+      case 'github':
+        return githubStatus;
+      default:
+        throw ArgumentError.value(
+          provider,
+          'provider',
+          'Unsupported OAuth provider.',
+        );
+    }
+  }
+
+  static String oauthRedirectUri(String provider) =>
+      'kaarya://oauth/${provider.toLowerCase()}';
+
+  static String oauthAuthorizeUrl(
+    String provider, {
+    required String redirectUri,
+    String intent = 'login',
+  }) {
+    final query = Uri(
+      queryParameters: {'redirectUri': redirectUri, 'intent': intent},
+    ).query;
+    return '$baseUrl${oauthAuthorize(provider)}?$query';
+  }
+
   static const String uploadCertification =
       '/auth/candidate-profile/certifications/upload';
 
-  // ============ User Endpoints ============
   static const String user = '/users';
   static String userById(String id) => '/users/$id';
 
-  // ============ Jobs Endpoints ============
   static const String jobs = '/jobs';
   static String jobById(String id) => '/jobs/$id';
   static String jobView(String id) => '/jobs/$id/view';
   static String jobMetrics(String id) => '/jobs/$id/metrics';
 
-  // ============ Applications Endpoints ============
   static const String myApplications = '/applications/me';
   static const String myApplicationsSummary = '/applications/me/summary';
   static String myApplicationByJob(String jobId) =>
@@ -66,7 +95,6 @@ class ApiEndpoints {
   static String deleteResume(String resumeId) =>
       '/applications/resumes/$resumeId';
 
-  // ============ Interviews Endpoints ============
   static const String interviews = '/interviews';
   static String interviewById(String id) => '/interviews/$id';
   static String interviewSessions(String id) => '/interviews/$id/sessions';
@@ -81,16 +109,13 @@ class ApiEndpoints {
   static String interviewAnalytics(String id) => '/interviews/$id/analytics';
   static const String vapiCreationConfig = '/interviews/vapi/creation-config';
 
-  // ============ Bookmarks Endpoints ============
   static const String myBookmarks = '/bookmarks/me';
   static String bookmarkJob(String jobId) => '/bookmarks/jobs/$jobId';
   static String bookmarkInterview(String interviewId) =>
       '/bookmarks/interviews/$interviewId';
 
-  // ============ Leaderboard Endpoints ============
   static const String leaderboard = '/leaderboard';
 
-  // ============ Companies Endpoints ============
   static const String companies = '/companies';
   static String companyById(String id) => '/companies/$id';
   static const String myCompany = '/companies/me';
@@ -103,7 +128,6 @@ class ApiEndpoints {
   static String removeRecruiter(String companyId, String recruiterId) =>
       '/companies/$companyId/recruiters/$recruiterId';
 
-  // ============ Colleges Endpoints ============
   static const String colleges = '/colleges';
   static String collegeById(String id) => '/colleges/$id';
   static const String myCollege = '/colleges/me';
@@ -117,7 +141,6 @@ class ApiEndpoints {
       '/colleges/$collegeId/students/$studentId';
   static String collegeMetrics(String id) => '/colleges/$id/metrics';
 
-  // ============ Resume Builder Endpoints ============
   static const String resumeBuilder = '/resume-builder';
   static const String resumeBuilderList = '/resume-builder/list';
   static String resumeBuilderById(String id) => '/resume-builder/$id';
@@ -131,18 +154,23 @@ class ApiEndpoints {
       '/resume-builder/ai/suggestions';
   static const String resumeBuilderAtsScan = '/resume-builder/ats-scan';
 
-  // ============ Resources Endpoints ============
   static const String resources = '/resources';
   static String resourceById(String id) => '/resources/$id';
 
-  // ============ Stream Endpoints ============
   static const String streamConfig = '/stream/config';
   static const String streamChatToken = '/stream/chat-token';
   static const String streamVideoToken = '/stream/video-token';
   static const String streamEnsureChannels = '/stream/ensure-channels';
   static const String streamEnsureChannelWith = '/stream/ensure-channel-with';
 
-  // ============ Admin Endpoints ============
+  static const String paymentBillingSummary = '/payments/billing-summary';
+  static const String paymentStripeCheckoutSession =
+      '/payments/stripe/checkout-session';
+  static const String paymentStripeVerifySession =
+      '/payments/stripe/verify-session';
+  static const String paymentStripePortalSession =
+      '/payments/stripe/portal-session';
+
   static const String adminUsers = '/admin/users';
   static const String adminUsersAnalytics = '/admin/users/analytics';
   static String adminUserById(String id) => '/admin/users/$id';

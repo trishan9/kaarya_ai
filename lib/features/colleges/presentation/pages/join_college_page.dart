@@ -6,8 +6,6 @@ import 'package:kaarya/core/widgets/my_button_widget.dart';
 import 'package:kaarya/core/widgets/my_text_form_field_widget.dart';
 import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
 
-/// Page for candidates to join a college workspace via invite code.
-/// No create feature - candidates can only join existing colleges.
 class JoinCollegePage extends ConsumerStatefulWidget {
   const JoinCollegePage({super.key});
 
@@ -30,16 +28,19 @@ class _JoinCollegePageState extends ConsumerState<JoinCollegePage> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isSubmitting = true);
-    final error = await ref.read(collegeDashboardViewModelProvider.notifier).joinWorkspace(
-          inviteCode: _inviteCodeController.text.trim(),
-        );
+    final error = await ref
+        .read(collegeDashboardViewModelProvider.notifier)
+        .joinWorkspace(inviteCode: _inviteCodeController.text.trim());
     if (!mounted) return;
     setState(() => _isSubmitting = false);
 
     if (error != null) {
       SnackbarUtils.showError(context, error);
     } else {
-      SnackbarUtils.showSuccess(context, 'Joined college workspace successfully');
+      SnackbarUtils.showSuccess(
+        context,
+        'Joined college workspace successfully',
+      );
       Navigator.of(context).pop(true);
     }
   }
@@ -47,9 +48,7 @@ class _JoinCollegePageState extends ConsumerState<JoinCollegePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Join College Workspace'),
-      ),
+      appBar: AppBar(title: const Text('Join College Workspace')),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -93,8 +92,9 @@ class _JoinCollegePageState extends ConsumerState<JoinCollegePage> {
                 MyTextFormField(
                   controller: _inviteCodeController,
                   text: 'Invite code (e.g. KR-AB12CD34)',
-                  validator: (v) =>
-                      (v == null || v.trim().isEmpty) ? 'Invite code is required' : null,
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Invite code is required'
+                      : null,
                 ),
                 const SizedBox(height: 28),
                 MyButton(

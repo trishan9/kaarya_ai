@@ -241,7 +241,9 @@ class CompanyRemoteDataSource implements ICompanyRemoteDataSource {
     if (data is Map) {
       return jsonCastMap(data);
     }
-
-    return <String, dynamic>{};
+    final fallback = Map<String, dynamic>.from(normalized)
+      ..remove('success')
+      ..remove('message');
+    return fallback;
   }
 }

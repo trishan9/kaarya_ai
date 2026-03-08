@@ -50,7 +50,6 @@ class JobBookmarkApiModel {
       _$JobBookmarkApiModelFromJson(json);
 
   factory JobBookmarkApiModel.fromApiResponse(Map<String, dynamic> json) {
-    // The API wraps the job data inside a "job" key
     final jobData = jsonAsMap(json['job']) ?? json;
     final companyData =
         jsonAsMap(jobData['company']) ?? jsonAsMap(jobData['college']);
@@ -168,7 +167,6 @@ class InterviewBookmarkApiModel {
       _$InterviewBookmarkApiModelFromJson(json);
 
   factory InterviewBookmarkApiModel.fromApiResponse(Map<String, dynamic> json) {
-    // The API wraps the interview data inside an "interview" key
     final interviewData = jsonAsMap(json['interview']) ?? json;
     final company = jsonAsMap(interviewData['company']);
     final college = jsonAsMap(interviewData['college']);

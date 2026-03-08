@@ -14,7 +14,7 @@ enum TakeInterviewPhase {
 }
 
 class TranscriptMessage extends Equatable {
-  final String role; // 'assistant', 'user', 'system'
+  final String role;
   final String content;
   final DateTime timestamp;
 
@@ -40,33 +40,28 @@ class TakeInterviewState extends Equatable {
   final TakeInterviewPhase phase;
   final String? error;
 
-  // Interview info
   final InterviewEntity? interview;
   final String? sessionId;
   final String? interviewId;
 
-  // VAPI config from startSession response
   final String? vapiWebToken;
   final String? vapiAssistantId;
   final Map<String, dynamic>? vapiAssistantConfig;
   final String? vapiWorkflowId;
   final Map<String, dynamic>? vapiVariableValues;
 
-  // Question bank from session
   final List<String> questionBank;
 
-  // Live call state
   final String? vapiCallId;
-  final bool isSpeaking; // AI is speaking
-  final String? activeSpeaker; // 'assistant', 'user', or null
+  final bool isSpeaking;
+  final String? activeSpeaker;
   final List<TranscriptMessage> transcript;
-  final String? partialMessage; // in-progress speech, shown as live preview
+  final String? partialMessage;
   final String? partialRole;
   final int askedQuestionCount;
   final int totalQuestions;
   final int elapsedSeconds;
 
-  // Post-interview feedback
   final InterviewFeedbackEntity? feedback;
   final bool isFeedbackLoading;
 
@@ -126,8 +121,9 @@ class TakeInterviewState extends Equatable {
           ? this.interview
           : interview as InterviewEntity?,
       sessionId: sessionId == _unset ? this.sessionId : sessionId as String?,
-      interviewId:
-          interviewId == _unset ? this.interviewId : interviewId as String?,
+      interviewId: interviewId == _unset
+          ? this.interviewId
+          : interviewId as String?,
       vapiWebToken: vapiWebToken == _unset
           ? this.vapiWebToken
           : vapiWebToken as String?,
@@ -144,8 +140,9 @@ class TakeInterviewState extends Equatable {
           ? this.vapiVariableValues
           : vapiVariableValues as Map<String, dynamic>?,
       questionBank: questionBank ?? this.questionBank,
-      vapiCallId:
-          vapiCallId == _unset ? this.vapiCallId : vapiCallId as String?,
+      vapiCallId: vapiCallId == _unset
+          ? this.vapiCallId
+          : vapiCallId as String?,
       isSpeaking: isSpeaking ?? this.isSpeaking,
       activeSpeaker: activeSpeaker == _unset
           ? this.activeSpeaker
@@ -154,8 +151,9 @@ class TakeInterviewState extends Equatable {
       partialMessage: partialMessage == _unset
           ? this.partialMessage
           : partialMessage as String?,
-      partialRole:
-          partialRole == _unset ? this.partialRole : partialRole as String?,
+      partialRole: partialRole == _unset
+          ? this.partialRole
+          : partialRole as String?,
       askedQuestionCount: askedQuestionCount ?? this.askedQuestionCount,
       totalQuestions: totalQuestions ?? this.totalQuestions,
       elapsedSeconds: elapsedSeconds ?? this.elapsedSeconds,

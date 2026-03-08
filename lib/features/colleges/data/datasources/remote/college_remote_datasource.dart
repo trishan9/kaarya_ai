@@ -41,7 +41,7 @@ class CollegeRemoteDataSource implements ICollegeRemoteDataSource {
     final response = await _apiClient.get(ApiEndpoints.collegeById(collegeId));
     final data = _extractDataMap(response);
     final college = jsonAsMap(data['college']) ?? data;
-    return CollegeApiModel.fromJson(college);
+    return CollegeApiModel.fromApiResponse(_castMap(college));
   }
 
   @override
@@ -65,7 +65,7 @@ class CollegeRemoteDataSource implements ICollegeRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final college = jsonAsMap(data['college']) ?? data;
-    return CollegeApiModel.fromJson(college);
+    return CollegeApiModel.fromApiResponse(_castMap(college));
   }
 
   @override
@@ -98,7 +98,7 @@ class CollegeRemoteDataSource implements ICollegeRemoteDataSource {
     );
     final data = _extractDataMap(response);
     final college = jsonAsMap(data['college']) ?? data;
-    return CollegeApiModel.fromJson(college);
+    return CollegeApiModel.fromApiResponse(_castMap(college));
   }
 
   @override
@@ -153,10 +153,17 @@ class CollegeRemoteDataSource implements ICollegeRemoteDataSource {
   Future<bool> inviteStudent({
     required String collegeId,
     required String email,
+    String? program,
+    int? year,
   }) async {
     final response = await _apiClient.post(
       ApiEndpoints.collegeInviteStudent(collegeId),
-      data: {'email': email},
+      data: {
+        'email': email,
+        if (program != null && program.trim().isNotEmpty)
+          'program': program.trim(),
+        if (year != null) 'year': year,
+      },
     );
     final body = response.data;
     if (body is Map) {
@@ -230,8 +237,10 @@ class CollegeRemoteDataSource implements ICollegeRemoteDataSource {
     if (data is Map) {
       return _castMap(data);
     }
-
-    return <String, dynamic>{};
+    final fallback = Map<String, dynamic>.from(normalized)
+      ..remove('success')
+      ..remove('message');
+    return fallback;
   }
 
   Map<String, dynamic> _castMap(Map value) {

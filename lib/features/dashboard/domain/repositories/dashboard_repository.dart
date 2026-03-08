@@ -7,7 +7,6 @@ abstract interface class IDashboardRepository {
     String? monthKey,
   });
 
-  /// Returns cached overview if available (for cache-first loading).
   Future<DashboardOverviewEntity?> getOverviewFromCache({String? monthKey});
 
   Future<Either<Failure, ProfilePreferences>> getProfilePreferences();

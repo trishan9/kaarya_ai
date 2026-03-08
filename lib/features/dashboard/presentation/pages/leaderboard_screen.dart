@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
@@ -10,18 +11,11 @@ import 'package:kaarya/features/leaderboard/domain/entities/leaderboard_entity.d
 import 'package:kaarya/features/leaderboard/presentation/view_model/leaderboard_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
-const _rankColors = [
-  Color(0xFF38BDF8), // #1 Champion   – sky-400
-  Color(0xFFA5B4FC), // #2 Runner-up  – indigo-300
-  Color(0xFF6EE7B7), // #3 3rd Place  – emerald-300
-];
+const _rankColors = [Color(0xFF38BDF8), Color(0xFFA5B4FC), Color(0xFF6EE7B7)];
 const _youBadge = Color(0xFF4F46E5);
 const _gold = Color(0xFFFFD700);
 const _silver = Color(0xFFC0C0C0);
 const _bronze = Color(0xFFCD7F32);
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
@@ -50,23 +44,21 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     final isRecruiter = ref.read(isRecruiterProvider);
     final collegeId = _selectedCollegeId;
 
-    // College role: always college leaderboard
     if (isCollege && collegeId != null) {
-      ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
-            scope: 'college',
-            collegeId: collegeId,
-          );
+      ref
+          .read(leaderboardViewModelProvider.notifier)
+          .loadLeaderboard(scope: 'college', collegeId: collegeId);
       return;
     }
-    // Recruiter: always global
     if (isRecruiter) {
-      ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
-            scope: 'global',
-          );
+      ref
+          .read(leaderboardViewModelProvider.notifier)
+          .loadLeaderboard(scope: 'global');
       return;
     }
-    // Candidate: use _scope; when college scope, pass collegeId
-    ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+    ref
+        .read(leaderboardViewModelProvider.notifier)
+        .loadLeaderboard(
           scope: _scope,
           collegeId: _scope == 'college' ? collegeId : null,
         );
@@ -78,17 +70,18 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     final collegeId = _selectedCollegeId;
 
     if (isCollege && collegeId != null) {
-      return ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
-            scope: 'college',
-            collegeId: collegeId,
-          );
+      return ref
+          .read(leaderboardViewModelProvider.notifier)
+          .loadLeaderboard(scope: 'college', collegeId: collegeId);
     }
     if (isRecruiter) {
-      return ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
-            scope: 'global',
-          );
+      return ref
+          .read(leaderboardViewModelProvider.notifier)
+          .loadLeaderboard(scope: 'global');
     }
-    return ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+    return ref
+        .read(leaderboardViewModelProvider.notifier)
+        .loadLeaderboard(
           scope: _scope,
           collegeId: _scope == 'college' ? collegeId : null,
         );
@@ -98,7 +91,9 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     if (_scope == scope) return;
     setState(() => _scope = scope);
     final collegeId = _selectedCollegeId;
-    ref.read(leaderboardViewModelProvider.notifier).loadLeaderboard(
+    ref
+        .read(leaderboardViewModelProvider.notifier)
+        .loadLeaderboard(
           scope: scope,
           collegeId: scope == 'college' ? collegeId : null,
         );
@@ -109,14 +104,11 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     final isRecruiter = ref.watch(isRecruiterProvider);
     final isCollege = ref.watch(isCollegeProvider);
     final collegeState = ref.watch(collegeDashboardViewModelProvider);
-    final hasCollegeWorkspaces = collegeState.workspacesStatus ==
-            CollegeDashboardLoadStatus.loaded &&
+    final hasCollegeWorkspaces =
+        collegeState.workspacesStatus == CollegeDashboardLoadStatus.loaded &&
         (collegeState.workspaces?.isNotEmpty ?? false);
 
-    // Show scope toggle only for candidates who are in a college workspace
-    final showScopeToggle = !isRecruiter &&
-        !isCollege &&
-        hasCollegeWorkspaces;
+    final showScopeToggle = !isRecruiter && !isCollege && hasCollegeWorkspaces;
 
     final state = ref.watch(leaderboardViewModelProvider);
     final data = state.leaderboard;
@@ -155,30 +147,30 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
               else if (state.error != null && data == null)
                 _ErrorState(message: state.error, onRetry: _refresh)
               else if (data != null) ...[
-            if (top3.length == 3) ...[
-              _PodiumSection(
-                top3: top3,
-                currentUserId: data.currentUserEntry?.userId,
-              ),
-              const SizedBox(height: 20),
+                if (top3.length == 3) ...[
+                  _PodiumSection(
+                    top3: top3,
+                    currentUserId: data.currentUserEntry?.userId,
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                if (rest.isNotEmpty) ...[
+                  _RankingTable(
+                    entries: rest,
+                    currentUserId: data.currentUserEntry?.userId,
+                    showFromRank: top3.length == 3 ? 4 : 1,
+                  ),
+                  const SizedBox(height: 20),
+                ],
+                const _KRankGuideCard(),
+              ],
             ],
-            if (rest.isNotEmpty) ...[
-              _RankingTable(
-                entries: rest,
-                currentUserId: data.currentUserEntry?.userId,
-                showFromRank: top3.length == 3 ? 4 : 1,
-              ),
-              const SizedBox(height: 20),
-            ],
-            const _KRankGuideCard(),
-          ],
-        ],
-      ),
-    ),
+          ),
+        ),
         if (isLoading && data != null)
           Positioned.fill(
             child: Container(
-              color: Colors.white.withAlpha(180),
+              color: appOverlayColor(context),
               child: const Center(child: LoaderWidget()),
             ),
           ),
@@ -186,8 +178,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     );
   }
 }
-
-// ─── Hero Banner ─────────────────────────────────────────────────────────────
 
 class _HeroBanner extends StatelessWidget {
   final LeaderboardEntity? data;
@@ -314,8 +304,6 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-// ─── Scope Toggle ─────────────────────────────────────────────────────────────
-
 class _ScopeToggle extends StatelessWidget {
   final String scope;
   final ValueChanged<String> onChanged;
@@ -332,9 +320,9 @@ class _ScopeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: AppColors.borderStroke),
+        border: Border.all(color: appBorderColor(context)),
       ),
       child: Row(
         children: [
@@ -391,7 +379,9 @@ class _ScopeTab extends StatelessWidget {
                 size: 14,
                 color: selected
                     ? Colors.white
-                    : (isDisabled ? AppColors.textLight.withAlpha(128) : AppColors.textLight),
+                    : (isDisabled
+                          ? appTextSecondaryColor(context).withAlpha(128)
+                          : appTextSecondaryColor(context)),
               ),
               const SizedBox(width: 6),
               Text(
@@ -401,7 +391,9 @@ class _ScopeTab extends StatelessWidget {
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                   color: selected
                       ? Colors.white
-                      : (isDisabled ? AppColors.textMedium.withAlpha(180) : AppColors.textMedium),
+                      : (isDisabled
+                            ? appTextSecondaryColor(context).withAlpha(180)
+                            : appTextSecondaryColor(context)),
                 ),
               ),
             ],
@@ -436,12 +428,12 @@ class _PodiumSection extends StatelessWidget {
           children: [
             const Icon(LucideIcons.medal, size: 15, color: AppColors.primary),
             const SizedBox(width: 6),
-            const Text(
+            Text(
               'Top Rankings',
               style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textDark,
+                color: appTextPrimaryColor(context),
               ),
             ),
           ],
@@ -530,7 +522,7 @@ class _PodiumCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
           color: color.withAlpha(isChampion ? 90 : 55),
@@ -551,10 +543,7 @@ class _PodiumCard extends StatelessWidget {
         child: Column(
           children: [
             // Accent top bar (thicker for champion)
-            Container(
-              height: isChampion ? 5 : 4,
-              color: color,
-            ),
+            Container(height: isChampion ? 5 : 4, color: color),
             Padding(
               padding: const EdgeInsets.fromLTRB(8, 10, 8, 10),
               child: Column(
@@ -562,7 +551,9 @@ class _PodiumCard extends StatelessWidget {
                   // Rank badge
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 3),
+                      horizontal: 10,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
                       color: color.withAlpha(30),
                       borderRadius: BorderRadius.circular(20),
@@ -617,7 +608,7 @@ class _PodiumCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: isChampion ? 12 : 11,
                       fontWeight: FontWeight.w700,
-                      color: AppColors.textDark,
+                      color: appTextPrimaryColor(context),
                     ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -627,7 +618,9 @@ class _PodiumCard extends StatelessWidget {
                   // Level badge
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 7, vertical: 2),
+                      horizontal: 7,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: color.withAlpha(20),
                       borderRadius: BorderRadius.circular(20),
@@ -642,7 +635,6 @@ class _PodiumCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  // "You" badge — always occupies space to keep all cards same height
                   Visibility(
                     visible: isCurrentUser,
                     maintainSize: true,
@@ -650,7 +642,9 @@ class _PodiumCard extends StatelessWidget {
                     maintainState: true,
                     child: Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 2),
+                        horizontal: 10,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: _youBadge,
                         borderRadius: BorderRadius.circular(20),
@@ -666,7 +660,6 @@ class _PodiumCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Metrics grid
                   _MetricsGrid(entry: entry),
                 ],
               ),
@@ -687,7 +680,7 @@ class _MetricsGrid extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
       decoration: BoxDecoration(
-        color: AppColors.bgLight,
+        color: appMutedSurfaceColor(context),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -697,13 +690,13 @@ class _MetricsGrid extends StatelessWidget {
             value: '${entry.xp}',
             color: const Color(0xFF0EA5E9),
           ),
-          _vDivider(),
+          _vDivider(context),
           _MetricCell(
             label: 'Score',
             value: '${entry.score}',
             color: AppColors.textDark,
           ),
-          _vDivider(),
+          _vDivider(context),
           _MetricCell(
             label: 'K-Rank',
             value: '${entry.kRank}',
@@ -714,20 +707,23 @@ class _MetricsGrid extends StatelessWidget {
     );
   }
 
-  Widget _vDivider() => Container(
-        width: 1,
-        height: 26,
-        color: AppColors.borderStroke,
-        margin: const EdgeInsets.symmetric(horizontal: 2),
-      );
+  Widget _vDivider(BuildContext context) => Container(
+    width: 1,
+    height: 26,
+    color: appBorderColor(context),
+    margin: const EdgeInsets.symmetric(horizontal: 2),
+  );
 }
 
 class _MetricCell extends StatelessWidget {
   final String label;
   final String value;
   final Color color;
-  const _MetricCell(
-      {required this.label, required this.value, required this.color});
+  const _MetricCell({
+    required this.label,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -745,7 +741,10 @@ class _MetricCell extends StatelessWidget {
           ),
           Text(
             label,
-            style: const TextStyle(fontSize: 9, color: AppColors.textLight),
+            style: TextStyle(
+              fontSize: 9,
+              color: appTextSecondaryColor(context),
+            ),
             textAlign: TextAlign.center,
           ),
         ],
@@ -753,8 +752,6 @@ class _MetricCell extends StatelessWidget {
     );
   }
 }
-
-// ─── Ranking Table ───────────────────────────────────────────────────────────
 
 class _RankingTable extends StatelessWidget {
   final List<LeaderboardEntryEntity> entries;
@@ -770,12 +767,12 @@ class _RankingTable extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderStroke2),
+        border: Border.all(color: appSubtleBorderColor(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withAlpha(6),
+            color: Colors.black.withAlpha(isDarkMode(context) ? 18 : 6),
             blurRadius: 12,
             offset: const Offset(0, 2),
           ),
@@ -788,33 +785,37 @@ class _RankingTable extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
             child: Row(
               children: [
-                const Icon(LucideIcons.list, size: 15, color: AppColors.primary),
+                const Icon(
+                  LucideIcons.list,
+                  size: 15,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 6),
-                const Text(
+                Text(
                   'All Rankings',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.textDark,
+                    color: appTextPrimaryColor(context),
                   ),
                 ),
                 const Spacer(),
                 Text(
                   '${entries.length} shown',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 12,
-                    color: AppColors.textLight,
+                    color: appTextSecondaryColor(context),
                   ),
                 ),
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          Divider(height: 1, color: appSubtleBorderColor(context)),
           // Column headers
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
-              children: const [
+              children: [
                 SizedBox(
                   width: 40,
                   child: Text(
@@ -822,7 +823,7 @@ class _RankingTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                     ),
                   ),
                 ),
@@ -832,7 +833,7 @@ class _RankingTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                     ),
                   ),
                 ),
@@ -843,12 +844,12 @@ class _RankingTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 SizedBox(
                   width: 40,
                   child: Text(
@@ -856,12 +857,12 @@ class _RankingTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(width: 4),
+                const SizedBox(width: 4),
                 SizedBox(
                   width: 52,
                   child: Text(
@@ -869,7 +870,7 @@ class _RankingTable extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
-                      color: AppColors.textLight,
+                      color: appTextSecondaryColor(context),
                     ),
                     textAlign: TextAlign.center,
                   ),
@@ -877,12 +878,11 @@ class _RankingTable extends StatelessWidget {
               ],
             ),
           ),
-          const Divider(height: 1, color: Color(0xFFF0F0F0)),
+          Divider(height: 1, color: appSubtleBorderColor(context)),
           ...entries.asMap().entries.map((mapEntry) {
             final e = mapEntry.value;
             final isLast = mapEntry.key == entries.length - 1;
-            final isMe =
-                currentUserId != null && e.userId == currentUserId;
+            final isMe = currentUserId != null && e.userId == currentUserId;
             final displayRank = e.rank.isNotEmpty
                 ? e.rank
                 : '${mapEntry.key + showFromRank}';
@@ -916,12 +916,10 @@ class _RankRow extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: isMe ? AppColors.bgSecondary : Colors.white,
+        color: isMe ? appSoftSurfaceColor(context) : appSurfaceColor(context),
         border: isLast
             ? null
-            : const Border(
-                bottom: BorderSide(color: Color(0xFFF5F5F5)),
-              ),
+            : Border(bottom: BorderSide(color: appSubtleBorderColor(context))),
         borderRadius: isLast
             ? const BorderRadius.vertical(bottom: Radius.circular(12))
             : null,
@@ -943,8 +941,7 @@ class _RankRow extends StatelessWidget {
             name: entry.name,
             photo: entry.photo,
             radius: 16,
-            borderColor:
-                isMe ? AppColors.primary : AppColors.borderStroke,
+            borderColor: isMe ? AppColors.primary : appBorderColor(context),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -961,7 +958,7 @@ class _RankRow extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           color: isMe
                               ? AppColors.primary
-                              : AppColors.textDark,
+                              : appTextPrimaryColor(context),
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -971,7 +968,9 @@ class _RankRow extends StatelessWidget {
                       const SizedBox(width: 4),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
+                          horizontal: 6,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary,
                           borderRadius: BorderRadius.circular(10),
@@ -990,9 +989,9 @@ class _RankRow extends StatelessWidget {
                 ),
                 Text(
                   'Lv ${entry.level}',
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: AppColors.textLight,
+                    color: appTextSecondaryColor(context),
                   ),
                 ),
               ],
@@ -1015,11 +1014,7 @@ class _RankRow extends StatelessWidget {
             width: 40,
             child: Text(
               '${entry.score}',
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: AppColors.textDark,
-              ),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ),
@@ -1058,9 +1053,9 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppColors.borderStroke2),
+        border: Border.all(color: appSubtleBorderColor(context)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1076,7 +1071,7 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
                     width: 32,
                     height: 32,
                     decoration: BoxDecoration(
-                      color: AppColors.bgSecondary,
+                      color: appSoftSurfaceColor(context),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: const Icon(
@@ -1086,7 +1081,7 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1095,32 +1090,30 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textDark,
+                            color: appTextPrimaryColor(context),
                           ),
                         ),
                         Text(
                           'How your ranking score is calculated',
                           style: TextStyle(
                             fontSize: 12,
-                            color: AppColors.textLight,
+                            color: appTextSecondaryColor(context),
                           ),
                         ),
                       ],
                     ),
                   ),
                   Icon(
-                    _expanded
-                        ? LucideIcons.chevronUp
-                        : LucideIcons.chevronDown,
+                    _expanded ? LucideIcons.chevronUp : LucideIcons.chevronDown,
                     size: 16,
-                    color: AppColors.textLight,
+                    color: appTextSecondaryColor(context),
                   ),
                 ],
               ),
             ),
           ),
           if (_expanded) ...[
-            const Divider(height: 1, color: Color(0xFFF0F0F0)),
+            Divider(height: 1, color: appSubtleBorderColor(context)),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Column(
@@ -1130,10 +1123,11 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
                     width: double.infinity,
                     padding: const EdgeInsets.all(14),
                     decoration: BoxDecoration(
-                      color: AppColors.bgSecondary,
+                      color: appSoftSurfaceColor(context),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: AppColors.primary.withAlpha(40)),
+                        color: AppColors.primary.withAlpha(40),
+                      ),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1186,8 +1180,11 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
                   const SizedBox(height: 14),
                   Row(
                     children: const [
-                      Icon(LucideIcons.trendingUp,
-                          size: 13, color: AppColors.primary),
+                      Icon(
+                        LucideIcons.trendingUp,
+                        size: 13,
+                        color: AppColors.primary,
+                      ),
                       SizedBox(width: 6),
                       Expanded(
                         child: Text(
@@ -1210,11 +1207,17 @@ class _KRankGuideCardState extends State<_KRankGuideCard> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  _tip(LucideIcons.zap, const Color(0xFF0EA5E9),
-                      'Earn XP by updating profile, saving jobs/interviews, applying, and completing activities.'),
+                  _tip(
+                    LucideIcons.zap,
+                    const Color(0xFF0EA5E9),
+                    'Earn XP by updating profile, saving jobs/interviews, applying, and completing activities.',
+                  ),
                   const SizedBox(height: 4),
-                  _tip(LucideIcons.star, const Color(0xFFF59E0B),
-                      'Raise Score with better mock interview results and consistency.'),
+                  _tip(
+                    LucideIcons.star,
+                    const Color(0xFFF59E0B),
+                    'Raise Score with better mock interview results and consistency.',
+                  ),
                 ],
               ),
             ),
@@ -1270,8 +1273,7 @@ class _QualityTable extends StatelessWidget {
           children: [
             Container(
               color: AppColors.bgLight,
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               child: const Row(
                 children: [
                   Expanded(
@@ -1307,7 +1309,9 @@ class _QualityTable extends StatelessWidget {
                         ),
                       ),
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 12, vertical: 7),
+                  horizontal: 12,
+                  vertical: 7,
+                ),
                 child: Row(
                   children: [
                     Expanded(
@@ -1321,7 +1325,9 @@ class _QualityTable extends StatelessWidget {
                     ),
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: color.withAlpha(25),
                         borderRadius: BorderRadius.circular(10),
@@ -1346,8 +1352,6 @@ class _QualityTable extends StatelessWidget {
   }
 }
 
-// ─── Error State ──────────────────────────────────────────────────────────────
-
 class _ErrorState extends StatelessWidget {
   final String? message;
   final VoidCallback onRetry;
@@ -1359,13 +1363,11 @@ class _ErrorState extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 60),
       child: Column(
         children: [
-          const Icon(LucideIcons.circleAlert,
-              size: 36, color: AppColors.error),
+          const Icon(LucideIcons.circleAlert, size: 36, color: AppColors.error),
           const SizedBox(height: 12),
           Text(
             message ?? 'Failed to load leaderboard',
-            style: const TextStyle(
-                color: AppColors.textMedium, fontSize: 14),
+            style: const TextStyle(color: AppColors.textMedium, fontSize: 14),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
@@ -1387,8 +1389,6 @@ class _ErrorState extends StatelessWidget {
   }
 }
 
-// ─── Shared Avatar ────────────────────────────────────────────────────────────
-
 class _Avatar extends StatelessWidget {
   final String name;
   final String? photo;
@@ -1404,8 +1404,7 @@ class _Avatar extends StatelessWidget {
   });
 
   String _initials() {
-    final parts =
-        name.trim().split(' ').where((p) => p.isNotEmpty).toList();
+    final parts = name.trim().split(' ').where((p) => p.isNotEmpty).toList();
     if (parts.isEmpty) return '?';
     if (parts.length == 1) return parts[0][0].toUpperCase();
     return '${parts[0][0]}${parts[1][0]}'.toUpperCase();

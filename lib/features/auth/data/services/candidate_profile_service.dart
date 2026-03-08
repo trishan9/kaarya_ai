@@ -7,7 +7,6 @@ import 'package:kaarya/core/services/storage/user_session_service.dart';
 import 'package:kaarya/core/utils/json_parse_helpers.dart';
 import 'package:kaarya/features/auth/domain/entities/candidate_profile_entity.dart';
 
-/// User info from /auth/me for prefill (name, email, photo).
 class CurrentUserData {
   const CurrentUserData({this.name, this.email, this.photo});
 
@@ -25,8 +24,6 @@ final candidateProfileServiceProvider = Provider<CandidateProfileService>((
   );
 });
 
-/// Raw response from /auth/me - single fetch, shared by both providers.
-/// Invalidate this (e.g. after profile update) to refresh user + candidate profile.
 final authMeResponseProvider = FutureProvider<Map<String, dynamic>?>((
   ref,
 ) async {
@@ -34,7 +31,6 @@ final authMeResponseProvider = FutureProvider<Map<String, dynamic>?>((
   return service.fetchAuthMeResponse();
 });
 
-/// User name, email, photo from /auth/me for form prefill.
 final currentUserProvider = FutureProvider<CurrentUserData?>((ref) async {
   final response = await ref.watch(authMeResponseProvider.future);
   if (response == null) return null;
@@ -47,7 +43,6 @@ final currentUserProvider = FutureProvider<CurrentUserData?>((ref) async {
   );
 });
 
-/// Fetches candidate profile from /auth/me. Uses shared fetch to avoid duplicate API calls.
 final candidateProfileProvider = FutureProvider<CandidateProfileEntity?>((
   ref,
 ) async {
@@ -66,7 +61,6 @@ class CandidateProfileService {
   }) : _apiClient = apiClient,
        _userSessionService = userSessionService;
 
-  /// Fetches /auth/me and returns parsed user + profile data for providers.
   Future<Map<String, dynamic>?> fetchAuthMeResponse() async {
     if (!_userSessionService.isLoggedIn()) return null;
 
@@ -79,7 +73,6 @@ class CandidateProfileService {
       if (data is! Map) return null;
       final dataMap = Map<String, dynamic>.from(data);
 
-      // Backend returns data = user object directly (user + linkedAccounts + linkedProviders)
       final userData = dataMap['user'];
       final userMap = userData is Map<String, dynamic>
           ? userData
@@ -141,7 +134,6 @@ CandidateProfileEntity _parseCandidateProfileFromResponse(
   );
 }
 
-/// Backend uses jobTitle, companyName. Also supports title, company for compatibility.
 List<CandidateExperienceEntity> _parseExperience(dynamic value) {
   if (value is! List) return const [];
   return value.map((item) {
@@ -166,7 +158,6 @@ List<CandidateExperienceEntity> _parseExperience(dynamic value) {
   }).toList();
 }
 
-/// Normalizes date from backend (YYYY-MM, YYYY-MM-DD, or ISO string) to YYYY-MM or YYYY-MM-DD.
 String? _normalizeDateString(dynamic value) {
   final s = jsonNullableString(value);
   if (s == null || s.isEmpty) return null;
@@ -214,7 +205,6 @@ List<CandidateSkillEntity> _parseSkills(dynamic value) {
       .toList();
 }
 
-/// Backend uses issuer (not issuingOrganization).
 List<CandidateCertificationEntity> _parseCertifications(dynamic value) {
   if (value is! List) return const [];
   return value.map((item) {

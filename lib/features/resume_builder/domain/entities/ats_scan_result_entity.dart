@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 class AtsScanTipEntity extends Equatable {
-  final String type; // "good" or "improve"
+  final String type;
   final String tip;
   final String? explanation;
 

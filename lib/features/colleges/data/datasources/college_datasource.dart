@@ -40,6 +40,8 @@ abstract interface class ICollegeRemoteDataSource {
   Future<bool> inviteStudent({
     required String collegeId,
     required String email,
+    String? program,
+    int? year,
   });
 
   Future<bool> removeStudent({

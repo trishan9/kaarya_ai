@@ -42,10 +42,7 @@ class UpdateProfileFormCard extends ConsumerStatefulWidget {
   final TextEditingController? githubController;
   final TextEditingController? portfolioUrlController;
 
-  /// When true, only shows Profile Picture, Full Name, Email (for recruiters/college).
   final bool isBasicProfile;
-
-  /// When false, renders without Card wrapper (for embedding in CandidateProfileFormCard).
   final bool embedInCard;
 
   @override

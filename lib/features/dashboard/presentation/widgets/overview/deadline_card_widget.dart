@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/core/utils/build_icon.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 
@@ -13,12 +14,12 @@ class DeadlineCardWidget extends StatelessWidget {
     final deadlineJob = job;
     if (deadlineJob == null) {
       return Card(
-        color: Colors.white,
+        color: appSurfaceColor(context),
         elevation: 0,
         margin: const EdgeInsets.all(0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
-          side: BorderSide(color: Colors.grey.shade300),
+          side: BorderSide(color: appBorderColor(context)),
         ),
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -31,12 +32,12 @@ class DeadlineCardWidget extends StatelessWidget {
               ),
               SizedBox(height: 12),
               Card(
-                color: AppColors.bgTertiary,
+                color: appMutedSurfaceColor(context),
                 elevation: 0,
                 margin: const EdgeInsets.all(0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(6),
-                  side: BorderSide(color: AppColors.borderStroke2),
+                  side: BorderSide(color: appSubtleBorderColor(context)),
                 ),
                 child: Padding(
                   padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
@@ -102,12 +103,12 @@ class DeadlineCardWidget extends StatelessWidget {
     }
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: const EdgeInsets.all(0),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -125,52 +126,63 @@ class DeadlineCardWidget extends StatelessWidget {
             ),
             SizedBox(height: 18),
             Card(
-              color: AppColors.bgTertiary,
+              color: appMutedSurfaceColor(context),
               elevation: 0,
               margin: const EdgeInsets.all(0),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
-                side: BorderSide(color: AppColors.borderStroke2),
+                side: BorderSide(color: appSubtleBorderColor(context)),
               ),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(10, 9, 12, 9),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
-                          child: deadlineJob.companyLogo != null
-                              ? Image.network(
-                                  deadlineJob.companyLogo!,
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) =>
-                                      _logoFallback(deadlineJob.companyName),
-                                )
-                              : _logoFallback(deadlineJob.companyName),
-                        ),
-                        SizedBox(width: 12),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              deadlineJob.title,
-                              style: Theme.of(context).textTheme.titleMedium,
+                    Expanded(
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(6),
+                            child: deadlineJob.companyLogo != null
+                                ? Image.network(
+                                    deadlineJob.companyLogo!,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, __, ___) =>
+                                        _logoFallback(deadlineJob.companyName),
+                                  )
+                                : _logoFallback(deadlineJob.companyName),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  deadlineJob.title,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: Theme.of(
+                                    context,
+                                  ).textTheme.titleMedium,
+                                ),
+                                Text(
+                                  deadlineJob.companyName,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: appTextSecondaryColor(context),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
-                            Text(
-                              deadlineJob.companyName,
-                              style: TextStyle(
-                                color: AppColors.textMedium,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
+                    const SizedBox(width: 10),
                     buildIcon(
                       assetPath: "assets/icons/bookmark.svg",
                       isActive: deadlineJob.isSaved,
@@ -185,7 +197,7 @@ class DeadlineCardWidget extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: AppColors.textMedium,
+                  color: appTextSecondaryColor(context),
                 ),
                 children: [
                   TextSpan(

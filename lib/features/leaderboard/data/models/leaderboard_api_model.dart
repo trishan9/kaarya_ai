@@ -87,8 +87,7 @@ class LeaderboardEntryApiModel {
       final studentId = jsonString(student['id']);
       return LeaderboardEntryApiModel.fromApiResponse(
         map,
-        isCurrentUser:
-            currentUserId.isNotEmpty && studentId == currentUserId,
+        isCurrentUser: currentUserId.isNotEmpty && studentId == currentUserId,
       );
     }).toList();
   }

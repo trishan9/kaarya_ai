@@ -5,6 +5,7 @@ import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/utils/user_role_provider.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
+import 'package:kaarya/core/widgets/workspace_overview_analytics_widget.dart';
 import 'package:kaarya/features/colleges/presentation/view_model/college_dashboard_view_model.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/manage_job_page.dart';
@@ -25,14 +26,15 @@ class _CollegeOverviewScreenState extends ConsumerState<CollegeOverviewScreen> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      await ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
+      await ref
+          .read(collegeDashboardViewModelProvider.notifier)
+          .loadWorkspaces();
       final state = ref.read(collegeDashboardViewModelProvider);
       final ws = state.selectedWorkspace ?? state.workspaces?.firstOrNull;
       if (ws != null) {
-        await ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
-              collegeId: ws.collegeId,
-              forceRefresh: true,
-            );
+        await ref
+            .read(collegeDashboardViewModelProvider.notifier)
+            .loadCollegeJobs(collegeId: ws.collegeId, forceRefresh: true);
       }
     });
   }
@@ -62,18 +64,21 @@ class _CollegeOverviewScreenState extends ConsumerState<CollegeOverviewScreen> {
       return const LoaderWidget();
     }
 
-    final overview = ref.read(collegeDashboardViewModelProvider.notifier).computeOverviewData();
+    final overview = ref
+        .read(collegeDashboardViewModelProvider.notifier)
+        .computeOverviewData();
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces(forceRefresh: true);
+        await ref
+            .read(collegeDashboardViewModelProvider.notifier)
+            .loadWorkspaces(forceRefresh: true);
         final s = ref.read(collegeDashboardViewModelProvider);
         final ws = s.selectedWorkspace ?? s.workspaces?.firstOrNull;
         if (ws != null) {
-          await ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
-                collegeId: ws.collegeId,
-                forceRefresh: true,
-              );
+          await ref
+              .read(collegeDashboardViewModelProvider.notifier)
+              .loadCollegeJobs(collegeId: ws.collegeId, forceRefresh: true);
         }
       },
       child: SingleChildScrollView(
@@ -82,32 +87,68 @@ class _CollegeOverviewScreenState extends ConsumerState<CollegeOverviewScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    workspace.collegeName,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textDark,
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final isNarrow = constraints.maxWidth < 430;
+                if (isNarrow) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        workspace.collegeName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textDark,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      MyButton(
+                        onPressed: () => _pushPostNewJob(context),
+                        text: 'Create Job Posting',
+                        icon: const Icon(
+                          LucideIcons.plus,
+                          size: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ],
+                  );
+                }
+                return Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        workspace.collegeName,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textDark,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                SizedBox(
-                  width: 160,
-                  child: MyButton(
-                    onPressed: () => _pushPostNewJob(context),
-                    text: 'Create Job Posting',
-                    btnWidth: 160,
-                    icon: const Icon(LucideIcons.plus, size: 18, color: Colors.white),
-                  ),
-                ),
-              ],
+                    const SizedBox(width: 12),
+                    MyButton(
+                      onPressed: () => _pushPostNewJob(context),
+                      text: 'Create Job Posting',
+                      btnWidth: 170,
+                      icon: const Icon(
+                        LucideIcons.plus,
+                        size: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 16),
             _SummaryCards(overview: overview),
+            const SizedBox(height: 20),
+            WorkspaceOverviewAnalyticsWidget(
+              jobs: overview.jobs,
+              variant: WorkspaceAnalyticsVariant.college,
+            ),
             const SizedBox(height: 20),
             if (overview.workModeDistribution.any((e) => e.count > 0)) ...[
               _WorkModeSection(items: overview.workModeDistribution),
@@ -129,7 +170,9 @@ class _CollegeOverviewScreenState extends ConsumerState<CollegeOverviewScreen> {
                 ),
               ),
               const SizedBox(height: 12),
-              ...overview.jobs.take(5).map(
+              ...overview.jobs
+                  .take(5)
+                  .map(
                     (j) => Padding(
                       padding: const EdgeInsets.only(bottom: 12),
                       child: RecruiterJobCardWidget(
@@ -167,7 +210,11 @@ class _EmptyCollegeState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.graduationCap, size: 64, color: AppColors.textMedium),
+            Icon(
+              LucideIcons.graduationCap,
+              size: 64,
+              color: AppColors.textMedium,
+            ),
             const SizedBox(height: 16),
             const Text(
               'No college workspace',
@@ -232,10 +279,7 @@ class _SummaryCards extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: cards.length,
         separatorBuilder: (_, __) => const SizedBox(width: 12),
-        itemBuilder: (_, i) => SizedBox(
-          width: 140,
-          child: cards[i],
-        ),
+        itemBuilder: (_, i) => SizedBox(width: 140, child: cards[i]),
       ),
     );
   }
@@ -293,10 +337,7 @@ class _StatCard extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             helper,
-            style: const TextStyle(
-              fontSize: 10,
-              color: AppColors.textLight,
-            ),
+            style: const TextStyle(fontSize: 10, color: AppColors.textLight),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -354,7 +395,9 @@ class _WorkModeSection extends StatelessWidget {
                     child: LinearProgressIndicator(
                       value: e.count / maxVal,
                       backgroundColor: AppColors.bgSecondary,
-                      valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                      valueColor: const AlwaysStoppedAnimation<Color>(
+                        AppColors.primary,
+                      ),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -402,39 +445,44 @@ class _UpcomingDeadlinesSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          ...deadlines.take(5).map(
+          ...deadlines
+              .take(5)
+              .map(
                 (d) => Padding(
                   padding: const EdgeInsets.only(bottom: 10),
-                  child: Row(
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          d.title,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: AppColors.textDark,
+                      Text(
+                        d.title,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textDark,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 4,
+                        children: [
+                          Text(
+                            _formatDeadline(d.deadline),
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textMedium,
+                            ),
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        _formatDeadline(d.deadline),
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textMedium,
-                        ),
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${d.applicants} applicants',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: AppColors.textLight,
-                        ),
+                          Text(
+                            '${d.applicants} applicants',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.textLight,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -452,7 +500,20 @@ class _UpcomingDeadlinesSection extends StatelessWidget {
   }
 
   String _month(int m) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[m - 1];
   }
 }
@@ -489,18 +550,28 @@ class _RoleStatusSection extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 12),
-          Row(
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
             children: [
               if (open > 0)
-                _StatusChip(label: 'Open', count: open, color: const Color(0xFF059669)),
-              if (draft > 0) ...[
-                const SizedBox(width: 8),
-                _StatusChip(label: 'Draft', count: draft, color: AppColors.textMedium),
-              ],
-              if (closed > 0) ...[
-                const SizedBox(width: 8),
-                _StatusChip(label: 'Closed', count: closed, color: AppColors.error),
-              ],
+                _StatusChip(
+                  label: 'Open',
+                  count: open,
+                  color: const Color(0xFF059669),
+                ),
+              if (draft > 0)
+                _StatusChip(
+                  label: 'Draft',
+                  count: draft,
+                  color: AppColors.textMedium,
+                ),
+              if (closed > 0)
+                _StatusChip(
+                  label: 'Closed',
+                  count: closed,
+                  color: AppColors.error,
+                ),
             ],
           ),
         ],
@@ -530,7 +601,11 @@ class _StatusChip extends StatelessWidget {
       ),
       child: Text(
         '$label ($count)',
-        style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: color),
+        style: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.w600,
+          color: color,
+        ),
       ),
     );
   }

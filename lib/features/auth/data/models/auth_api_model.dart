@@ -9,6 +9,7 @@ class AuthApiModel {
   final String? name;
   final String? email;
   final String? password;
+  final String? confirmPassword;
   final String? provider;
   final String? socialId;
   final String? role;
@@ -19,6 +20,7 @@ class AuthApiModel {
     this.name,
     this.email,
     this.password,
+    this.confirmPassword,
     this.provider,
     this.socialId,
     this.role,
@@ -27,13 +29,13 @@ class AuthApiModel {
 
   factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     final model = _$AuthApiModelFromJson(json);
-    // Parse role from multiple possible API response keys (role, userRole, user_role)
     final role = _parseRole(json) ?? model.role;
     return AuthApiModel(
       id: model.id,
       name: model.name,
       email: model.email,
       password: model.password,
+      confirmPassword: model.confirmPassword,
       provider: model.provider,
       socialId: model.socialId,
       role: role,
@@ -66,8 +68,10 @@ class AuthApiModel {
       name: entity.name,
       email: entity.email,
       password: entity.password,
+      confirmPassword: entity.confirmPassword,
       provider: entity.provider,
       socialId: entity.socialId,
+      role: entity.role,
       photo: entity.profilePicture,
     );
   }

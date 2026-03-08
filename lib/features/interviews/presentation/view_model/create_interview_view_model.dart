@@ -5,7 +5,8 @@ import 'package:kaarya/features/interviews/domain/usecases/create_interview_usec
 
 final createInterviewViewModelProvider =
     NotifierProvider<CreateInterviewViewModel, CreateInterviewState>(
-        CreateInterviewViewModel.new);
+      CreateInterviewViewModel.new,
+    );
 
 class CreateInterviewState {
   final bool isLoading;
@@ -41,10 +42,7 @@ class CreateInterviewViewModel extends Notifier<CreateInterviewState> {
     final result = await useCase(params);
     return result.fold(
       (failure) {
-        state = state.copyWith(
-          isLoading: false,
-          errorMessage: failure.message,
-        );
+        state = state.copyWith(isLoading: false, errorMessage: failure.message);
         return failure;
       },
       (interview) {

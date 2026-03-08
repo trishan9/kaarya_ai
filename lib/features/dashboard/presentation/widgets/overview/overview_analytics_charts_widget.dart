@@ -1,6 +1,7 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/features/dashboard/domain/entities/dashboard_overview_entity.dart';
 
 class OverviewAnalyticsChartsWidget extends StatelessWidget {
@@ -27,12 +28,12 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
     final maxY = _momentumMaxY();
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -53,6 +54,7 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
               children: [
                 Expanded(
                   child: _metricTile(
+                    context,
                     "This Week Applications",
                     "${analytics.applicationsThisWeek}",
                   ),
@@ -60,6 +62,7 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                 const SizedBox(width: 8),
                 Expanded(
                   child: _metricTile(
+                    context,
                     "Interview Conversion",
                     "${analytics.interviewConversion.toStringAsFixed(1)}%",
                   ),
@@ -86,7 +89,7 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                       drawVerticalLine: false,
                       horizontalInterval: (maxY / 5).clamp(1, maxY).toDouble(),
                       getDrawingHorizontalLine: (_) => FlLine(
-                        color: AppColors.borderStroke2,
+                        color: appSubtleBorderColor(context),
                         strokeWidth: 1,
                       ),
                     ),
@@ -98,9 +101,9 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                           interval: (maxY / 5).clamp(1, maxY).toDouble(),
                           getTitlesWidget: (value, _) => Text(
                             value.toInt().toString(),
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 10,
-                              color: AppColors.textMedium,
+                              color: appTextSecondaryColor(context),
                             ),
                           ),
                         ),
@@ -116,9 +119,9 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                                 : "";
                             return Text(
                               label,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 10,
-                                color: AppColors.textMedium,
+                                color: appTextSecondaryColor(context),
                               ),
                             );
                           },
@@ -185,12 +188,12 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
     final maxY = _pipelineMaxY().toDouble();
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -243,7 +246,7 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                       show: true,
                       drawVerticalLine: false,
                       getDrawingHorizontalLine: (_) => FlLine(
-                        color: AppColors.borderStroke2,
+                        color: appSubtleBorderColor(context),
                         strokeWidth: 1,
                       ),
                     ),
@@ -272,9 +275,9 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                               padding: const EdgeInsets.only(top: 8),
                               child: Text(
                                 label,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
-                                  color: AppColors.textMedium,
+                                  color: appTextSecondaryColor(context),
                                 ),
                               ),
                             );
@@ -305,12 +308,12 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
     final total = mix.fold<double>(0, (sum, item) => sum + item.value);
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 20),
@@ -380,7 +383,7 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                                   const SizedBox(width: 8),
                                   Text(
                                     item.name,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       color: AppColors.textMedium,
                                       fontSize: 12,
                                     ),
@@ -389,7 +392,7 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
                               ),
                               Text(
                                 "${item.value.toStringAsFixed(item.value % 1 == 0 ? 0 : 1)}%",
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                 ),
@@ -405,7 +408,10 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               "Based on ${total.toStringAsFixed(total % 1 == 0 ? 0 : 1)} invitations from the last 30 days.",
-              style: const TextStyle(color: AppColors.textMedium, fontSize: 11),
+              style: TextStyle(
+                color: appTextSecondaryColor(context),
+                fontSize: 11,
+              ),
             ),
           ],
         ),
@@ -413,11 +419,11 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
     );
   }
 
-  Widget _metricTile(String title, String value) {
+  Widget _metricTile(BuildContext context, String title, String value) {
     return Container(
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: const Color(0xFFF7FAFC),
+        color: appMutedSurfaceColor(context),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Column(
@@ -425,7 +431,10 @@ class OverviewAnalyticsChartsWidget extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(fontSize: 11, color: AppColors.textMedium),
+            style: TextStyle(
+              fontSize: 11,
+              color: appTextSecondaryColor(context),
+            ),
           ),
           const SizedBox(height: 4),
           Text(

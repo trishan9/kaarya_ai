@@ -12,6 +12,7 @@ import 'package:kaarya/features/auth/data/models/auth_api_model.dart';
 import 'package:kaarya/features/auth/data/models/auth_hive_model.dart';
 import 'package:kaarya/features/auth/domain/entities/auth_entity.dart';
 import 'package:kaarya/features/auth/domain/entities/linked_account_entity.dart';
+import 'package:kaarya/features/auth/domain/entities/oauth_provider_status_entity.dart';
 import 'package:kaarya/features/auth/domain/repositories/auth_repository.dart';
 
 final authRepositoryProvider = Provider<IAuthRepository>((ref) {
@@ -127,6 +128,104 @@ class AuthRepository implements IAuthRepository {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
     }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> loginWithGoogle(
+    String serverClientId,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final userModel = await _authRemoteDataSource.loginWithGoogle(
+          serverClientId,
+        );
+
+        if (userModel != null) {
+          return Right(userModel.toEntity());
+        }
+
+        return const Left(ApiFailure(message: 'Google login failed.'));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ?? 'Failed to login with Google!',
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    }
+
+    return const Left(
+      NetworkFailure(message: 'Internet connection required for Google login.'),
+    );
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> exchangeOAuthResult(
+    String resultToken,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final userModel = await _authRemoteDataSource.exchangeOAuthResult(
+          resultToken,
+        );
+
+        if (userModel != null) {
+          return Right(userModel.toEntity());
+        }
+
+        return const Left(ApiFailure(message: 'Social login failed.'));
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ??
+                'Failed to complete social login!',
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    }
+
+    return const Left(
+      NetworkFailure(message: 'Internet connection required for social login.'),
+    );
+  }
+
+  @override
+  Future<Either<Failure, OAuthProviderStatusEntity>> getOAuthProviderStatus(
+    String provider,
+  ) async {
+    if (await _networkInfo.isConnected) {
+      try {
+        final model = await _authRemoteDataSource.getOAuthProviderStatus(
+          provider,
+        );
+        return Right(model.toEntity());
+      } on DioException catch (e) {
+        return Left(
+          ApiFailure(
+            statusCode: e.response?.statusCode,
+            message:
+                e.response?.data['message'] ??
+                'Failed to fetch social login status!',
+          ),
+        );
+      } catch (e) {
+        return Left(ApiFailure(message: e.toString()));
+      }
+    }
+
+    return const Left(
+      NetworkFailure(
+        message: 'Internet connection required to verify social login.',
+      ),
+    );
   }
 
   @override
@@ -342,12 +441,14 @@ class AuthRepository implements IAuthRepository {
   Future<Either<Failure, bool>> confirmPasswordReset(
     String token,
     String password,
+    String confirmPassword,
   ) async {
     if (await _networkInfo.isConnected) {
       try {
         final result = await _authRemoteDataSource.confirmPasswordReset(
           token,
           password,
+          confirmPassword,
         );
         return Right(result);
       } on DioException catch (e) {

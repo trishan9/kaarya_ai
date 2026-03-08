@@ -234,7 +234,6 @@ class InterviewSessionStartApiModel {
     final interview = jsonAsMap(data['interview']) ?? const <String, dynamic>{};
     final vapi = jsonAsMap(data['vapi']) ?? const <String, dynamic>{};
 
-    // Parse questions from interview
     final rawQuestions = jsonAsList(interview['questions']);
     final questions = rawQuestions
         .whereType<Map>()
@@ -404,9 +403,7 @@ class InterviewCategoryScoreApiModel {
 
   factory InterviewCategoryScoreApiModel.fromJson(Map<String, dynamic> json) {
     return InterviewCategoryScoreApiModel(
-      category: jsonString(
-        json['name'] ?? json['category'],
-      ),
+      category: jsonString(json['name'] ?? json['category']),
       score: jsonDouble(json['score']),
       feedback: jsonNullableString(json['comment'] ?? json['feedback']),
     );

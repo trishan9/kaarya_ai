@@ -243,9 +243,16 @@ class CollegeViewModel extends Notifier<CollegeState> {
   Future<Failure?> inviteStudent({
     required String collegeId,
     required String email,
+    String? program,
+    int? year,
   }) async {
     final result = await _inviteStudentUseCase(
-      InviteStudentUseCaseParams(collegeId: collegeId, email: email),
+      InviteStudentUseCaseParams(
+        collegeId: collegeId,
+        email: email,
+        program: program,
+        year: year,
+      ),
     );
 
     return result.fold((failure) => failure, (_) => null);

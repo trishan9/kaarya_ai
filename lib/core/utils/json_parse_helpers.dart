@@ -46,10 +46,6 @@ List<String> jsonStringList(dynamic value) {
       .toList();
 }
 
-/// Parses techStack from API - supports both formats:
-/// - ["React", "TypeScript"] (strings)
-/// - [{"name": "React", "iconUrl": "https://..."}] (objects with iconUrl from backend)
-/// Returns (techNames, iconUrls). When backend provides iconUrl, iconUrls is populated.
 (List<String> techNames, List<String> iconUrls) jsonTechStack(dynamic value) {
   if (value is! List) return (const <String>[], const <String>[]);
   final names = <String>[];
@@ -60,7 +56,8 @@ List<String> jsonStringList(dynamic value) {
     } else if (item is Map) {
       final map = jsonCastMap(item);
       final name = jsonNullableString(map['name']) ?? jsonString(map['name']);
-      final iconUrl = jsonNullableString(map['iconUrl']) ??
+      final iconUrl =
+          jsonNullableString(map['iconUrl']) ??
           jsonNullableString(map['icon_url']);
       if (name.isNotEmpty) names.add(name);
       if (iconUrl != null && iconUrl.isNotEmpty) urls.add(iconUrl);

@@ -41,7 +41,9 @@ class _CreateOrJoinWorkspacePageState
 
   final _joinFormKey = GlobalKey<FormState>();
   final _inviteCodeController = TextEditingController();
-  final _joinDesignationController = TextEditingController(text: 'Talent Partner');
+  final _joinDesignationController = TextEditingController(
+    text: 'Talent Partner',
+  );
 
   String? _selectedIndustry;
   bool _isSubmitting = false;
@@ -83,7 +85,9 @@ class _CreateOrJoinWorkspacePageState
       return;
     }
     setState(() => _isSubmitting = true);
-    final error = await ref.read(recruiterViewModelProvider.notifier).createWorkspace(
+    final error = await ref
+        .read(recruiterViewModelProvider.notifier)
+        .createWorkspace(
           name: _companyNameController.text.trim(),
           industry: _selectedIndustry!,
           location: _locationController.text.trim(),
@@ -102,7 +106,9 @@ class _CreateOrJoinWorkspacePageState
   Future<void> _submitJoin() async {
     if (!_joinFormKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
-    final error = await ref.read(recruiterViewModelProvider.notifier).joinWorkspace(
+    final error = await ref
+        .read(recruiterViewModelProvider.notifier)
+        .joinWorkspace(
           inviteCode: _inviteCodeController.text.trim(),
           designation: _joinDesignationController.text.trim(),
         );
@@ -195,8 +201,9 @@ class _CreateOrJoinWorkspacePageState
           MyTextFormField(
             controller: _companyNameController,
             text: 'Company Name',
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Company name is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Company name is required'
+                : null,
           ),
           const SizedBox(height: 16),
           _IndustryDropdown(
@@ -208,21 +215,20 @@ class _CreateOrJoinWorkspacePageState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
-                child:           MyTextFormField(
-            controller: _locationController,
-            text: 'Search city, office, or click on map',
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Location is required' : null,
-          ),
+                child: MyTextFormField(
+                  controller: _locationController,
+                  text: 'Search city, office, or click on map',
+                  validator: (v) => (v == null || v.trim().isEmpty)
+                      ? 'Location is required'
+                      : null,
+                ),
               ),
               const SizedBox(width: 8),
               TextButton.icon(
                 onPressed: _pickLocation,
                 icon: const Icon(LucideIcons.mapPin, size: 18),
                 label: const Text('Pick on map'),
-                style: TextButton.styleFrom(
-                  foregroundColor: AppColors.primary,
-                ),
+                style: TextButton.styleFrom(foregroundColor: AppColors.primary),
               ),
             ],
           ),
@@ -235,8 +241,9 @@ class _CreateOrJoinWorkspacePageState
           MyTextFormField(
             controller: _designationController,
             text: 'Your Designation',
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Designation is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Designation is required'
+                : null,
           ),
           const SizedBox(height: 28),
           MyButton(
@@ -258,15 +265,17 @@ class _CreateOrJoinWorkspacePageState
           MyTextFormField(
             controller: _inviteCodeController,
             text: 'Invite code (e.g. KR-AB12CD34)',
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Invite code is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Invite code is required'
+                : null,
           ),
           const SizedBox(height: 16),
           MyTextFormField(
             controller: _joinDesignationController,
             text: 'Designation (e.g. Talent Partner)',
-            validator: (v) =>
-                (v == null || v.trim().isEmpty) ? 'Designation is required' : null,
+            validator: (v) => (v == null || v.trim().isEmpty)
+                ? 'Designation is required'
+                : null,
           ),
           const SizedBox(height: 28),
           MyButton(
@@ -348,13 +357,17 @@ class _IndustryDropdown extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
           borderSide: const BorderSide(color: AppColors.borderStroke),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
       ),
       items: _industries
           .map((i) => DropdownMenuItem(value: i, child: Text(i)))
           .toList(),
       onChanged: onChanged,
-      validator: (v) => v == null || v.isEmpty ? 'Please select an industry' : null,
+      validator: (v) =>
+          v == null || v.isEmpty ? 'Please select an industry' : null,
     );
   }
 }

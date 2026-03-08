@@ -13,8 +13,6 @@ class InterviewFeedbackPage extends ConsumerStatefulWidget {
   final String sessionId;
   final String? interviewId;
 
-  /// When true, skip the AI-generation wait (use for already-completed sessions
-  /// navigated from history, not from a just-finished live interview).
   final bool immediate;
 
   const InterviewFeedbackPage({
@@ -31,9 +29,6 @@ class InterviewFeedbackPage extends ConsumerStatefulWidget {
 
 class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
   late bool _isGenerating;
-  // Stays true until the first loadFeedback call completes (success or failure).
-  // Ensures the loading spinner is always shown on first render — prevents any
-  // flash of empty/stale state before the API response arrives.
   bool _localLoading = true;
   static const _generationDelay = Duration(seconds: 5);
   static const _retryDelay = Duration(seconds: 4);
@@ -42,16 +37,12 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
   void initState() {
     super.initState();
     _isGenerating = !widget.immediate;
-    // Defer until after first build — Riverpod disallows state updates during
-    // the widget mount / _firstBuild phase (would throw a ProviderElement error).
     Future.microtask(_waitThenFetch);
   }
 
   Future<void> _waitThenFetch() async {
     try {
       if (!widget.immediate) {
-        // Give the backend time to finish generating the AI evaluation
-        // (only needed right after a live interview completes).
         await Future.delayed(_generationDelay);
         if (!mounted) return;
         setState(() => _isGenerating = false);
@@ -63,7 +54,6 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
       if (mounted) setState(() => _localLoading = false);
     }
     if (!mounted) return;
-    // If scores look like unfinished placeholders, retry once after a short delay
     final feedback = ref.read(takeInterviewViewModelProvider).feedback;
     if (_looksLikePlaceholder(feedback)) {
       await Future.delayed(_retryDelay);
@@ -75,12 +65,8 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
   }
 
   bool _looksLikePlaceholder(dynamic feedback) {
-    // null means the API returned an error — show the error state + Retry,
-    // don't auto-retry (a second request won't help if evaluation isn't ready).
     if (feedback == null) return false;
-    // If totalScore is null or 0, evaluation generation may still be in flight
     if (feedback.totalScore == null || feedback.totalScore == 0) return true;
-    // If all category scores are identical it's likely a default placeholder
     final scores = feedback.categoryScores
         .map((c) => c.score)
         .where((s) => s != null)
@@ -106,8 +92,8 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
       body: _isGenerating || _localLoading || state.isFeedbackLoading
           ? _buildGeneratingState(_isGenerating)
           : feedback == null
-              ? _buildEmptyState(state.error)
-              : _buildFeedbackContent(feedback),
+          ? _buildEmptyState(state.error)
+          : _buildFeedbackContent(feedback),
     );
   }
 
@@ -191,7 +177,6 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Action buttons
           Row(
             children: [
               Expanded(
@@ -229,15 +214,12 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
           ),
           const SizedBox(height: 16),
 
-          // Score hero card
           _buildScoreHeroCard(feedback, totalScore, band, benchmark),
           const SizedBox(height: 16),
 
-          // Category scores
           _buildCategoryScores(feedback, band),
           const SizedBox(height: 16),
 
-          // Strengths & Areas for improvement
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -297,7 +279,6 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Badges
           Row(
             children: [
               _whiteBadge('AI Interview Report'),
@@ -325,21 +306,24 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
           ),
           const SizedBox(height: 16),
 
-          // Score ring + metrics
           Row(
             children: [
-              // Score ring
               _buildScoreRing(totalScore, scoreAccent, band),
               const SizedBox(width: 16),
-              // Metrics
               Expanded(
                 child: Column(
                   children: [
-                    _metricPill(LucideIcons.target, 'Recommended',
-                        '${benchmark.min}-${benchmark.max}'),
+                    _metricPill(
+                      LucideIcons.target,
+                      'Recommended',
+                      '${benchmark.min}-${benchmark.max}',
+                    ),
                     const SizedBox(height: 8),
-                    _metricPill(LucideIcons.chartBar, 'Skills Rated',
-                        '${feedback.categoryScores.length}'),
+                    _metricPill(
+                      LucideIcons.chartBar,
+                      'Skills Rated',
+                      '${feedback.categoryScores.length}',
+                    ),
                     const SizedBox(height: 8),
                     if (feedback.durationSeconds != null)
                       _metricPill(
@@ -362,10 +346,7 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
       width: 100,
       height: 100,
       child: CustomPaint(
-        painter: _ScoreRingPainter(
-          score: score,
-          accentColor: accent,
-        ),
+        painter: _ScoreRingPainter(score: score, accentColor: accent),
         child: Center(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -393,7 +374,9 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
   }
 
   Widget _buildCategoryScores(
-      InterviewFeedbackEntity feedback, _PerformanceBand band) {
+    InterviewFeedbackEntity feedback,
+    _PerformanceBand band,
+  ) {
     if (feedback.categoryScores.isEmpty) return const SizedBox.shrink();
 
     return Container(
@@ -458,7 +441,9 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           border: Border.all(color: const Color(0xFFECECF0)),
                           borderRadius: BorderRadius.circular(6),
@@ -474,15 +459,15 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
                     ],
                   ),
                   const SizedBox(height: 8),
-                  // Score bar
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: score / 100,
                       minHeight: 8,
                       backgroundColor: const Color(0xFFE8EDF3),
-                      valueColor:
-                          AlwaysStoppedAnimation<Color>(catBand.barColor),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        catBand.barColor,
+                      ),
                     ),
                   ),
                   if (cat.feedback != null && cat.feedback!.isNotEmpty) ...[
@@ -538,24 +523,28 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
           ),
           const SizedBox(height: 10),
           if (items.isNotEmpty)
-            ...items.map((item) => Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.only(bottom: 6),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                  decoration: BoxDecoration(
-                    color: bgColor,
-                    borderRadius: BorderRadius.circular(8),
+            ...items.map(
+              (item) => Container(
+                width: double.infinity,
+                margin: const EdgeInsets.only(bottom: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: bgColor,
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Text(
+                  item,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textLight,
+                    height: 1.3,
                   ),
-                  child: Text(
-                    item,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: AppColors.textLight,
-                      height: 1.3,
-                    ),
-                  ),
-                ))
+                ),
+              ),
+            )
           else
             Text(
               'No items listed.',
@@ -620,8 +609,6 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
     );
   }
 
-  // ─── Helpers ───
-
   _PerformanceBand _getPerformanceBand(int score) {
     if (score >= 85) {
       return _PerformanceBand(
@@ -678,7 +665,8 @@ class _InterviewFeedbackPageState extends ConsumerState<InterviewFeedbackPage> {
 
   String _getScoreRangeMessage(int score, _LevelBenchmark range) {
     if (score < range.min) return 'You are below the recommended range.';
-    if (score > range.max) return 'You are above the recommended range. Great job.';
+    if (score > range.max)
+      return 'You are above the recommended range. Great job.';
     return 'You are within the recommended range.';
   }
 }
@@ -714,7 +702,6 @@ class _ScoreRingPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 6;
 
-    // Background ring
     final bgPaint = Paint()
       ..color = Colors.white.withValues(alpha: 0.18)
       ..style = PaintingStyle.stroke
@@ -723,7 +710,6 @@ class _ScoreRingPainter extends CustomPainter {
 
     canvas.drawCircle(center, radius, bgPaint);
 
-    // Score arc
     final scorePaint = Paint()
       ..color = accentColor
       ..style = PaintingStyle.stroke

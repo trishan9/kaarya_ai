@@ -3,6 +3,9 @@ import 'package:flutter/material.dart';
 class AppRoutes {
   AppRoutes._();
 
+  static final GlobalKey<NavigatorState> navigatorKey =
+      GlobalKey<NavigatorState>();
+
   /// Push a new route onto the stack
   static void push(BuildContext context, Widget page) {
     Navigator.push(context, MaterialPageRoute(builder: (_) => page));
@@ -42,5 +45,16 @@ class AppRoutes {
   /// Pop to first route (root)
   static void popToFirst(BuildContext context) {
     Navigator.popUntil(context, (route) => route.isFirst);
+  }
+
+  static void popToFirstGlobal() {
+    navigatorKey.currentState?.popUntil((route) => route.isFirst);
+  }
+
+  static Future<T?> pushAndRemoveUntilGlobal<T>(Widget page) {
+    return navigatorKey.currentState!.pushAndRemoveUntil<T>(
+      MaterialPageRoute(builder: (_) => page),
+      (route) => false,
+    );
   }
 }

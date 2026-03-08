@@ -8,10 +8,12 @@ import 'package:kaarya/features/interviews/presentation/pages/interview_hub_scre
 import 'package:kaarya/features/dashboard/presentation/pages/leaderboard_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/overview_screen.dart';
 import 'package:kaarya/features/dashboard/presentation/pages/resume_builder_screen.dart';
+import 'package:kaarya/features/companies/presentation/pages/company_settings_page.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/company_jobs_screen.dart';
 import 'package:kaarya/features/recruiter/presentation/pages/recruiter_overview_screen.dart';
 import 'package:kaarya/features/colleges/presentation/pages/college_overview_screen.dart';
 import 'package:kaarya/features/colleges/presentation/pages/college_jobs_screen.dart';
+import 'package:kaarya/features/colleges/presentation/pages/college_settings_page.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/app_drawer_widget.dart';
 import 'package:kaarya/core/widgets/notifications_widget.dart';
@@ -48,6 +50,7 @@ class DashboardPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final isRecruiter = ref.watch(isRecruiterProvider);
     final isCollege = ref.watch(isCollegeProvider);
+    final dividerColor = Theme.of(context).dividerColor;
 
     if (isRecruiter) {
       return const _RecruiterDashboard();
@@ -68,12 +71,12 @@ class DashboardPage extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
+            child: const NotificationsWidget(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: dividerColor),
         ),
       ),
 
@@ -86,22 +89,28 @@ class DashboardPage extends ConsumerWidget {
         children: [
           Container(
             height: 2,
-            color: const Color(0xFFF0F0F0),
+            color: dividerColor,
             child: Row(
               children: List.generate(5, (index) {
                 return Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 2,
-                      width: selectedIndex == index ? double.infinity : 0,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == index
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
+                  child: TweenAnimationBuilder<double>(
+                    tween: Tween<double>(end: selectedIndex == index ? 1 : 0),
+                    duration: const Duration(milliseconds: 200),
+                    builder: (context, value, _) {
+                      return Align(
+                        alignment: Alignment.centerLeft,
+                        child: FractionallySizedBox(
+                          widthFactor: value,
+                          child: Container(
+                            height: 2,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary,
+                              borderRadius: BorderRadius.circular(1),
+                            ),
+                          ),
+                        ),
+                      );
+                    },
                   ),
                 );
               }),
@@ -112,6 +121,7 @@ class DashboardPage extends ConsumerWidget {
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (i) {
+              ref.read(pushedPageProvider.notifier).state = null;
               ref.read(bottomNavProvider.notifier).state =
                   _destinationFromIndex(i);
             },
@@ -190,18 +200,53 @@ class DashboardPage extends ConsumerWidget {
 class _RecruiterDashboard extends ConsumerWidget {
   const _RecruiterDashboard();
 
-  static const _recruiterTitles = ["Overview", "Company Jobs", "Leaderboard"];
+  static const _recruiterTitles = [
+    "Overview",
+    "Company Jobs",
+    "Leaderboard",
+    "Company Settings",
+  ];
 
   static const _recruiterScreens = [
     RecruiterOverviewScreen(),
     CompanyJobsScreen(),
     LeaderboardScreen(),
+    CompanySettingsPage(),
   ];
+
+  Widget _buildIndicatorBar(int count, int selectedIndex) {
+    return Row(
+      children: List.generate(count, (index) {
+        return Expanded(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(end: selectedIndex == index ? 1 : 0),
+            duration: const Duration(milliseconds: 200),
+            builder: (context, value, _) {
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: value,
+                  child: Container(
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final destination = ref.watch(recruiterNavProvider);
     final selectedIndex = _recruiterIndexFromDest(destination);
+    final dividerColor = Theme.of(context).dividerColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -212,12 +257,12 @@ class _RecruiterDashboard extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
+            child: const NotificationsWidget(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: dividerColor),
         ),
       ),
       drawer: AppDrawerWidget(),
@@ -227,31 +272,14 @@ class _RecruiterDashboard extends ConsumerWidget {
         children: [
           Container(
             height: 2,
-            color: const Color(0xFFF0F0F0),
-            child: Row(
-              children: List.generate(3, (index) {
-                return Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 2,
-                      width: selectedIndex == index ? double.infinity : 0,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == index
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
+            color: dividerColor,
+            child: _buildIndicatorBar(4, selectedIndex),
           ),
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (i) {
+              ref.read(pushedPageProvider.notifier).state = null;
               ref.read(recruiterNavProvider.notifier).state =
                   _recruiterDestFromIndex(i);
             },
@@ -264,12 +292,17 @@ class _RecruiterDashboard extends ConsumerWidget {
               BottomNavigationBarItem(
                 icon: Icon(LucideIcons.briefcaseBusiness),
                 activeIcon: Icon(LucideIcons.briefcaseBusiness),
-                label: "Company Jobs",
+                label: "College Jobs",
               ),
               BottomNavigationBarItem(
                 icon: Icon(LucideIcons.trophy),
                 activeIcon: Icon(LucideIcons.trophy),
                 label: "Leaderboard",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(LucideIcons.settings2),
+                activeIcon: Icon(LucideIcons.settings2),
+                label: "Settings",
               ),
             ],
           ),
@@ -283,6 +316,7 @@ class _RecruiterDashboard extends ConsumerWidget {
       RecruiterDestination.overview,
       RecruiterDestination.companyJobs,
       RecruiterDestination.leaderboard,
+      RecruiterDestination.settings,
     ];
     final i = order.indexOf(dest);
     return i >= 0 ? i : 0;
@@ -293,6 +327,7 @@ class _RecruiterDashboard extends ConsumerWidget {
       RecruiterDestination.overview,
       RecruiterDestination.companyJobs,
       RecruiterDestination.leaderboard,
+      RecruiterDestination.settings,
     ];
     return order[index.clamp(0, order.length - 1)];
   }
@@ -301,18 +336,53 @@ class _RecruiterDashboard extends ConsumerWidget {
 class _CollegeDashboard extends ConsumerWidget {
   const _CollegeDashboard();
 
-  static const _collegeTitles = ["College Overview", "College Jobs", "Leaderboard"];
+  static const _collegeTitles = [
+    "College Overview",
+    "College Jobs",
+    "Leaderboard",
+    "College Settings",
+  ];
 
   static const _collegeScreens = [
     CollegeOverviewScreen(),
     CollegeJobsScreen(),
     LeaderboardScreen(),
+    CollegeSettingsPage(),
   ];
+
+  Widget _buildIndicatorBar(int count, int selectedIndex) {
+    return Row(
+      children: List.generate(count, (index) {
+        return Expanded(
+          child: TweenAnimationBuilder<double>(
+            tween: Tween<double>(end: selectedIndex == index ? 1 : 0),
+            duration: const Duration(milliseconds: 200),
+            builder: (context, value, _) {
+              return Align(
+                alignment: Alignment.centerLeft,
+                child: FractionallySizedBox(
+                  widthFactor: value,
+                  child: Container(
+                    height: 2,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(1),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final destination = ref.watch(collegeNavProvider);
     final selectedIndex = _collegeIndexFromDest(destination);
+    final dividerColor = Theme.of(context).dividerColor;
 
     return Scaffold(
       appBar: AppBar(
@@ -323,12 +393,12 @@ class _CollegeDashboard extends ConsumerWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
+            child: const NotificationsWidget(),
           ),
         ],
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          child: Container(height: 1, color: dividerColor),
         ),
       ),
       drawer: AppDrawerWidget(),
@@ -339,31 +409,14 @@ class _CollegeDashboard extends ConsumerWidget {
         children: [
           Container(
             height: 2,
-            color: const Color(0xFFF0F0F0),
-            child: Row(
-              children: List.generate(3, (index) {
-                return Expanded(
-                  child: Center(
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      height: 2,
-                      width: selectedIndex == index ? double.infinity : 0,
-                      decoration: BoxDecoration(
-                        color: selectedIndex == index
-                            ? AppColors.primary
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                  ),
-                );
-              }),
-            ),
+            color: dividerColor,
+            child: _buildIndicatorBar(4, selectedIndex),
           ),
           BottomNavigationBar(
             type: BottomNavigationBarType.fixed,
             currentIndex: selectedIndex,
             onTap: (i) {
+              ref.read(pushedPageProvider.notifier).state = null;
               ref.read(collegeNavProvider.notifier).state =
                   _collegeDestFromIndex(i);
             },
@@ -383,6 +436,11 @@ class _CollegeDashboard extends ConsumerWidget {
                 activeIcon: Icon(LucideIcons.trophy),
                 label: "Leaderboard",
               ),
+              BottomNavigationBarItem(
+                icon: Icon(LucideIcons.settings2),
+                activeIcon: Icon(LucideIcons.settings2),
+                label: "Settings",
+              ),
             ],
           ),
         ],
@@ -395,6 +453,7 @@ class _CollegeDashboard extends ConsumerWidget {
       CollegeDestination.overview,
       CollegeDestination.collegeJobs,
       CollegeDestination.leaderboard,
+      CollegeDestination.collegeSettings,
     ];
     final i = order.indexOf(dest);
     return i >= 0 ? i : 0;
@@ -405,6 +464,7 @@ class _CollegeDashboard extends ConsumerWidget {
       CollegeDestination.overview,
       CollegeDestination.collegeJobs,
       CollegeDestination.leaderboard,
+      CollegeDestination.collegeSettings,
     ];
     return order[index.clamp(0, order.length - 1)];
   }

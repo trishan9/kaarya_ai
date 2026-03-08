@@ -13,8 +13,6 @@ import 'package:kaarya/features/interviews/presentation/pages/interview_detail_p
 import 'package:kaarya/features/recruiter/presentation/view_model/recruiter_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Interview Management page for recruiters and colleges.
-/// Shows interviews created by them and allows creating new ones.
 class InterviewManagementPage extends ConsumerStatefulWidget {
   const InterviewManagementPage({super.key});
 
@@ -23,7 +21,8 @@ class InterviewManagementPage extends ConsumerStatefulWidget {
       _InterviewManagementPageState();
 }
 
-class _InterviewManagementPageState extends ConsumerState<InterviewManagementPage> {
+class _InterviewManagementPageState
+    extends ConsumerState<InterviewManagementPage> {
   @override
   void initState() {
     super.initState();
@@ -44,21 +43,20 @@ class _InterviewManagementPageState extends ConsumerState<InterviewManagementPag
     String? collegeId;
 
     if (isRecruiter) {
-      final ws = ref.read(recruiterViewModelProvider).selectedWorkspace ??
+      final ws =
+          ref.read(recruiterViewModelProvider).selectedWorkspace ??
           ref.read(recruiterViewModelProvider).workspaces?.firstOrNull;
       if (ws != null) companyId = ws.companyId;
     } else if (isCollege) {
-      final ws = ref.read(collegeDashboardViewModelProvider).selectedWorkspace ??
+      final ws =
+          ref.read(collegeDashboardViewModelProvider).selectedWorkspace ??
           ref.read(collegeDashboardViewModelProvider).workspaces?.firstOrNull;
       if (ws != null) collegeId = ws.collegeId;
     }
 
     AppRoutes.push(
       context,
-      CreateInterviewPage(
-        companyId: companyId,
-        collegeId: collegeId,
-      ),
+      CreateInterviewPage(companyId: companyId, collegeId: collegeId),
     );
   }
 
@@ -85,8 +83,9 @@ class _InterviewManagementPageState extends ConsumerState<InterviewManagementPag
         ],
       ),
       body: RefreshIndicator(
-        onRefresh: () =>
-            ref.read(dashboardViewModelProvider.notifier).loadInterviews(forceRefresh: true),
+        onRefresh: () => ref
+            .read(dashboardViewModelProvider.notifier)
+            .loadInterviews(forceRefresh: true),
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
@@ -256,11 +255,7 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.only(top: 40),
       child: Column(
         children: [
-          Icon(
-            LucideIcons.calendarX,
-            size: 64,
-            color: AppColors.textLight,
-          ),
+          Icon(LucideIcons.calendarX, size: 64, color: AppColors.textLight),
           const SizedBox(height: 16),
           const Text(
             'No interviews yet',
@@ -274,10 +269,7 @@ class _EmptyState extends StatelessWidget {
           const Text(
             'Create your first interview using voice or manual setup.',
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 14,
-              color: AppColors.textMedium,
-            ),
+            style: TextStyle(fontSize: 14, color: AppColors.textMedium),
           ),
           const SizedBox(height: 24),
           FilledButton.icon(
@@ -316,10 +308,7 @@ class _ErrorState extends StatelessWidget {
             style: const TextStyle(color: AppColors.textMedium),
           ),
           const SizedBox(height: 16),
-          OutlinedButton(
-            onPressed: onRetry,
-            child: const Text('Retry'),
-          ),
+          OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
         ],
       ),
     );

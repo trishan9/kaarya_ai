@@ -15,7 +15,8 @@ class ChangePasswordFormCard extends ConsumerStatefulWidget {
       _ChangePasswordFormCardState();
 }
 
-class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard> {
+class _ChangePasswordFormCardState
+    extends ConsumerState<ChangePasswordFormCard> {
   final _formKey = GlobalKey<FormState>();
   final _currentPasswordController = TextEditingController();
   final _newPasswordController = TextEditingController();
@@ -56,7 +57,9 @@ class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard>
   Future<void> _handleSubmit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    await ref.read(authViewModelProvider.notifier).changePassword(
+    await ref
+        .read(authViewModelProvider.notifier)
+        .changePassword(
           currentPassword: _currentPasswordController.text.trim(),
           newPassword: _newPasswordController.text.trim(),
           confirmNewPassword: _confirmPasswordController.text.trim(),
@@ -108,9 +111,9 @@ class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard>
             const SizedBox(height: 6),
             Text(
               'Update your password. You will receive a confirmation email after the change.',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Colors.grey.shade600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: Colors.grey.shade600),
             ),
             const SizedBox(height: 20),
             Form(
@@ -120,10 +123,7 @@ class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard>
                 children: [
                   Text(
                     'Current Password',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                   ),
                   const SizedBox(height: 6),
                   MyTextFormField(
@@ -136,10 +136,7 @@ class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard>
                   const SizedBox(height: 14),
                   Text(
                     'New Password',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                   ),
                   const SizedBox(height: 6),
                   MyTextFormField(
@@ -153,17 +150,14 @@ class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard>
                   Text(
                     'Min 12 chars with uppercase, lowercase, number, and symbol.',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: Colors.grey.shade600,
-                          fontSize: 12,
-                        ),
+                      color: Colors.grey.shade600,
+                      fontSize: 12,
+                    ),
                   ),
                   const SizedBox(height: 14),
                   Text(
                     'Confirm New Password',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w500,
-                      fontSize: 15,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),
                   ),
                   const SizedBox(height: 6),
                   MyTextFormField(
@@ -180,7 +174,11 @@ class _ChangePasswordFormCardState extends ConsumerState<ChangePasswordFormCard>
                       text: 'Change Password',
                       onPressed: _handleSubmit,
                       isLoading: isLoading,
-                      icon: Icon(LucideIcons.keyRound, color: Colors.white, size: 18),
+                      icon: Icon(
+                        LucideIcons.keyRound,
+                        color: Colors.white,
+                        size: 18,
+                      ),
                     ),
                   ),
                 ],

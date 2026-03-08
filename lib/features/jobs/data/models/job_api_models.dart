@@ -84,7 +84,6 @@ class JobApiModel {
 
   Map<String, dynamic> toJson() => _$JobApiModelToJson(this);
 
-  /// API response has nested company/college; use for remote parsing.
   factory JobApiModel.fromApiResponse(Map<String, dynamic> json) {
     final companyData = _asMap(json['company']) ?? _asMap(json['college']);
     return JobApiModel(
@@ -197,7 +196,6 @@ class JobDetailApiModel {
 
   Map<String, dynamic> toJson() => _$JobDetailApiModelToJson(this);
 
-  /// API response has nested company/college.
   factory JobDetailApiModel.fromApiResponse(Map<String, dynamic> json) {
     final companyData = _asMap(json['company']) ?? _asMap(json['college']);
     final companyModel = companyData != null

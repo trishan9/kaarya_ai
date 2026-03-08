@@ -269,6 +269,8 @@ class CollegeRepository implements ICollegeRepository {
   Future<Either<Failure, bool>> inviteStudent({
     required String collegeId,
     required String email,
+    String? program,
+    int? year,
   }) async {
     if (!await _networkInfo.isConnected) {
       return const Left(
@@ -280,6 +282,8 @@ class CollegeRepository implements ICollegeRepository {
       final result = await _remoteDatasource.inviteStudent(
         collegeId: collegeId,
         email: email,
+        program: program,
+        year: year,
       );
       if (!result) {
         return const Left(ApiFailure(message: 'Unable to invite student.'));

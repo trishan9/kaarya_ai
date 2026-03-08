@@ -29,23 +29,15 @@ class _SplashPageState extends ConsumerState<SplashPage> {
     final isLoggedIn = userSessionService.isLoggedIn();
 
     if (isLoggedIn) {
-      // Refresh session from API so role is correct (fixes candidate seeing recruiter dashboard)
       final result = await ref.read(getCurrentUserUseCaseProvider).call();
-      result.fold(
-        (_) {},
-        (_) {},
-      );
+      result.fold((_) {}, (_) {});
       if (!mounted) return;
       ref.read(dashboardViewModelProvider.notifier).resetState();
-      // Prefetch overview so it may be ready when dashboard loads
       ref.read(dashboardViewModelProvider.notifier).loadOverview();
-      // Prefetch Explore jobs for candidates
       if (!ref.read(isRecruiterProvider) && !ref.read(isCollegeProvider)) {
         ref.read(jobsViewModelProvider.notifier).loadJobsSection();
       }
-      // Prefetch college workspaces for college role and candidates
       ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
-      // Force session/role providers to refresh so dashboard shows correct view
       ref.invalidate(userSessionServiceProvider);
       AppRoutes.pushReplacement(context, const DashboardPage());
     } else {

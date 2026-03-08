@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/routes/app_routes.dart';
-import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
-import 'package:kaarya/features/onboarding/data/models/onboarding_data_model.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/core/widgets/my_button_widget.dart';
+import 'package:kaarya/features/auth/presentation/pages/login_page.dart';
+import 'package:kaarya/features/onboarding/data/models/onboarding_data_model.dart';
 import 'package:kaarya/features/onboarding/presentation/widgets/onboarding_progress_widget.dart';
 
 class OnboardingPage extends StatefulWidget {
@@ -36,7 +36,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     OnboardingDataModel(
       title: "Track Your Career Progress",
       subtitle:
-          "Monitor applications, interviews, feedback, and more — all in one place.",
+          "Monitor applications, interviews, feedback, and more all in one place.",
       image: "assets/images/onboarding4.png",
     ),
   ];
@@ -45,19 +45,21 @@ class _OnboardingPageState extends State<OnboardingPage> {
   int currentIndex = 0;
 
   @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bgSecondary,
-
       body: SafeArea(
         child: Column(
           children: [
             const SizedBox(height: 32),
-
             OnboardingProgress(index: currentIndex),
-
             const SizedBox(height: 16),
-
             Expanded(
               child: PageView.builder(
                 controller: _controller,
@@ -69,44 +71,48 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   final page = onboardingPages[index];
 
                   return Padding(
-                    padding: const EdgeInsets.only(left: 20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 20),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                page.title,
-                                style: const TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-
-                              const SizedBox(height: 1),
-
-                              Text(
-                                page.subtitle,
-                                style: TextStyle(fontSize: 14),
-                              ),
-                            ],
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              page.title,
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w700,
+                                    color: AppColors.textDark,
+                                  ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              page.subtitle,
+                              style: Theme.of(context).textTheme.bodyMedium
+                                  ?.copyWith(
+                                    color: AppColors.textLight,
+                                    height: 1.5,
+                                  ),
+                            ),
+                          ],
                         ),
-
+                        const SizedBox(height: 24),
                         Expanded(
-                          child: Align(
-                            alignment: Alignment.centerRight,
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(20),
-                                  bottomLeft: Radius.circular(20),
+                          child: Container(
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(24),
+                            ),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(24),
+                              child: Padding(
+                                padding: const EdgeInsets.all(18),
+                                child: Image.asset(
+                                  page.image,
+                                  fit: BoxFit.contain,
                                 ),
-                                color: Colors.white,
                               ),
-                              child: Image.asset(page.image, fit: BoxFit.cover),
                             ),
                           ),
                         ),
@@ -116,48 +122,45 @@ class _OnboardingPageState extends State<OnboardingPage> {
                 },
               ),
             ),
-
+            const SizedBox(height: 18),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (currentIndex != 0) ...{
-                    MyButton(
-                      variant: ButtonVariant.text,
-                      btnWidth: 180,
+                  Expanded(
+                    child: currentIndex == 0
+                        ? const SizedBox()
+                        : OutlinedButton(
+                            onPressed: () {
+                              _controller.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
+                            },
+                            child: const Text('Previous'),
+                          ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: MyButton(
                       onPressed: () {
-                        _controller.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
-                        );
+                        if (currentIndex == onboardingPages.length - 1) {
+                          AppRoutes.pushReplacement(context, const LoginPage());
+                        } else {
+                          _controller.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeOut,
+                          );
+                        }
                       },
-                      text: "Previous",
+                      text: currentIndex == onboardingPages.length - 1
+                          ? "Get Started"
+                          : "Next",
                     ),
-                  } else ...{
-                    const SizedBox(width: 180),
-                  },
-
-                  MyButton(
-                    btnWidth: 180,
-                    onPressed: () {
-                      if (currentIndex == onboardingPages.length - 1) {
-                        AppRoutes.pushReplacement(context, const LoginPage());
-                      } else {
-                        _controller.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeOut,
-                        );
-                      }
-                    },
-                    text: currentIndex == onboardingPages.length - 1
-                        ? "Get Started"
-                        : "Next",
                   ),
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
           ],
         ),

@@ -29,8 +29,13 @@ class UpdateApplicationUseCaseParams extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [jobId, applicationId, status, interviewScheduledAt, interviewNote];
+  List<Object?> get props => [
+    jobId,
+    applicationId,
+    status,
+    interviewScheduledAt,
+    interviewNote,
+  ];
 }
 
 class UpdateApplicationUseCase

@@ -33,7 +33,10 @@ class CollegeApiModel {
     return CollegeApiModel(
       id: jsonString(json['_id'] ?? json['id']),
       name: jsonString(json['name']),
-      institutionType: jsonString(json['institutionType'] ?? json['institution_type'], fallback: 'Other'),
+      institutionType: jsonString(
+        json['institutionType'] ?? json['institution_type'],
+        fallback: 'Other',
+      ),
       location: jsonString(json['location']),
       logo: jsonNullableString(json['logo']),
       inviteCode: jsonNullableString(json['inviteCode'] ?? json['invite_code']),
@@ -134,6 +137,8 @@ class StudentMemberApiModel {
   final String name;
   final String email;
   final String? photo;
+  final String? program;
+  final int? year;
   final String joinedAt;
 
   const StudentMemberApiModel({
@@ -141,25 +146,36 @@ class StudentMemberApiModel {
     required this.name,
     required this.email,
     this.photo,
+    this.program,
+    this.year,
     required this.joinedAt,
   });
 
   factory StudentMemberApiModel.fromApiResponse(Map<String, dynamic> json) {
-    final user = jsonAsMap(json['user']);
+    final user =
+        jsonAsMap(json['user']) ??
+        jsonAsMap(json['student']) ??
+        jsonAsMap(json['studentId']);
     if (user != null) {
       return StudentMemberApiModel(
         userId: jsonString(user['_id'] ?? user['id']),
         name: jsonString(user['name']),
         email: jsonString(user['email']),
         photo: jsonNullableString(user['photo']),
+        program: jsonNullableString(json['program']),
+        year: json['year'] == null ? null : jsonInt(json['year']),
         joinedAt: jsonString(json['joinedAt'] ?? json['createdAt']),
       );
     }
     return StudentMemberApiModel(
-      userId: jsonString(json['userId'] ?? json['_id'] ?? json['id']),
+      userId: jsonString(
+        json['userId'] ?? json['studentId'] ?? json['_id'] ?? json['id'],
+      ),
       name: jsonString(json['name']),
       email: jsonString(json['email']),
       photo: jsonNullableString(json['photo']),
+      program: jsonNullableString(json['program']),
+      year: json['year'] == null ? null : jsonInt(json['year']),
       joinedAt: jsonString(json['joinedAt'] ?? json['createdAt']),
     );
   }
@@ -174,6 +190,8 @@ class StudentMemberApiModel {
     name: name,
     email: email,
     photo: photo,
+    program: program,
+    year: year,
     joinedAt: joinedAt,
   );
 

@@ -8,8 +8,6 @@ import 'package:kaarya/features/resources/presentation/view_model/resource_view_
 import 'package:kaarya/features/resources/presentation/state/resource_state.dart';
 
 void showCreateCourseSheet(BuildContext context) {
-  // Capture the parent ScaffoldMessenger before the sheet opens so we can
-  // show snackbars on the parent scaffold reliably (even after the sheet pops).
   final messenger = ScaffoldMessenger.of(context);
   showModalBottomSheet(
     context: context,
@@ -118,8 +116,7 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(resourceViewModelProvider);
-    final isGenerating =
-        state.createCourseStatus == ResourceLoadStatus.loading;
+    final isGenerating = state.createCourseStatus == ResourceLoadStatus.loading;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
@@ -130,7 +127,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
       ),
       child: Column(
         children: [
-          // ── Handle ─────────────────────────────────────────────────────────
           const SizedBox(height: 10),
           Container(
             width: 36,
@@ -141,7 +137,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
             ),
           ),
           const SizedBox(height: 14),
-          // ── Header ─────────────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Row(
@@ -205,7 +200,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
           ),
           const SizedBox(height: 14),
           const Divider(height: 1, color: AppColors.borderStroke2),
-          // ── Form ───────────────────────────────────────────────────────────
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(20, 20, 20, 20 + bottomInset),
@@ -214,13 +208,11 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // ── Mode Toggle ──────────────────────────────────────────
                     _label('Course Type', required: true),
                     const SizedBox(height: 8),
                     _modeToggle(),
                     const SizedBox(height: 20),
 
-                    // ── Title ────────────────────────────────────────────────
                     _label('Course Title', required: true),
                     const SizedBox(height: 6),
                     TextFormField(
@@ -235,14 +227,12 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                             ? 'e.g. Transformers: From Fundamentals to Production'
                             : 'e.g. Backend Engineer Interview Sprint',
                       ),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'Title is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Title is required'
+                          : null,
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Target Roles ─────────────────────────────────────────
                     _label('Target Roles', required: true),
                     const SizedBox(height: 4),
                     Text(
@@ -261,14 +251,12 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                         color: AppColors.textDark,
                       ),
                       decoration: _inputDecoration('AI Engineer, ML Engineer'),
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'At least one role is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'At least one role is required'
+                          : null,
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Difficulty + Chapters Row ────────────────────────────
                     Row(
                       children: [
                         Expanded(
@@ -344,7 +332,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Visibility ───────────────────────────────────────────
                     _label('Visibility'),
                     const SizedBox(height: 6),
                     _dropdown(
@@ -376,7 +363,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Description (Optional) ───────────────────────────────
                     _label('Description'),
                     const SizedBox(height: 4),
                     Text(
@@ -403,7 +389,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Job Description Context (Optional) ───────────────────
                     _label('Job Description Context'),
                     const SizedBox(height: 4),
                     Text(
@@ -428,7 +413,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                     ),
                     const SizedBox(height: 20),
 
-                    // ── Additional AI Instructions (Optional) ────────────────
                     _label('Additional Instructions'),
                     const SizedBox(height: 4),
                     Text(
@@ -455,7 +439,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                     ),
                     const SizedBox(height: 28),
 
-                    // ── Submit Button ────────────────────────────────────────
                     SizedBox(
                       width: double.infinity,
                       height: 50,
@@ -464,8 +447,9 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppColors.primary,
                           foregroundColor: Colors.white,
-                          disabledBackgroundColor:
-                              AppColors.primary.withAlpha(120),
+                          disabledBackgroundColor: AppColors.primary.withAlpha(
+                            120,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -501,8 +485,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
     );
   }
 
-  // ─── Mode Toggle ─────────────────────────────────────────────────────────
-
   Widget _modeToggle() {
     return Container(
       padding: const EdgeInsets.all(4),
@@ -514,7 +496,11 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
       child: Row(
         children: [
           _modeOption('learn', LucideIcons.bookOpen, 'Learn'),
-          _modeOption('interview_prep', LucideIcons.messageSquare, 'Interview Prep'),
+          _modeOption(
+            'interview_prep',
+            LucideIcons.messageSquare,
+            'Interview Prep',
+          ),
         ],
       ),
     );
@@ -557,8 +543,6 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
     );
   }
 
-  // ─── Helpers ─────────────────────────────────────────────────────────────
-
   Widget _label(String text, {bool required = false}) {
     return Text.rich(
       TextSpan(
@@ -590,8 +574,7 @@ class _CreateCourseSheetState extends ConsumerState<_CreateCourseSheet> {
       ),
       filled: true,
       fillColor: AppColors.bgLight,
-      contentPadding:
-          const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(8),
         borderSide: const BorderSide(color: AppColors.borderStroke),

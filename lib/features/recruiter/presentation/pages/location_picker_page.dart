@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 
-/// Full-screen map picker (Leaflet-style with OpenStreetMap) for selecting job location.
 class LocationPickerPage extends StatelessWidget {
   const LocationPickerPage({
     super.key,
@@ -39,9 +38,9 @@ class LocationPickerPage extends StatelessWidget {
           if (context.mounted) Navigator.of(context).pop();
         },
         onError: (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Map error: $e')),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text('Map error: $e')));
         },
       ),
     );

@@ -8,14 +8,8 @@ import 'package:kaarya/features/interviews/presentation/pages/create_interview_m
 import 'package:kaarya/features/interviews/presentation/pages/interview_detail_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Create Interview page – form-based creation only.
-/// Used by: candidates (from AI Interview Hub), recruiters, and colleges (from Interview Management).
 class CreateInterviewPage extends ConsumerWidget {
-  const CreateInterviewPage({
-    super.key,
-    this.companyId,
-    this.collegeId,
-  });
+  const CreateInterviewPage({super.key, this.companyId, this.collegeId});
 
   final String? companyId;
   final String? collegeId;

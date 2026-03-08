@@ -40,7 +40,6 @@ class ApiClient {
       ),
     );
 
-    // Auto retry on network failures
     _dio.interceptors.add(
       RetryInterceptor(
         dio: _dio,
@@ -51,7 +50,6 @@ class ApiClient {
           Duration(seconds: 3),
         ],
         retryEvaluator: (error, attempt) {
-          // Retry on connection errors and timeouts, not on 4xx/5xx
           return error.type == DioExceptionType.connectionTimeout ||
               error.type == DioExceptionType.sendTimeout ||
               error.type == DioExceptionType.receiveTimeout ||
@@ -146,10 +144,15 @@ class ApiClient {
     Options? options,
     ProgressCallback? onSendProgress,
   }) async {
-    return _dio.post(
+    final requestOptions = (options ?? Options()).copyWith(
+      method: options?.method ?? 'POST',
+      contentType: 'multipart/form-data',
+    );
+
+    return _dio.request(
       path,
       data: formData,
-      options: options,
+      options: requestOptions,
       onSendProgress: onSendProgress,
     );
   }

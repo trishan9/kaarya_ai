@@ -15,8 +15,6 @@ import 'package:kaarya/features/interviews/presentation/pages/interview_detail_p
 import 'package:kaarya/features/interviews/presentation/pages/interview_feedback_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-// ─── Sort ─────────────────────────────────────────────────────────────────────
-
 enum _SortValue {
   recentlyCreated,
   scoreHighToLow,
@@ -42,8 +40,6 @@ extension _SortValueLabel on _SortValue {
   }
 }
 
-// ─── Page ─────────────────────────────────────────────────────────────────────
-
 class MyInterviewsPage extends ConsumerStatefulWidget {
   const MyInterviewsPage({super.key});
 
@@ -52,7 +48,7 @@ class MyInterviewsPage extends ConsumerStatefulWidget {
 }
 
 class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
-  int _tabIndex = 0; // 0 = Taken, 1 = Created
+  int _tabIndex = 0;
   _SortValue _sort = _SortValue.recentlyCreated;
   String _search = '';
   final TextEditingController _searchCtrl = TextEditingController();
@@ -97,8 +93,9 @@ class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
         result.sort((a, b) => b.createdAt.compareTo(a.createdAt));
       case _SortValue.scoreHighToLow:
         result.sort(
-          (a, b) => (b.myLatestScore ?? double.negativeInfinity)
-              .compareTo(a.myLatestScore ?? double.negativeInfinity),
+          (a, b) => (b.myLatestScore ?? double.negativeInfinity).compareTo(
+            a.myLatestScore ?? double.negativeInfinity,
+          ),
         );
       case _SortValue.mostAttempted:
         result.sort((a, b) => b.attemptsCount.compareTo(a.attemptsCount));
@@ -157,7 +154,6 @@ class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
           children: [
             _HeroBanner(data: data),
             const SizedBox(height: 14),
-            // Tab bar
             _TabRow(
               selected: _tabIndex,
               takenCount: takenCount,
@@ -169,7 +165,6 @@ class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
               }),
             ),
             const SizedBox(height: 10),
-            // Toolbar: Search + Sort
             _Toolbar(
               searchCtrl: _searchCtrl,
               sortValue: _sort,
@@ -177,7 +172,6 @@ class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
               onSortChanged: (v) => setState(() => _sort = v),
             ),
             const SizedBox(height: 10),
-            // Content
             if (isLoading)
               const SizedBox(height: 260, child: LoaderWidget())
             else if (isError)
@@ -202,16 +196,17 @@ class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
                       context,
                       InterviewDetailPage(interview: interview),
                     ),
-                    onViewResults: interview.hasAttempted &&
+                    onViewResults:
+                        interview.hasAttempted &&
                             interview.myLatestSessionId != null
                         ? () => AppRoutes.push(
-                              context,
-                              InterviewFeedbackPage(
-                                sessionId: interview.myLatestSessionId!,
-                                interviewId: interview.id,
-                                immediate: true,
-                              ),
-                            )
+                            context,
+                            InterviewFeedbackPage(
+                              sessionId: interview.myLatestSessionId!,
+                              interviewId: interview.id,
+                              immediate: true,
+                            ),
+                          )
                         : null,
                   ),
                 ),
@@ -232,8 +227,6 @@ class _MyInterviewsPageState extends ConsumerState<MyInterviewsPage> {
   }
 }
 
-// ─── Hero Banner ──────────────────────────────────────────────────────────────
-
 class _HeroBanner extends StatelessWidget {
   final InterviewsSectionEntity? data;
   const _HeroBanner({required this.data});
@@ -243,9 +236,8 @@ class _HeroBanner extends StatelessWidget {
     final takenCount = data?.takenByMe.length ?? 0;
     final createdCount = data?.createdByMe.length ?? 0;
     final avgScore = data?.averageScore ?? 0.0;
-    final totalAttempts = data?.takenByMe
-            .fold<int>(0, (sum, i) => sum + i.attemptsCount) ??
-        0;
+    final totalAttempts =
+        data?.takenByMe.fold<int>(0, (sum, i) => sum + i.attemptsCount) ?? 0;
 
     return Container(
       decoration: BoxDecoration(
@@ -289,8 +281,11 @@ class _HeroBanner extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(LucideIcons.calendarCheck,
-                        size: 16, color: Colors.white),
+                    const Icon(
+                      LucideIcons.calendarCheck,
+                      size: 16,
+                      color: Colors.white,
+                    ),
                     const SizedBox(width: 8),
                     const Text(
                       'My Interview History',
@@ -397,8 +392,6 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-// ─── Tab Row ──────────────────────────────────────────────────────────────────
-
 class _TabRow extends StatelessWidget {
   final int selected;
   final int takenCount;
@@ -414,10 +407,7 @@ class _TabRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tabs = [
-      ('Taken by Me', takenCount),
-      ('Created by Me', createdCount),
-    ];
+    final tabs = [('Taken by Me', takenCount), ('Created by Me', createdCount)];
 
     return SizedBox(
       height: 38,
@@ -433,8 +423,10 @@ class _TabRow extends StatelessWidget {
               onTap: () => onSelected(i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.primary : Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -454,15 +446,16 @@ class _TabRow extends StatelessWidget {
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.w500,
-                        color:
-                            isSelected ? Colors.white : AppColors.textMedium,
+                        color: isSelected ? Colors.white : AppColors.textMedium,
                       ),
                     ),
                     if (count > 0) ...[
                       const SizedBox(width: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
+                          horizontal: 6,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? Colors.white.withAlpha(50)
@@ -474,8 +467,9 @@ class _TabRow extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            color:
-                                isSelected ? Colors.white : AppColors.primary,
+                            color: isSelected
+                                ? Colors.white
+                                : AppColors.primary,
                           ),
                         ),
                       ),
@@ -490,8 +484,6 @@ class _TabRow extends StatelessWidget {
     );
   }
 }
-
-// ─── Toolbar ──────────────────────────────────────────────────────────────────
 
 class _Toolbar extends StatelessWidget {
   final TextEditingController searchCtrl;
@@ -522,19 +514,26 @@ class _Toolbar extends StatelessWidget {
               children: [
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10),
-                  child: Icon(LucideIcons.search,
-                      size: 15, color: AppColors.textLight),
+                  child: Icon(
+                    LucideIcons.search,
+                    size: 15,
+                    color: AppColors.textLight,
+                  ),
                 ),
                 Expanded(
                   child: TextField(
                     controller: searchCtrl,
                     onChanged: onSearchChanged,
                     style: const TextStyle(
-                        fontSize: 13, color: AppColors.textDark),
+                      fontSize: 13,
+                      color: AppColors.textDark,
+                    ),
                     decoration: const InputDecoration(
                       hintText: 'Search interviews...',
                       hintStyle: TextStyle(
-                          fontSize: 13, color: AppColors.textLight),
+                        fontSize: 13,
+                        color: AppColors.textLight,
+                      ),
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
@@ -551,8 +550,9 @@ class _Toolbar extends StatelessWidget {
         PopupMenuButton<_SortValue>(
           initialValue: sortValue,
           onSelected: onSortChanged,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           offset: const Offset(0, 40),
           itemBuilder: (_) => _SortValue.values
               .map(
@@ -563,14 +563,21 @@ class _Toolbar extends StatelessWidget {
                       if (v == sortValue)
                         const Padding(
                           padding: EdgeInsets.only(right: 8),
-                          child: Icon(LucideIcons.check,
-                              size: 13, color: AppColors.primary),
+                          child: Icon(
+                            LucideIcons.check,
+                            size: 13,
+                            color: AppColors.primary,
+                          ),
                         )
                       else
                         const SizedBox(width: 21),
-                      Text(v.label,
-                          style: const TextStyle(
-                              fontSize: 13, color: AppColors.textDark)),
+                      Text(
+                        v.label,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textDark,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -587,8 +594,11 @@ class _Toolbar extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(LucideIcons.arrowUpDown,
-                    size: 14, color: AppColors.textMedium),
+                const Icon(
+                  LucideIcons.arrowUpDown,
+                  size: 14,
+                  color: AppColors.textMedium,
+                ),
                 const SizedBox(width: 6),
                 const Text(
                   'Sort',
@@ -606,8 +616,6 @@ class _Toolbar extends StatelessWidget {
     );
   }
 }
-
-// ─── Interview Card ───────────────────────────────────────────────────────────
 
 class _InterviewCard extends StatelessWidget {
   final InterviewEntity interview;
@@ -628,12 +636,12 @@ class _InterviewCard extends StatelessWidget {
     final scoreColor = score == null
         ? AppColors.textLight
         : score >= 85
-            ? const Color(0xFF16A34A)
-            : score >= 70
-                ? const Color(0xFF0D6FAE)
-                : score >= 55
-                    ? const Color(0xFFD97706)
-                    : const Color(0xFFDC2626);
+        ? const Color(0xFF16A34A)
+        : score >= 70
+        ? const Color(0xFF0D6FAE)
+        : score >= 55
+        ? const Color(0xFFD97706)
+        : const Color(0xFFDC2626);
 
     return GestureDetector(
       onTap: onTap,
@@ -659,8 +667,9 @@ class _InterviewCard extends StatelessWidget {
                 color: interview.hasAttempted
                     ? const Color(0xFF16A34A)
                     : const Color(0xFF0D6FAE),
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(12)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(12),
+                ),
               ),
             ),
             Padding(
@@ -668,7 +677,6 @@ class _InterviewCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Header row
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -698,10 +706,11 @@ class _InterviewCard extends StatelessWidget {
                                   ),
                                 ),
                                 const SizedBox(width: 8),
-                                // Attempt status badge
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 4),
+                                    horizontal: 8,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: interview.hasAttempted
                                         ? const Color(0xFFF0FDF4)
@@ -743,26 +752,29 @@ class _InterviewCard extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 10),
-                  // Meta pills
                   Wrap(
                     spacing: 6,
                     runSpacing: 6,
                     children: [
                       _Pill(
-                          icon: LucideIcons.tag,
-                          text: interview.interviewType),
+                        icon: LucideIcons.tag,
+                        text: interview.interviewType,
+                      ),
                       _Pill(
-                          icon: LucideIcons.user,
-                          text: interview.role.isNotEmpty
-                              ? interview.role
-                              : 'General'),
+                        icon: LucideIcons.user,
+                        text: interview.role.isNotEmpty
+                            ? interview.role
+                            : 'General',
+                      ),
                       _Pill(
-                          icon: LucideIcons.repeat,
-                          text:
-                              '${interview.attemptsCount} attempt${interview.attemptsCount == 1 ? '' : 's'}'),
+                        icon: LucideIcons.repeat,
+                        text:
+                            '${interview.attemptsCount} attempt${interview.attemptsCount == 1 ? '' : 's'}',
+                      ),
                       _Pill(
-                          icon: LucideIcons.calendar,
-                          text: _fmtDate(interview.createdAt)),
+                        icon: LucideIcons.calendar,
+                        text: _fmtDate(interview.createdAt),
+                      ),
                       if (score != null)
                         _ScorePill(score: score, color: scoreColor),
                     ],
@@ -770,7 +782,6 @@ class _InterviewCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   const Divider(height: 1, color: Color(0xFFF5F5F5)),
                   const SizedBox(height: 10),
-                  // Action row
                   Row(
                     children: [
                       Expanded(
@@ -792,8 +803,7 @@ class _InterviewCard extends StatelessWidget {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            padding:
-                                const EdgeInsets.symmetric(vertical: 10),
+                            padding: const EdgeInsets.symmetric(vertical: 10),
                           ),
                         ),
                       ),
@@ -802,21 +812,18 @@ class _InterviewCard extends StatelessWidget {
                         Expanded(
                           child: OutlinedButton.icon(
                             onPressed: onViewResults,
-                            icon: const Icon(LucideIcons.chartBar,
-                                size: 14),
+                            icon: const Icon(LucideIcons.chartBar, size: 14),
                             label: const Text(
                               'Results',
                               style: TextStyle(fontWeight: FontWeight.w600),
                             ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.textDark,
-                              side: const BorderSide(
-                                  color: Color(0xFFCBD5E1)),
+                              side: const BorderSide(color: Color(0xFFCBD5E1)),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 10),
+                              padding: const EdgeInsets.symmetric(vertical: 10),
                             ),
                           ),
                         ),
@@ -848,13 +855,11 @@ class _InterviewCard extends StatelessWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     return '${m[d.month]} ${d.day}';
   }
 }
-
-// ─── Company Avatar ───────────────────────────────────────────────────────────
 
 class _CompanyAvatar extends StatelessWidget {
   final String name;
@@ -913,8 +918,6 @@ class _CompanyAvatar extends StatelessWidget {
     );
   }
 }
-
-// ─── Pill Widgets ─────────────────────────────────────────────────────────────
 
 class _Pill extends StatelessWidget {
   final IconData icon;
@@ -989,8 +992,6 @@ class _ScorePill extends StatelessWidget {
   }
 }
 
-// ─── Detail Bottom Sheet ──────────────────────────────────────────────────────
-
 class _DetailSheet extends ConsumerStatefulWidget {
   final InterviewEntity interview;
   const _DetailSheet({required this.interview});
@@ -1034,12 +1035,12 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
     final scoreColor = score == null
         ? AppColors.textLight
         : score >= 85
-            ? const Color(0xFF16A34A)
-            : score >= 70
-                ? const Color(0xFF0D6FAE)
-                : score >= 55
-                    ? const Color(0xFFD97706)
-                    : const Color(0xFFDC2626);
+        ? const Color(0xFF16A34A)
+        : score >= 70
+        ? const Color(0xFF0D6FAE)
+        : score >= 55
+        ? const Color(0xFFD97706)
+        : const Color(0xFFDC2626);
 
     return DraggableScrollableSheet(
       initialChildSize: 0.82,
@@ -1065,10 +1066,11 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                 ),
               ),
               const SizedBox(height: 4),
-              // Header
               Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 12,
+                ),
                 child: Row(
                   children: [
                     const Text(
@@ -1081,8 +1083,11 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                     ),
                     const Spacer(),
                     IconButton(
-                      icon: const Icon(LucideIcons.x,
-                          size: 18, color: AppColors.textMedium),
+                      icon: const Icon(
+                        LucideIcons.x,
+                        size: 18,
+                        color: AppColors.textMedium,
+                      ),
                       onPressed: () => Navigator.of(context).pop(),
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
@@ -1096,7 +1101,6 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
                   children: [
-                    // Gradient info card
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
@@ -1134,7 +1138,8 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                             children: [
                               _WhiteBadge(interview.interviewType),
                               _WhiteBadge(
-                                  '${interview.attemptsCount} attempt${interview.attemptsCount == 1 ? '' : 's'}'),
+                                '${interview.attemptsCount} attempt${interview.attemptsCount == 1 ? '' : 's'}',
+                              ),
                               if (score != null)
                                 _WhiteBadge('${score.round()}/100'),
                             ],
@@ -1144,21 +1149,19 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                     ),
                     const SizedBox(height: 14),
 
-                    // Tech Stack
                     if (interview.techStack.isNotEmpty) ...[
                       _SectionLabel('Tech Stack'),
                       const SizedBox(height: 8),
                       Wrap(
                         spacing: 6,
                         runSpacing: 6,
-                        children: interview.techStack
-                            .asMap()
-                            .entries
-                            .map((entry) {
+                        children: interview.techStack.asMap().entries.map((
+                          entry,
+                        ) {
                           final idx = entry.key;
                           final tech = entry.value;
-                          final iconUrl = idx <
-                                  interview.techStackIconUrls.length
+                          final iconUrl =
+                              idx < interview.techStackIconUrls.length
                               ? interview.techStackIconUrls[idx]
                               : null;
                           return _TechChip(name: tech, iconUrl: iconUrl);
@@ -1167,7 +1170,6 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                       const SizedBox(height: 14),
                     ],
 
-                    // Score details (if attempted)
                     if (score != null) ...[
                       _SectionLabel('Latest Score'),
                       const SizedBox(height: 8),
@@ -1176,13 +1178,11 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                         decoration: BoxDecoration(
                           color: scoreColor.withAlpha(15),
                           borderRadius: BorderRadius.circular(10),
-                          border:
-                              Border.all(color: scoreColor.withAlpha(60)),
+                          border: Border.all(color: scoreColor.withAlpha(60)),
                         ),
                         child: Row(
                           children: [
-                            Icon(LucideIcons.star,
-                                size: 20, color: scoreColor),
+                            Icon(LucideIcons.star, size: 20, color: scoreColor),
                             const SizedBox(width: 12),
                             Text(
                               '${score.round()} / 100',
@@ -1195,7 +1195,9 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                             const Spacer(),
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
                               decoration: BoxDecoration(
                                 color: scoreColor.withAlpha(25),
                                 borderRadius: BorderRadius.circular(6),
@@ -1215,7 +1217,6 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                       const SizedBox(height: 14),
                     ],
 
-                    // Recent Attempts
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -1223,10 +1224,11 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                         if (_sessions != null)
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 8, vertical: 3),
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: AppColors.borderStroke),
+                              border: Border.all(color: AppColors.borderStroke),
                               borderRadius: BorderRadius.circular(10),
                             ),
                             child: Text(
@@ -1271,19 +1273,21 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                         ),
                       )
                     else
-                      ..._sessions!.map((session) => _SessionRow(session: session)),
+                      ..._sessions!.map(
+                        (session) => _SessionRow(session: session),
+                      ),
 
                     const SizedBox(height: 20),
                   ],
                 ),
               ),
-              // Action footer
               Container(
                 padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   border: Border(
-                      top: BorderSide(color: AppColors.borderStroke)),
+                    top: BorderSide(color: AppColors.borderStroke),
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -1341,7 +1345,9 @@ class _DetailSheetState extends ConsumerState<_DetailSheet> {
                           foregroundColor: AppColors.textDark,
                           side: const BorderSide(color: Color(0xFFCBD5E1)),
                           padding: const EdgeInsets.symmetric(
-                              vertical: 13, horizontal: 16),
+                            vertical: 13,
+                            horizontal: 16,
+                          ),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
@@ -1430,8 +1436,11 @@ class _TechChip extends StatelessWidget {
               height: 14,
               child: iconUrl!.endsWith('.svg') || iconUrl!.contains('/svg/')
                   ? SvgPicture.network(iconUrl!, fit: BoxFit.contain)
-                  : Image.network(iconUrl!, fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => const SizedBox()),
+                  : Image.network(
+                      iconUrl!,
+                      fit: BoxFit.contain,
+                      errorBuilder: (_, __, ___) => const SizedBox(),
+                    ),
             ),
             const SizedBox(width: 5),
           ],
@@ -1459,12 +1468,12 @@ class _SessionRow extends ConsumerWidget {
     final scoreColor = score == null
         ? AppColors.textLight
         : score >= 85
-            ? const Color(0xFF16A34A)
-            : score >= 70
-                ? const Color(0xFF0D6FAE)
-                : score >= 55
-                    ? const Color(0xFFD97706)
-                    : const Color(0xFFDC2626);
+        ? const Color(0xFF16A34A)
+        : score >= 70
+        ? const Color(0xFF0D6FAE)
+        : score >= 55
+        ? const Color(0xFFD97706)
+        : const Color(0xFFDC2626);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -1503,8 +1512,7 @@ class _SessionRow extends ConsumerWidget {
           Row(
             children: [
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: score != null
                       ? scoreColor.withAlpha(20)
@@ -1526,12 +1534,17 @@ class _SessionRow extends ConsumerWidget {
                   Navigator.of(context).pop();
                   AppRoutes.push(
                     context,
-                    InterviewFeedbackPage(sessionId: session.id, immediate: true),
+                    InterviewFeedbackPage(
+                      sessionId: session.id,
+                      immediate: true,
+                    ),
                   );
                 },
                 child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 5,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(6),
@@ -1570,7 +1583,7 @@ class _SessionRow extends ConsumerWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     final hour = d.hour % 12 == 0 ? 12 : d.hour % 12;
     final ampm = d.hour < 12 ? 'AM' : 'PM';
@@ -1578,8 +1591,6 @@ class _SessionRow extends ConsumerWidget {
     return '${m[d.month]} ${d.day}, ${d.year} · $hour:$min $ampm';
   }
 }
-
-// ─── Empty State ──────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   final bool isSearch;
@@ -1620,10 +1631,9 @@ class _EmptyState extends StatelessWidget {
               isSearch
                   ? 'Try a different search term.'
                   : tabLabel == 'taken'
-                      ? 'Head to the Interview Hub to start your first mock interview!'
-                      : 'Interviews you create will appear here.',
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.textMedium),
+                  ? 'Head to the Interview Hub to start your first mock interview!'
+                  : 'Interviews you create will appear here.',
+              style: const TextStyle(fontSize: 13, color: AppColors.textMedium),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1632,8 +1642,6 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-
-// ─── Error Block ──────────────────────────────────────────────────────────────
 
 class _ErrorBlock extends StatelessWidget {
   final String message;
@@ -1647,13 +1655,15 @@ class _ErrorBlock extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            const Icon(LucideIcons.circleAlert,
-                size: 36, color: AppColors.error),
+            const Icon(
+              LucideIcons.circleAlert,
+              size: 36,
+              color: AppColors.error,
+            ),
             const SizedBox(height: 12),
             Text(
               message,
-              style: const TextStyle(
-                  color: AppColors.textMedium, fontSize: 14),
+              style: const TextStyle(color: AppColors.textMedium, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

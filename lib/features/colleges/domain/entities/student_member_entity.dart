@@ -5,6 +5,8 @@ class StudentMemberEntity extends Equatable {
   final String name;
   final String email;
   final String? photo;
+  final String? program;
+  final int? year;
   final String joinedAt;
 
   const StudentMemberEntity({
@@ -12,9 +14,19 @@ class StudentMemberEntity extends Equatable {
     required this.name,
     required this.email,
     this.photo,
+    this.program,
+    this.year,
     required this.joinedAt,
   });
 
   @override
-  List<Object?> get props => [userId, name, email, photo, joinedAt];
+  List<Object?> get props => [
+    userId,
+    name,
+    email,
+    photo,
+    program,
+    year,
+    joinedAt,
+  ];
 }

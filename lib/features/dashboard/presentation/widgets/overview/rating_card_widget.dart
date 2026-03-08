@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class RatingCardWidget extends StatelessWidget {
@@ -35,12 +36,12 @@ class RatingCardWidget extends StatelessWidget {
     final bounded = rating.clamp(0, 100).toDouble();
 
     return Card(
-      color: Colors.white,
+      color: appSurfaceColor(context),
       elevation: 0,
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(10),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: appBorderColor(context)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
@@ -55,7 +56,7 @@ class RatingCardWidget extends StatelessWidget {
                   width: 34,
                   height: 34,
                   decoration: BoxDecoration(
-                    color: AppColors.bgSecondary,
+                    color: appSoftSurfaceColor(context),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   child: const Icon(
@@ -105,15 +106,15 @@ class RatingCardWidget extends StatelessWidget {
               child: LinearProgressIndicator(
                 minHeight: 7,
                 value: bounded / 100,
-                backgroundColor: AppColors.borderStroke2,
+                backgroundColor: appSubtleBorderColor(context),
                 valueColor: AlwaysStoppedAnimation<Color>(ratingColor),
               ),
             ),
             const SizedBox(height: 10),
             Text(
               description,
-              style: const TextStyle(
-                color: AppColors.textMedium,
+              style: TextStyle(
+                color: appTextSecondaryColor(context),
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
@@ -123,9 +124,9 @@ class RatingCardWidget extends StatelessWidget {
               width: double.infinity,
               padding: const EdgeInsets.fromLTRB(12, 10, 12, 10),
               decoration: BoxDecoration(
-                color: AppColors.bgSecondary,
+                color: appSoftSurfaceColor(context),
                 borderRadius: BorderRadius.circular(6),
-                border: Border.all(color: AppColors.borderStroke2),
+                border: Border.all(color: appSubtleBorderColor(context)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,8 +142,8 @@ class RatingCardWidget extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     suggestionBody,
-                    style: const TextStyle(
-                      color: AppColors.textMedium,
+                    style: TextStyle(
+                      color: appTextSecondaryColor(context),
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
@@ -160,7 +161,7 @@ class RatingCardWidget extends StatelessWidget {
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.primary),
                   foregroundColor: AppColors.primary,
-                  backgroundColor: const Color(0xFFE7F2F8),
+                  backgroundColor: appSoftSurfaceColor(context),
                   padding: const EdgeInsets.symmetric(vertical: 11),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),

@@ -26,7 +26,9 @@ class _ResourceCourseDetailPageState
   void initState() {
     super.initState();
     Future.microtask(() {
-      ref.read(resourceViewModelProvider.notifier).loadCourseDetail(widget.courseId);
+      ref
+          .read(resourceViewModelProvider.notifier)
+          .loadCourseDetail(widget.courseId);
     });
   }
 
@@ -69,8 +71,6 @@ class _ResourceCourseDetailPageState
     );
   }
 
-  // ─── Full content ────────────────────────────────────────────────────────
-
   Widget _buildContent(ResourceCourseEntity course) {
     final completedCount = _completedChapters.length;
     final totalChapters = course.chapters.length;
@@ -79,7 +79,6 @@ class _ResourceCourseDetailPageState
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
       children: [
-        // ── Title section ───────────────────────────────────────────────────
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -98,7 +97,9 @@ class _ResourceCourseDetailPageState
               runSpacing: 6,
               children: [
                 _badge(
-                  course.generationMode == 'interview_prep' ? 'Interview Prep' : 'Learn',
+                  course.generationMode == 'interview_prep'
+                      ? 'Interview Prep'
+                      : 'Learn',
                   icon: course.generationMode == 'interview_prep'
                       ? LucideIcons.messageSquare
                       : LucideIcons.bookOpen,
@@ -106,16 +107,19 @@ class _ResourceCourseDetailPageState
                 _badge(_capitalize(course.difficulty)),
                 _badge(
                   course.visibility == 'public' ? 'Public' : 'Private',
-                  icon: course.visibility == 'public' ? LucideIcons.globe : LucideIcons.lock,
+                  icon: course.visibility == 'public'
+                      ? LucideIcons.globe
+                      : LucideIcons.lock,
                 ),
-                ...course.targetRoles.take(2).map((r) => _badge(r, small: true)),
+                ...course.targetRoles
+                    .take(2)
+                    .map((r) => _badge(r, small: true)),
               ],
             ),
           ],
         ),
         const SizedBox(height: 16),
 
-        // ── Progress Bar ────────────────────────────────────────────────────
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -131,11 +135,18 @@ class _ResourceCourseDetailPageState
                 children: [
                   const Text(
                     'Course Progress',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textDark),
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.textDark,
+                    ),
                   ),
                   Text(
                     '$completedCount / $totalChapters chapters',
-                    style: const TextStyle(fontSize: 12, color: AppColors.textLight),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textLight,
+                    ),
                   ),
                 ],
               ),
@@ -145,21 +156,25 @@ class _ResourceCourseDetailPageState
                 child: LinearProgressIndicator(
                   value: progress,
                   backgroundColor: AppColors.bgLight,
-                  valueColor: const AlwaysStoppedAnimation<Color>(AppColors.success2),
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.success2,
+                  ),
                   minHeight: 8,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 '${(progress * 100).round()}% complete',
-                style: const TextStyle(fontSize: 12, color: AppColors.textLight),
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textLight,
+                ),
               ),
             ],
           ),
         ),
         const SizedBox(height: 16),
 
-        // ── Description ─────────────────────────────────────────────────────
         if (course.description.isNotEmpty) ...[
           Container(
             padding: const EdgeInsets.all(12),
@@ -173,12 +188,20 @@ class _ResourceCourseDetailPageState
               children: [
                 const Text(
                   'Description',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textDark),
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textDark,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   course.description,
-                  style: const TextStyle(fontSize: 13, color: AppColors.textLight, height: 1.5),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    color: AppColors.textLight,
+                    height: 1.5,
+                  ),
                 ),
               ],
             ),
@@ -186,22 +209,26 @@ class _ResourceCourseDetailPageState
           const SizedBox(height: 16),
         ],
 
-        // ── Chapters ────────────────────────────────────────────────────────
         const Text(
           'Learning Path',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: AppColors.textDark),
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
+            color: AppColors.textDark,
+          ),
         ),
         const SizedBox(height: 10),
-        ...course.chapters.asMap().entries.map((entry) => _buildChapterTile(entry.key, entry.value)),
+        ...course.chapters.asMap().entries.map(
+          (entry) => _buildChapterTile(entry.key, entry.value),
+        ),
       ],
     );
   }
 
-  // ─── Chapter Tile ───────────────────────────────────────────────────────
-
   Widget _buildChapterTile(int index, CourseChapterEntity chapter) {
     final isCompleted = _completedChapters.contains(index);
-    final hasContent = chapter.sections.isNotEmpty ||
+    final hasContent =
+        chapter.sections.isNotEmpty ||
         chapter.coreConcepts.isNotEmpty ||
         chapter.interviewQuestions.isNotEmpty ||
         chapter.practicePrompts.isNotEmpty;
@@ -240,7 +267,11 @@ class _ResourceCourseDetailPageState
               const SizedBox(height: 2),
               Text(
                 chapter.title,
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.textDark),
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.textDark,
+                ),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -248,7 +279,10 @@ class _ResourceCourseDetailPageState
           ),
           trailing: isCompleted
               ? Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: const Color(0xFFDCFCE7),
                     borderRadius: BorderRadius.circular(20),
@@ -256,7 +290,11 @@ class _ResourceCourseDetailPageState
                   child: const Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(LucideIcons.check, size: 11, color: AppColors.success2),
+                      Icon(
+                        LucideIcons.check,
+                        size: 11,
+                        color: AppColors.success2,
+                      ),
                       SizedBox(width: 3),
                       Text(
                         'Done',
@@ -281,9 +319,12 @@ class _ResourceCourseDetailPageState
                     padding: EdgeInsets.all(12),
                     child: Text(
                       'No content available.',
-                      style: TextStyle(fontSize: 13, color: AppColors.textLight),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: AppColors.textLight,
+                      ),
                     ),
-                  )
+                  ),
                 ],
         ),
       ),
@@ -303,7 +344,6 @@ class _ResourceCourseDetailPageState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Complete button ───────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.fromLTRB(12, 10, 12, 0),
             child: Row(
@@ -312,13 +352,22 @@ class _ResourceCourseDetailPageState
                 OutlinedButton.icon(
                   onPressed: () => _toggleChapter(index),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 0,
+                    ),
                     minimumSize: const Size(0, 32),
                     side: BorderSide(
-                      color: isCompleted ? AppColors.success2 : AppColors.borderStroke,
+                      color: isCompleted
+                          ? AppColors.success2
+                          : AppColors.borderStroke,
                     ),
-                    foregroundColor: isCompleted ? AppColors.success2 : AppColors.textLight,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                    foregroundColor: isCompleted
+                        ? AppColors.success2
+                        : AppColors.textLight,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(6),
+                    ),
                   ),
                   icon: Icon(
                     isCompleted ? LucideIcons.check : LucideIcons.check,
@@ -326,41 +375,40 @@ class _ResourceCourseDetailPageState
                   ),
                   label: Text(
                     isCompleted ? 'Completed' : 'Mark Done',
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ],
             ),
           ),
 
-          // ── Content ──────────────────────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Reading Material
                 if (chapter.sections.isNotEmpty) ...[
                   _sectionHeader('READING MATERIAL', LucideIcons.fileText),
                   ...chapter.sections.map((s) => _buildSection(s)),
                 ],
 
-                // Core Concepts
                 if (chapter.coreConcepts.isNotEmpty) ...[
                   if (chapter.sections.isNotEmpty) const SizedBox(height: 12),
                   _sectionHeader('CORE CONCEPTS', LucideIcons.brain),
                   ...chapter.coreConcepts.map((c) => _buildCoreConcept(c)),
                 ],
 
-                // Interview Q&A
                 if (chapter.interviewQuestions.isNotEmpty) ...[
-                  if (chapter.sections.isNotEmpty || chapter.coreConcepts.isNotEmpty)
+                  if (chapter.sections.isNotEmpty ||
+                      chapter.coreConcepts.isNotEmpty)
                     const SizedBox(height: 12),
                   _sectionHeader('INTERVIEW Q&A', LucideIcons.messageSquare),
                   ...chapter.interviewQuestions.map((q) => _buildQA(q)),
                 ],
 
-                // Practice Prompts
                 if (chapter.practicePrompts.isNotEmpty) ...[
                   if (chapter.sections.isNotEmpty ||
                       chapter.coreConcepts.isNotEmpty ||
@@ -368,8 +416,8 @@ class _ResourceCourseDetailPageState
                     const SizedBox(height: 12),
                   _sectionHeader('PRACTICE PROMPTS', LucideIcons.zap),
                   ...chapter.practicePrompts.asMap().entries.map(
-                        (e) => _buildPromptItem(e.key + 1, e.value),
-                      ),
+                    (e) => _buildPromptItem(e.key + 1, e.value),
+                  ),
                 ],
               ],
             ),
@@ -408,29 +456,42 @@ class _ResourceCourseDetailPageState
         children: [
           Text(
             section.heading,
-            style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textDark),
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: AppColors.textDark,
+            ),
           ),
           if (section.subheadings.isNotEmpty) ...[
             const SizedBox(height: 6),
-            ...section.subheadings.map((sub) => Padding(
-              padding: const EdgeInsets.only(top: 4),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 5),
-                    child: CircleAvatar(radius: 2.5, backgroundColor: AppColors.textLight),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      sub,
-                      style: const TextStyle(fontSize: 13, color: AppColors.textLight, height: 1.5),
+            ...section.subheadings.map(
+              (sub) => Padding(
+                padding: const EdgeInsets.only(top: 4),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 5),
+                      child: CircleAvatar(
+                        radius: 2.5,
+                        backgroundColor: AppColors.textLight,
+                      ),
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        sub,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.textLight,
+                          height: 1.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            )),
+            ),
           ],
         ],
       ),
@@ -454,13 +515,20 @@ class _ResourceCourseDetailPageState
               Container(
                 width: 5,
                 height: 5,
-                decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
+                  shape: BoxShape.circle,
+                ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   concept.title,
-                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppColors.textDark),
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.textDark,
+                  ),
                 ),
               ),
             ],
@@ -469,7 +537,11 @@ class _ResourceCourseDetailPageState
             const SizedBox(height: 6),
             Text(
               concept.explanation,
-              style: const TextStyle(fontSize: 13, color: AppColors.textLight, height: 1.5),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textLight,
+                height: 1.5,
+              ),
             ),
           ],
         ],
@@ -522,7 +594,11 @@ class _ResourceCourseDetailPageState
                   const SizedBox(height: 3),
                   Text(
                     qa.sampleAnswer,
-                    style: const TextStyle(fontSize: 13, color: AppColors.textLight, height: 1.5),
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: AppColors.textLight,
+                      height: 1.5,
+                    ),
                   ),
                 ],
               ),
@@ -561,15 +637,17 @@ class _ResourceCourseDetailPageState
           Expanded(
             child: Text(
               prompt,
-              style: const TextStyle(fontSize: 13, color: AppColors.textLight, height: 1.4),
+              style: const TextStyle(
+                fontSize: 13,
+                color: AppColors.textLight,
+                height: 1.4,
+              ),
             ),
           ),
         ],
       ),
     );
   }
-
-  // ─── Helpers ────────────────────────────────────────────────────────────
 
   Widget _badge(String text, {IconData? icon, bool small = false}) {
     return Container(
@@ -609,7 +687,11 @@ class _ResourceCourseDetailPageState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.circleAlert, size: 48, color: AppColors.error.withAlpha(160)),
+            Icon(
+              LucideIcons.circleAlert,
+              size: 48,
+              color: AppColors.error.withAlpha(160),
+            ),
             const SizedBox(height: 12),
             Text(
               message ?? 'Failed to load course',
@@ -630,5 +712,6 @@ class _ResourceCourseDetailPageState
     );
   }
 
-  String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _capitalize(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }

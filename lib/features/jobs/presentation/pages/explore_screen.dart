@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
+import 'package:kaarya/app/theme/theme_utils.dart';
 import 'package:kaarya/core/utils/snackbar_utils.dart';
 import 'package:kaarya/core/widgets/job_card_widget.dart';
 import 'package:kaarya/core/widgets/loader_widget.dart';
@@ -90,6 +91,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   }
 
   Widget _buildHero() {
+    final isDark = isDarkMode(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -148,8 +150,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: isDark ? const Color(0xFF18222D) : Colors.white,
                   borderRadius: BorderRadius.circular(10),
+                  border: Border.all(
+                    color: isDark
+                        ? Colors.white.withAlpha(35)
+                        : Colors.transparent,
+                  ),
                 ),
                 child: Column(
                   children: [
@@ -161,7 +168,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     Divider(
                       height: 1,
                       thickness: 1,
-                      color: Colors.grey.shade200,
+                      color: isDark
+                          ? Colors.white.withAlpha(18)
+                          : Colors.grey.shade200,
                     ),
                     _heroField(
                       controller: _locationController,
@@ -247,7 +256,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 _labelForTab(tab),
                 style: TextStyle(
                   fontSize: 13,
-                  color: selected ? Colors.white : AppColors.textDark,
+                  color: selected ? Colors.white : appTextPrimaryColor(context),
                   fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
                 ),
               ),
@@ -265,9 +274,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                 _refreshJobsFromApi(forceRefresh: true);
               },
               selectedColor: AppColors.primary,
-              backgroundColor: Colors.white,
+              backgroundColor: appSurfaceColor(context),
               side: BorderSide(
-                color: selected ? AppColors.primary : const Color(0xFFE0E0E0),
+                color: selected ? AppColors.primary : appBorderColor(context),
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(6),
@@ -475,13 +484,13 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                       ),
                       decoration: BoxDecoration(
                         color: _sortBy == value
-                            ? const Color(0xFFF8F9FA)
-                            : Colors.white,
+                            ? appMutedSurfaceColor(context)
+                            : appSurfaceColor(context),
                         borderRadius: BorderRadius.circular(8),
                         border: Border.all(
                           color: _sortBy == value
                               ? AppColors.primary
-                              : const Color(0xFFF0F0F0),
+                              : appSubtleBorderColor(context),
                         ),
                       ),
                       child: Row(
@@ -495,7 +504,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                                     : FontWeight.w500,
                                 color: _sortBy == value
                                     ? AppColors.primary
-                                    : AppColors.textDark,
+                                    : appTextPrimaryColor(context),
                               ),
                             ),
                           ),
@@ -559,7 +568,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               Text(
                                 "Choose filters to narrow down matching roles",
                                 style: Theme.of(context).textTheme.bodySmall
-                                    ?.copyWith(color: AppColors.textMedium),
+                                    ?.copyWith(
+                                      color: appTextSecondaryColor(context),
+                                    ),
                               ),
                             ],
                           ),
@@ -570,9 +581,7 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                               });
                             },
                             style: OutlinedButton.styleFrom(
-                              side: const BorderSide(
-                                color: AppColors.borderStroke,
-                              ),
+                              side: BorderSide(color: appBorderColor(context)),
                             ),
                             child: const Text("Clear"),
                           ),
@@ -696,7 +705,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                     value,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isSelected ? Colors.white : AppColors.textDark,
+                      color: isSelected
+                          ? Colors.white
+                          : appTextPrimaryColor(context),
                       fontWeight: isSelected
                           ? FontWeight.w600
                           : FontWeight.w500,
@@ -713,11 +724,11 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
                   ),
                   onSelected: (checked) => onToggle(value, checked),
                   selectedColor: AppColors.primary,
-                  backgroundColor: Colors.white,
+                  backgroundColor: appSurfaceColor(context),
                   side: BorderSide(
                     color: isSelected
                         ? AppColors.primary
-                        : const Color(0xFFE0E0E0),
+                        : appBorderColor(context),
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(6),
@@ -752,16 +763,27 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
     required IconData icon,
     required String hint,
   }) {
+    final isDark = isDarkMode(context);
     return TextField(
       controller: controller,
-      style: const TextStyle(fontSize: 13),
+      style: TextStyle(
+        fontSize: 13,
+        color: isDark ? Colors.white : appTextPrimaryColor(context),
+      ),
       onSubmitted: (_) {
         _refreshJobsFromApi();
       },
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: AppColors.textMedium, fontSize: 13),
-        prefixIcon: Icon(icon, size: 18, color: AppColors.textMedium),
+        hintStyle: TextStyle(
+          color: isDark ? const Color(0xFF9BA9BA) : AppColors.textMedium,
+          fontSize: 13,
+        ),
+        prefixIcon: Icon(
+          icon,
+          size: 18,
+          color: isDark ? const Color(0xFF9BA9BA) : AppColors.textMedium,
+        ),
         border: InputBorder.none,
         enabledBorder: InputBorder.none,
         focusedBorder: InputBorder.none,
