@@ -35,45 +35,58 @@ void main() {
     container.dispose();
   });
 
-  test('CollegeDashboardViewModel should load workspaces and select first one', () async {
-    final workspace = buildCollegeWorkspaceEntity();
-    when(
-      () => mockCollegeRepository.listCollegeWorkspaces(
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-      ),
-    ).thenAnswer((_) async => Right([workspace]));
+  test(
+    'CollegeDashboardViewModel should load workspaces and select first one',
+    () async {
+      final workspace = buildCollegeWorkspaceEntity();
+      when(
+        () => mockCollegeRepository.listCollegeWorkspaces(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+        ),
+      ).thenAnswer((_) async => Right([workspace]));
 
-    final viewModel = container.read(collegeDashboardViewModelProvider.notifier);
-    await viewModel.loadWorkspaces();
+      final viewModel = container.read(
+        collegeDashboardViewModelProvider.notifier,
+      );
+      await viewModel.loadWorkspaces();
 
-    final state = container.read(collegeDashboardViewModelProvider);
-    expect(state.workspacesStatus, CollegeDashboardLoadStatus.loaded);
-    expect(state.selectedWorkspace, workspace);
-  });
+      final state = container.read(collegeDashboardViewModelProvider);
+      expect(state.workspacesStatus, CollegeDashboardLoadStatus.loaded);
+      expect(state.selectedWorkspace, workspace);
+    },
+  );
 
-  test('CollegeDashboardViewModel should join workspace and select refreshed college', () async {
-    final college = buildCollegeEntity();
-    final workspace = buildCollegeWorkspaceEntity();
-    when(() => mockCollegeRepository.joinByCode(any())).thenAnswer(
-      (_) async => Right(college),
-    );
-    when(
-      () => mockCollegeRepository.listCollegeWorkspaces(
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-      ),
-    ).thenAnswer((_) async => Right([workspace]));
+  test(
+    'CollegeDashboardViewModel should join workspace and select refreshed college',
+    () async {
+      final college = buildCollegeEntity();
+      final workspace = buildCollegeWorkspaceEntity();
+      when(
+        () => mockCollegeRepository.joinByCode(any()),
+      ).thenAnswer((_) async => Right(college));
+      when(
+        () => mockCollegeRepository.listCollegeWorkspaces(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+        ),
+      ).thenAnswer((_) async => Right([workspace]));
 
-    final viewModel = container.read(collegeDashboardViewModelProvider.notifier);
-    final result = await viewModel.joinWorkspace(inviteCode: 'COLLEGE123');
+      final viewModel = container.read(
+        collegeDashboardViewModelProvider.notifier,
+      );
+      final result = await viewModel.joinWorkspace(inviteCode: 'COLLEGE123');
 
-    expect(result, isNull);
-    expect(
-      container.read(collegeDashboardViewModelProvider).selectedWorkspace?.collegeId,
-      workspace.collegeId,
-    );
-  });
+      expect(result, isNull);
+      expect(
+        container
+            .read(collegeDashboardViewModelProvider)
+            .selectedWorkspace
+            ?.collegeId,
+        workspace.collegeId,
+      );
+    },
+  );
 
   test('CollegeDashboardViewModel should load college jobs', () async {
     final jobs = [buildJobEntity(), buildJobEntity(id: 'job-2')];
@@ -87,7 +100,9 @@ void main() {
       ),
     ).thenAnswer((_) async => Right(jobs));
 
-    final viewModel = container.read(collegeDashboardViewModelProvider.notifier);
+    final viewModel = container.read(
+      collegeDashboardViewModelProvider.notifier,
+    );
     await viewModel.loadCollegeJobs(collegeId: 'college-1');
 
     final state = container.read(collegeDashboardViewModelProvider);
@@ -96,14 +111,17 @@ void main() {
   });
 
   test('CollegeDashboardViewModel should compute overview data from jobs', () {
-    final viewModel = container.read(collegeDashboardViewModelProvider.notifier);
-    container.read(collegeDashboardViewModelProvider.notifier).state =
-        CollegeDashboardState(
-          collegeJobs: [
-            buildJobEntity(status: 'open', workMode: 'remote'),
-            buildJobEntity(id: 'job-2', status: 'draft', workMode: 'onsite'),
-          ],
-        );
+    final viewModel = container.read(
+      collegeDashboardViewModelProvider.notifier,
+    );
+    container
+        .read(collegeDashboardViewModelProvider.notifier)
+        .state = CollegeDashboardState(
+      collegeJobs: [
+        buildJobEntity(status: 'open', workMode: 'remote'),
+        buildJobEntity(id: 'job-2', status: 'draft', workMode: 'onsite'),
+      ],
+    );
 
     final overview = viewModel.computeOverviewData();
 
@@ -113,7 +131,9 @@ void main() {
   });
 
   test('CollegeDashboardViewModel should clear jobs and reset state', () {
-    final viewModel = container.read(collegeDashboardViewModelProvider.notifier);
+    final viewModel = container.read(
+      collegeDashboardViewModelProvider.notifier,
+    );
     viewModel.clearCollegeJobs();
     viewModel.resetState();
 

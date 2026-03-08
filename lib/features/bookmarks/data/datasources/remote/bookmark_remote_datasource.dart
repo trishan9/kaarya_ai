@@ -54,8 +54,8 @@ class BookmarkRemoteDataSource implements IBookmarkRemoteDataSource {
     final status = response.statusCode ?? 0;
     if (status < 200 || status >= 300) return false;
     final body = response.data;
-    if (body == null) return true; // e.g. 204 No Content
-    if (body is! Map) return true; // 2xx with non-map body, assume success
+    if (body == null) return true;
+    if (body is! Map) return true;
     final map = jsonCastMap(body);
     if (map['success'] == false) return false;
     if (map['success'] == true) return true;
@@ -65,7 +65,7 @@ class BookmarkRemoteDataSource implements IBookmarkRemoteDataSource {
       if (dataMap['success'] == false) return false;
       if (dataMap['success'] == true) return true;
     }
-    return true; // 2xx with no explicit failure
+    return true;
   }
 
   @override

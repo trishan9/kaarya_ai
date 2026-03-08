@@ -19,7 +19,7 @@ class CompanyJobsScreen extends ConsumerStatefulWidget {
 }
 
 class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
-  String _statusFilter = 'all'; // all, open, closed
+  String _statusFilter = 'all';
   final _searchController = TextEditingController();
 
   @override
@@ -30,7 +30,9 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
       final state = ref.read(recruiterViewModelProvider);
       final ws = state.selectedWorkspace ?? state.workspaces?.firstOrNull;
       if (ws != null) {
-        await ref.read(recruiterViewModelProvider.notifier).loadCompanyJobs(
+        await ref
+            .read(recruiterViewModelProvider.notifier)
+            .loadCompanyJobs(
               companyId: ws.companyId,
               companyName: ws.companyName,
               forceRefresh: true,
@@ -56,9 +58,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
     }
 
     if (workspace == null || state.workspaces!.isEmpty) {
-      return _EmptyWorkspaceState(
-        onCreateJob: () => _pushPostNewJob(context),
-      );
+      return _EmptyWorkspaceState(onCreateJob: () => _pushPostNewJob(context));
     }
 
     if (state.companyJobsStatus == RecruiterLoadStatus.loading &&
@@ -71,7 +71,9 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(recruiterViewModelProvider.notifier).loadCompanyJobs(
+        await ref
+            .read(recruiterViewModelProvider.notifier)
+            .loadCompanyJobs(
               companyId: workspace.companyId,
               companyName: workspace.companyName,
               search: _searchController.text.trim().isEmpty
@@ -195,11 +197,17 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                             vertical: 12,
                           ),
                         ),
-                        onSubmitted: (_) => _refreshWithFilters(workspace.companyId, workspace.companyName),
+                        onSubmitted: (_) => _refreshWithFilters(
+                          workspace.companyId,
+                          workspace.companyName,
+                        ),
                       ),
                       const SizedBox(height: 12),
                       MyButton(
-                        onPressed: () => _refreshWithFilters(workspace.companyId, workspace.companyName),
+                        onPressed: () => _refreshWithFilters(
+                          workspace.companyId,
+                          workspace.companyName,
+                        ),
                         text: 'Find Job',
                         icon: const Icon(
                           LucideIcons.search,
@@ -226,12 +234,18 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                             vertical: 12,
                           ),
                         ),
-                        onSubmitted: (_) => _refreshWithFilters(workspace.companyId, workspace.companyName),
+                        onSubmitted: (_) => _refreshWithFilters(
+                          workspace.companyId,
+                          workspace.companyName,
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     MyButton(
-                      onPressed: () => _refreshWithFilters(workspace.companyId, workspace.companyName),
+                      onPressed: () => _refreshWithFilters(
+                        workspace.companyId,
+                        workspace.companyName,
+                      ),
                       text: 'Find Job',
                       btnWidth: 116,
                       icon: const Icon(
@@ -257,8 +271,12 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                         'All Company Jobs',
                         style: TextStyle(
                           fontSize: 13,
-                          color: _statusFilter == 'all' ? Colors.white : AppColors.textDark,
-                          fontWeight: _statusFilter == 'all' ? FontWeight.w600 : FontWeight.w500,
+                          color: _statusFilter == 'all'
+                              ? Colors.white
+                              : AppColors.textDark,
+                          fontWeight: _statusFilter == 'all'
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                       selected: _statusFilter == 'all',
@@ -267,7 +285,10 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
                       labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       selectedColor: AppColors.primary,
                       backgroundColor: Colors.white,
                       side: BorderSide(
@@ -287,8 +308,12 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                         'Open Jobs',
                         style: TextStyle(
                           fontSize: 13,
-                          color: _statusFilter == 'open' ? Colors.white : AppColors.textDark,
-                          fontWeight: _statusFilter == 'open' ? FontWeight.w600 : FontWeight.w500,
+                          color: _statusFilter == 'open'
+                              ? Colors.white
+                              : AppColors.textDark,
+                          fontWeight: _statusFilter == 'open'
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                       selected: _statusFilter == 'open',
@@ -297,7 +322,10 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
                       labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       selectedColor: AppColors.primary,
                       backgroundColor: Colors.white,
                       side: BorderSide(
@@ -317,17 +345,25 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                         'Closed Jobs',
                         style: TextStyle(
                           fontSize: 13,
-                          color: _statusFilter == 'closed' ? Colors.white : AppColors.textDark,
-                          fontWeight: _statusFilter == 'closed' ? FontWeight.w600 : FontWeight.w500,
+                          color: _statusFilter == 'closed'
+                              ? Colors.white
+                              : AppColors.textDark,
+                          fontWeight: _statusFilter == 'closed'
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                         ),
                       ),
                       selected: _statusFilter == 'closed',
-                      onSelected: (_) => setState(() => _statusFilter = 'closed'),
+                      onSelected: (_) =>
+                          setState(() => _statusFilter = 'closed'),
                       showCheckmark: false,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
                       labelPadding: const EdgeInsets.symmetric(horizontal: 6),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
                       selectedColor: AppColors.primary,
                       backgroundColor: Colors.white,
                       side: BorderSide(
@@ -350,10 +386,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
                   padding: EdgeInsets.all(40),
                   child: Text(
                     'No jobs match your filters.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textMedium,
-                    ),
+                    style: TextStyle(fontSize: 16, color: AppColors.textMedium),
                   ),
                 ),
               )
@@ -385,9 +418,11 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
     final search = _searchController.text.trim().toLowerCase();
     if (search.isNotEmpty) {
       result = result
-          .where((j) =>
-              j.title.toLowerCase().contains(search) ||
-              j.companyName.toLowerCase().contains(search))
+          .where(
+            (j) =>
+                j.title.toLowerCase().contains(search) ||
+                j.companyName.toLowerCase().contains(search),
+          )
           .toList();
     }
 
@@ -395,7 +430,9 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
   }
 
   void _refreshWithFilters(String companyId, String companyName) {
-    ref.read(recruiterViewModelProvider.notifier).loadCompanyJobs(
+    ref
+        .read(recruiterViewModelProvider.notifier)
+        .loadCompanyJobs(
           companyId: companyId,
           companyName: companyName,
           search: _searchController.text.trim().isEmpty
@@ -413,10 +450,7 @@ class _CompanyJobsScreenState extends ConsumerState<CompanyJobsScreen> {
   void _pushManageJob(BuildContext context, JobEntity job) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ManageJobPage(
-          jobId: job.id,
-          jobTitle: job.title,
-        ),
+        builder: (_) => ManageJobPage(jobId: job.id, jobTitle: job.title),
       ),
     );
   }

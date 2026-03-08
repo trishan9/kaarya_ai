@@ -59,7 +59,6 @@ class BookmarkViewModel extends Notifier<BookmarkState> {
     return result.fold((_) => null, (ok) => ok);
   }
 
-  /// Optimistically remove item from list without refetching.
   void removeJobFromBookmarks(String jobId) {
     final b = state.bookmarks;
     if (b == null) return;
@@ -78,7 +77,9 @@ class BookmarkViewModel extends Notifier<BookmarkState> {
   void removeInterviewFromBookmarks(String interviewId) {
     final b = state.bookmarks;
     if (b == null) return;
-    final newInterviews = b.interviews.where((i) => i.id != interviewId).toList();
+    final newInterviews = b.interviews
+        .where((i) => i.id != interviewId)
+        .toList();
     state = state.copyWith(
       bookmarks: BookmarksListEntity(
         jobs: b.jobs,
@@ -93,7 +94,8 @@ class BookmarkViewModel extends Notifier<BookmarkState> {
   void addJobBackToBookmarks(JobEntity job) {
     final b = state.bookmarks;
     if (b == null) return;
-    final newJobs = [...b.jobs, job]..sort((a, c) => c.createdAt.compareTo(a.createdAt));
+    final newJobs = [...b.jobs, job]
+      ..sort((a, c) => c.createdAt.compareTo(a.createdAt));
     state = state.copyWith(
       bookmarks: BookmarksListEntity(
         jobs: newJobs,

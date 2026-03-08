@@ -20,9 +20,11 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_fixtures.dart';
 
-class MockApplicationRepository extends Mock implements IApplicationRepository {}
+class MockApplicationRepository extends Mock
+    implements IApplicationRepository {}
 
-class MockGetMyApplicationsUseCase extends Mock implements GetMyApplicationsUseCase {}
+class MockGetMyApplicationsUseCase extends Mock
+    implements GetMyApplicationsUseCase {}
 
 class MockGetApplicationsSummaryUseCase extends Mock
     implements GetApplicationsSummaryUseCase {}
@@ -127,7 +129,9 @@ void main() {
         updateApplicationUseCaseProvider.overrideWithValue(
           mockUpdateApplicationUseCase,
         ),
-        listMyResumesUseCaseProvider.overrideWithValue(mockListMyResumesUseCase),
+        listMyResumesUseCaseProvider.overrideWithValue(
+          mockListMyResumesUseCase,
+        ),
         uploadResumeUseCaseProvider.overrideWithValue(mockUploadResumeUseCase),
         deleteResumeUseCaseProvider.overrideWithValue(mockDeleteResumeUseCase),
         updateResumeActivityUseCaseProvider.overrideWithValue(
@@ -158,73 +162,87 @@ void main() {
     expect(state.summaryStatus, ApplicationLoadStatus.loaded);
   });
 
-  test('ApplicationViewModel should load application detail and job applicants', () async {
-    when(
-      () => mockGetApplicationForJobUseCase(any()),
-    ).thenAnswer((_) async => Right(buildApplicationEntity()));
-    when(
-      () => mockApplicationRepository.getJobApplicants(
-        jobId: any(named: 'jobId'),
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-        status: any(named: 'status'),
-      ),
-    ).thenAnswer((_) async => Right(buildJobApplicantsListEntity()));
+  test(
+    'ApplicationViewModel should load application detail and job applicants',
+    () async {
+      when(
+        () => mockGetApplicationForJobUseCase(any()),
+      ).thenAnswer((_) async => Right(buildApplicationEntity()));
+      when(
+        () => mockApplicationRepository.getJobApplicants(
+          jobId: any(named: 'jobId'),
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+        ),
+      ).thenAnswer((_) async => Right(buildJobApplicantsListEntity()));
 
-    final viewModel = container.read(applicationViewModelProvider.notifier);
-    await viewModel.loadApplicationForJob(jobId: 'job-1');
-    await viewModel.loadJobApplicants(jobId: 'job-1');
+      final viewModel = container.read(applicationViewModelProvider.notifier);
+      await viewModel.loadApplicationForJob(jobId: 'job-1');
+      await viewModel.loadJobApplicants(jobId: 'job-1');
 
-    final state = container.read(applicationViewModelProvider);
-    expect(state.applicationForJobStatus, ApplicationLoadStatus.loaded);
-    expect(state.jobApplicantsStatus, ApplicationLoadStatus.loaded);
-  });
+      final state = container.read(applicationViewModelProvider);
+      expect(state.applicationForJobStatus, ApplicationLoadStatus.loaded);
+      expect(state.jobApplicantsStatus, ApplicationLoadStatus.loaded);
+    },
+  );
 
-  test('ApplicationViewModel should update resume list on upload and delete', () async {
-    final resume = buildResumeEntity();
-    when(
-      () => mockListMyResumesUseCase(any()),
-    ).thenAnswer((_) async => Right([resume]));
-    when(
-      () => mockUploadResumeUseCase(any()),
-    ).thenAnswer((_) async => Right(buildResumeEntity(id: 'resume-2')));
-    when(
-      () => mockDeleteResumeUseCase(any()),
-    ).thenAnswer((_) async => const Right(true));
+  test(
+    'ApplicationViewModel should update resume list on upload and delete',
+    () async {
+      final resume = buildResumeEntity();
+      when(
+        () => mockListMyResumesUseCase(any()),
+      ).thenAnswer((_) async => Right([resume]));
+      when(
+        () => mockUploadResumeUseCase(any()),
+      ).thenAnswer((_) async => Right(buildResumeEntity(id: 'resume-2')));
+      when(
+        () => mockDeleteResumeUseCase(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-    final viewModel = container.read(applicationViewModelProvider.notifier);
-    await viewModel.loadMyResumes();
-    final uploadResult = await viewModel.uploadResume(filePath: '/tmp/resume.pdf');
-    final deleteResult = await viewModel.deleteResume(resumeId: 'resume-1');
+      final viewModel = container.read(applicationViewModelProvider.notifier);
+      await viewModel.loadMyResumes();
+      final uploadResult = await viewModel.uploadResume(
+        filePath: '/tmp/resume.pdf',
+      );
+      final deleteResult = await viewModel.deleteResume(resumeId: 'resume-1');
 
-    expect(uploadResult.$2, isNull);
-    expect(deleteResult, isNull);
-    expect(container.read(applicationViewModelProvider).resumesData?.length, 1);
-  });
+      expect(uploadResult.$2, isNull);
+      expect(deleteResult, isNull);
+      expect(
+        container.read(applicationViewModelProvider).resumesData?.length,
+        1,
+      );
+    },
+  );
 
-  test('ApplicationViewModel should return failures for apply and update actions', () async {
-    const failure = ApiFailure(message: 'Action failed');
-    when(
-      () => mockApplyToJobUseCase(any()),
-    ).thenAnswer((_) async => const Left(failure));
-    when(
-      () => mockUpdateApplicationUseCase(any()),
-    ).thenAnswer((_) async => const Left(failure));
+  test(
+    'ApplicationViewModel should return failures for apply and update actions',
+    () async {
+      const failure = ApiFailure(message: 'Action failed');
+      when(
+        () => mockApplyToJobUseCase(any()),
+      ).thenAnswer((_) async => const Left(failure));
+      when(
+        () => mockUpdateApplicationUseCase(any()),
+      ).thenAnswer((_) async => const Left(failure));
 
-    final viewModel = container.read(applicationViewModelProvider.notifier);
-    final applyFailure = await viewModel.applyToJob('job-1');
-    final updateFailure = await viewModel.updateApplication(
-      jobId: 'job-1',
-      applicationId: 'app-1',
-    );
+      final viewModel = container.read(applicationViewModelProvider.notifier);
+      final applyFailure = await viewModel.applyToJob('job-1');
+      final updateFailure = await viewModel.updateApplication(
+        jobId: 'job-1',
+        applicationId: 'app-1',
+      );
 
-    expect(applyFailure, failure);
-    expect(updateFailure, failure);
-    expect(
-      container.read(applicationViewModelProvider).updateApplicationStatus,
-      ApplicationLoadStatus.error,
-    );
-  });
+      expect(applyFailure, failure);
+      expect(updateFailure, failure);
+      expect(
+        container.read(applicationViewModelProvider).updateApplicationStatus,
+        ApplicationLoadStatus.error,
+      );
+    },
+  );
 
   test('ApplicationViewModel should reset state', () {
     final viewModel = container.read(applicationViewModelProvider.notifier);

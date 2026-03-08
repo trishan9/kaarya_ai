@@ -24,45 +24,51 @@ void main() {
     container.dispose();
   });
 
-  test('InboxViewModel should initialize ready state when chat is configured', () async {
-    const payload = InboxBootstrapPayload(
-      chatEnabled: true,
-      videoEnabled: false,
-      apiKey: 'stream-key',
-      token: 'token',
-    );
-    when(() => mockRemoteService.fetchBootstrapPayload()).thenAnswer(
-      (_) async => payload,
-    );
+  test(
+    'InboxViewModel should initialize ready state when chat is configured',
+    () async {
+      const payload = InboxBootstrapPayload(
+        chatEnabled: true,
+        videoEnabled: false,
+        apiKey: 'stream-key',
+        token: 'token',
+      );
+      when(
+        () => mockRemoteService.fetchBootstrapPayload(),
+      ).thenAnswer((_) async => payload);
 
-    final viewModel = container.read(inboxViewModelProvider.notifier);
-    await viewModel.initialize();
+      final viewModel = container.read(inboxViewModelProvider.notifier);
+      await viewModel.initialize();
 
-    final state = container.read(inboxViewModelProvider);
-    expect(state.status, InboxLoadStatus.ready);
-    expect(state.bootstrap, payload);
-    expect(state.errorMessage, isNull);
-  });
+      final state = container.read(inboxViewModelProvider);
+      expect(state.status, InboxLoadStatus.ready);
+      expect(state.bootstrap, payload);
+      expect(state.errorMessage, isNull);
+    },
+  );
 
-  test('InboxViewModel should expose configuration error when chat is disabled', () async {
-    const payload = InboxBootstrapPayload(
-      chatEnabled: false,
-      videoEnabled: false,
-      apiKey: 'stream-key',
-      token: 'token',
-    );
-    when(() => mockRemoteService.fetchBootstrapPayload()).thenAnswer(
-      (_) async => payload,
-    );
+  test(
+    'InboxViewModel should expose configuration error when chat is disabled',
+    () async {
+      const payload = InboxBootstrapPayload(
+        chatEnabled: false,
+        videoEnabled: false,
+        apiKey: 'stream-key',
+        token: 'token',
+      );
+      when(
+        () => mockRemoteService.fetchBootstrapPayload(),
+      ).thenAnswer((_) async => payload);
 
-    final viewModel = container.read(inboxViewModelProvider.notifier);
-    await viewModel.initialize();
+      final viewModel = container.read(inboxViewModelProvider.notifier);
+      await viewModel.initialize();
 
-    final state = container.read(inboxViewModelProvider);
-    expect(state.status, InboxLoadStatus.error);
-    expect(state.bootstrap, payload);
-    expect(state.errorMessage, contains('not configured'));
-  });
+      final state = container.read(inboxViewModelProvider);
+      expect(state.status, InboxLoadStatus.error);
+      expect(state.bootstrap, payload);
+      expect(state.errorMessage, contains('not configured'));
+    },
+  );
 
   test('InboxViewModel should expose missing api key error', () async {
     const payload = InboxBootstrapPayload(
@@ -71,9 +77,9 @@ void main() {
       apiKey: '',
       token: 'token',
     );
-    when(() => mockRemoteService.fetchBootstrapPayload()).thenAnswer(
-      (_) async => payload,
-    );
+    when(
+      () => mockRemoteService.fetchBootstrapPayload(),
+    ).thenAnswer((_) async => payload);
 
     final viewModel = container.read(inboxViewModelProvider.notifier);
     await viewModel.initialize();
@@ -84,9 +90,9 @@ void main() {
   });
 
   test('InboxViewModel should surface thrown exception message', () async {
-    when(() => mockRemoteService.fetchBootstrapPayload()).thenThrow(
-      Exception('Server unavailable'),
-    );
+    when(
+      () => mockRemoteService.fetchBootstrapPayload(),
+    ).thenThrow(Exception('Server unavailable'));
 
     final viewModel = container.read(inboxViewModelProvider.notifier);
     await viewModel.initialize();
@@ -96,21 +102,24 @@ void main() {
     expect(state.errorMessage, 'Server unavailable');
   });
 
-  test('InboxViewModel should skip reload when state is already ready', () async {
-    const payload = InboxBootstrapPayload(
-      chatEnabled: true,
-      videoEnabled: false,
-      apiKey: 'stream-key',
-      token: 'token',
-    );
-    when(() => mockRemoteService.fetchBootstrapPayload()).thenAnswer(
-      (_) async => payload,
-    );
+  test(
+    'InboxViewModel should skip reload when state is already ready',
+    () async {
+      const payload = InboxBootstrapPayload(
+        chatEnabled: true,
+        videoEnabled: false,
+        apiKey: 'stream-key',
+        token: 'token',
+      );
+      when(
+        () => mockRemoteService.fetchBootstrapPayload(),
+      ).thenAnswer((_) async => payload);
 
-    final viewModel = container.read(inboxViewModelProvider.notifier);
-    await viewModel.initialize();
-    await viewModel.initialize();
+      final viewModel = container.read(inboxViewModelProvider.notifier);
+      await viewModel.initialize();
+      await viewModel.initialize();
 
-    verify(() => mockRemoteService.fetchBootstrapPayload()).called(1);
-  });
+      verify(() => mockRemoteService.fetchBootstrapPayload()).called(1);
+    },
+  );
 }

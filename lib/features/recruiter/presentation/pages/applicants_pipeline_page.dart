@@ -27,7 +27,8 @@ class ApplicantsPipelinePage extends ConsumerStatefulWidget {
       _ApplicantsPipelinePageState();
 }
 
-class _ApplicantsPipelinePageState extends ConsumerState<ApplicantsPipelinePage> {
+class _ApplicantsPipelinePageState
+    extends ConsumerState<ApplicantsPipelinePage> {
   List<JobApplicantEntity>? _applicants;
   bool _loading = true;
   String? _error;
@@ -100,7 +101,8 @@ class _ApplicantsPipelinePageState extends ConsumerState<ApplicantsPipelinePage>
                 applicant: applicant,
                 onUpdated: (closeSheet) {
                   _loadApplicants();
-                  if (closeSheet && context.mounted) Navigator.of(context).pop();
+                  if (closeSheet && context.mounted)
+                    Navigator.of(context).pop();
                 },
               ),
             ),
@@ -127,7 +129,9 @@ class _ApplicantsPipelinePageState extends ConsumerState<ApplicantsPipelinePage>
               style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w400,
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.onSurface.withValues(alpha: 0.7),
               ),
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
@@ -142,13 +146,13 @@ class _ApplicantsPipelinePageState extends ConsumerState<ApplicantsPipelinePage>
       body: _loading
           ? const LoaderWidget()
           : _error != null
-              ? _ErrorState(message: _error!, onRetry: _loadApplicants)
-              : _applicants == null || _applicants!.isEmpty
-                  ? _EmptyState()
-                  : _ApplicantList(
-                      applicants: _applicants!,
-                      onSelect: _openApplicantSheet,
-                    ),
+          ? _ErrorState(message: _error!, onRetry: _loadApplicants)
+          : _applicants == null || _applicants!.isEmpty
+          ? _EmptyState()
+          : _ApplicantList(
+              applicants: _applicants!,
+              onSelect: _openApplicantSheet,
+            ),
     );
   }
 }
@@ -250,10 +254,7 @@ class _EmptyState extends StatelessWidget {
 }
 
 class _ApplicantList extends StatelessWidget {
-  const _ApplicantList({
-    required this.applicants,
-    required this.onSelect,
-  });
+  const _ApplicantList({required this.applicants, required this.onSelect});
 
   final List<JobApplicantEntity> applicants;
   final ValueChanged<JobApplicantEntity> onSelect;
@@ -266,83 +267,86 @@ class _ApplicantList extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
         itemCount: applicants.length,
         itemBuilder: (_, i) {
-        final a = applicants[i];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          elevation: 1,
-          color: Colors.white,
-          shadowColor: Colors.black.withValues(alpha: 0.06),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-            side: const BorderSide(color: AppColors.borderStroke2),
-          ),
-          child: InkWell(
-            onTap: () => onSelect(a),
-            borderRadius: BorderRadius.circular(12),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      _Avatar(name: a.candidateName),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              a.candidateName,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                                color: AppColors.textDark,
-                              ),
-                            ),
-                            if (a.candidateEmail != null)
+          final a = applicants[i];
+          return Card(
+            margin: const EdgeInsets.only(bottom: 12),
+            elevation: 1,
+            color: Colors.white,
+            shadowColor: Colors.black.withValues(alpha: 0.06),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: const BorderSide(color: AppColors.borderStroke2),
+            ),
+            child: InkWell(
+              onTap: () => onSelect(a),
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        _Avatar(name: a.candidateName),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                a.candidateEmail!,
+                                a.candidateName,
                                 style: const TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textMedium,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 14,
+                                  color: AppColors.textDark,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                          ],
+                              if (a.candidateEmail != null)
+                                Text(
+                                  a.candidateEmail!,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: AppColors.textMedium,
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.bgSecondary,
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Text(
+                        _formatStatus(a.status),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
                         ),
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: AppColors.bgSecondary,
-                      borderRadius: BorderRadius.circular(4),
                     ),
-                    child: Text(
-                      _formatStatus(a.status),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Applied ${_formatDate(a.appliedAt)}',
                       style: const TextStyle(
                         fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: AppColors.textMedium,
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Applied ${_formatDate(a.appliedAt)}',
-                    style: const TextStyle(
-                      fontSize: 11,
-                      color: AppColors.textMedium,
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
           );
         },
       ),
@@ -364,7 +368,20 @@ class _ApplicantList extends StatelessWidget {
   }
 
   String _month(int m) {
-    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return months[m - 1];
   }
 }
@@ -399,8 +416,8 @@ class _Avatar extends StatelessWidget {
     final initials = parts.length >= 2
         ? '${parts[0][0]}${parts[1][0]}'.toUpperCase()
         : name.isNotEmpty
-            ? name[0].toUpperCase()
-            : '?';
+        ? name[0].toUpperCase()
+        : '?';
     return CircleAvatar(
       radius: 20,
       backgroundColor: AppColors.bgSecondary,
@@ -451,7 +468,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
   @override
   void initState() {
     super.initState();
-    _selectedStatus = widget.applicant.status.isEmpty ? 'applied' : widget.applicant.status;
+    _selectedStatus = widget.applicant.status.isEmpty
+        ? 'applied'
+        : widget.applicant.status;
     if (widget.applicant.interviewDate != null) {
       _interviewDate = DateTime.tryParse(widget.applicant.interviewDate!);
     }
@@ -466,7 +485,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
 
   Future<void> _trackResumeActivity(WidgetRef ref, String action) async {
     try {
-      await ref.read(applicationRepositoryProvider).updateResumeActivity(
+      await ref
+          .read(applicationRepositoryProvider)
+          .updateResumeActivity(
             jobId: widget.jobId,
             applicationId: widget.applicant.id,
             action: action,
@@ -488,12 +509,10 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
       }
       return;
     }
-    // Fire-and-forget: track download (backend may return 404 if route not implemented)
     unawaited(_trackResumeActivity(ref, 'downloaded'));
     await _downloadAndOpen(context, resumeUrl, fileName);
   }
 
-  /// Downloads resume from URL and opens with system viewer (matches web: anchor download + open)
   Future<void> _downloadAndOpen(
     BuildContext context,
     String resumeUrl,
@@ -517,12 +536,14 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
           );
         } else if (result.type == ResultType.noAppToOpen) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No app to open PDF. Install a PDF viewer.')),
+            const SnackBar(
+              content: Text('No app to open PDF. Install a PDF viewer.'),
+            ),
           );
         } else if (result.message.isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(result.message)),
-          );
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(result.message)));
         }
       }
     } catch (e) {
@@ -536,7 +557,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final hasResume = widget.applicant.resumeUrl != null && widget.applicant.resumeUrl!.isNotEmpty;
+    final hasResume =
+        widget.applicant.resumeUrl != null &&
+        widget.applicant.resumeUrl!.isNotEmpty;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -570,7 +593,7 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                       ),
-                        if (widget.applicant.candidateEmail != null) ...[
+                      if (widget.applicant.candidateEmail != null) ...[
                         const SizedBox(height: 4),
                         Text(
                           widget.applicant.candidateEmail!,
@@ -609,11 +632,11 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
             InkWell(
               onTap: hasResume
                   ? () => _downloadResume(
-                        context,
-                        ref,
-                        widget.applicant.resumeUrl,
-                        widget.applicant.resumeFileName,
-                      )
+                      context,
+                      ref,
+                      widget.applicant.resumeUrl,
+                      widget.applicant.resumeFileName,
+                    )
                   : null,
               borderRadius: BorderRadius.circular(10),
               child: Container(
@@ -716,7 +739,11 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
             ),
             child: Row(
               children: [
-                const Icon(LucideIcons.briefcase, size: 20, color: AppColors.primary),
+                const Icon(
+                  LucideIcons.briefcase,
+                  size: 20,
+                  color: AppColors.primary,
+                ),
                 const SizedBox(width: 12),
                 Text(
                   'Open to work: ${widget.applicant.candidateOpenToWork ? 'Yes' : 'No'}',
@@ -750,10 +777,12 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
                     ),
                   ),
                   items: _statusOptions
-                      .map((s) => DropdownMenuItem(
-                            value: s,
-                            child: Text(_formatStatus(s)),
-                          ))
+                      .map(
+                        (s) => DropdownMenuItem(
+                          value: s,
+                          child: Text(_formatStatus(s)),
+                        ),
+                      )
                       .toList(),
                   onChanged: (v) {
                     if (v != null) setState(() => _selectedStatus = v);
@@ -764,7 +793,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
               SizedBox(
                 width: 140,
                 child: MyButton(
-                  onPressed: () { _saveStatus(); },
+                  onPressed: () {
+                    _saveStatus();
+                  },
                   text: 'Update Status',
                   btnWidth: 140,
                   isLoading: _isSavingStatus,
@@ -808,7 +839,8 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
           TextField(
             controller: _interviewNoteController,
             decoration: InputDecoration(
-              hintText: 'Interview note, meeting link, or recruiter instructions',
+              hintText:
+                  'Interview note, meeting link, or recruiter instructions',
               filled: true,
               fillColor: AppColors.bgTertiary,
               border: OutlineInputBorder(
@@ -825,7 +857,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
           ),
           const SizedBox(height: 16),
           MyButton(
-            onPressed: () { _sendInterviewInvite(); },
+            onPressed: () {
+              _sendInterviewInvite();
+            },
             text: 'Send Interview Invite',
             icon: const Icon(LucideIcons.send, size: 18, color: Colors.white),
             isLoading: _isSavingInvite,
@@ -855,15 +889,27 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
 
   String _month(int m) {
     const months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return months[m - 1];
   }
 
   Future<void> _saveStatus() async {
     setState(() => _isSavingStatus = true);
-    final result = await ref.read(applicationRepositoryProvider).updateApplication(
+    final result = await ref
+        .read(applicationRepositoryProvider)
+        .updateApplication(
           jobId: widget.jobId,
           applicationId: widget.applicant.id,
           status: _selectedStatus,
@@ -871,9 +917,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
     if (!mounted) return;
     setState(() => _isSavingStatus = false);
     result.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(f.message)),
-      ),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.message))),
       (_) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -889,7 +935,8 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
   Future<void> _pickInterviewDateTime() async {
     final date = await showDatePicker(
       context: context,
-      initialDate: _interviewDate ?? DateTime.now().add(const Duration(days: 1)),
+      initialDate:
+          _interviewDate ?? DateTime.now().add(const Duration(days: 1)),
       firstDate: DateTime.now(),
       lastDate: DateTime.now().add(const Duration(days: 365)),
     );
@@ -920,7 +967,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
       return;
     }
     setState(() => _isSavingInvite = true);
-    final result = await ref.read(applicationRepositoryProvider).updateApplication(
+    final result = await ref
+        .read(applicationRepositoryProvider)
+        .updateApplication(
           jobId: widget.jobId,
           applicationId: widget.applicant.id,
           status: 'interview_scheduled',
@@ -932,9 +981,9 @@ class _ApplicantDetailState extends ConsumerState<_ApplicantDetail> {
     if (!mounted) return;
     setState(() => _isSavingInvite = false);
     result.fold(
-      (f) => ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(f.message)),
-      ),
+      (f) => ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(f.message))),
       (_) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

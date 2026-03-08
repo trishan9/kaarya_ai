@@ -180,7 +180,10 @@ void main() {
       );
 
       expect(result, isNull);
-      expect(container.read(resourceViewModelProvider).courseDetailData, course);
+      expect(
+        container.read(resourceViewModelProvider).courseDetailData,
+        course,
+      );
     });
 
     test('should delete course successfully', () async {

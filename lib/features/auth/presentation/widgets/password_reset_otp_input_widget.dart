@@ -1,6 +1,5 @@
 import 'dart:math' as math;
 
-// coverage:ignore-file
 import 'package:flutter/material.dart';
 import 'package:kaarya/app/theme/app_colors.dart';
 

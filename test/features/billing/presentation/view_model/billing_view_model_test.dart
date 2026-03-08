@@ -28,7 +28,8 @@ void main() {
   late MockGetBillingSummaryUseCase mockGetBillingSummaryUseCase;
   late MockCreateStripeCheckoutSessionUseCase
   mockCreateStripeCheckoutSessionUseCase;
-  late MockCreateStripePortalSessionUseCase mockCreateStripePortalSessionUseCase;
+  late MockCreateStripePortalSessionUseCase
+  mockCreateStripePortalSessionUseCase;
   late MockVerifyStripeCheckoutSessionUseCase
   mockVerifyStripeCheckoutSessionUseCase;
   late ProviderContainer container;
@@ -163,10 +164,7 @@ void main() {
 
       expect(result, session);
       expect(failure, isNull);
-      expect(
-        container.read(billingViewModelProvider).isOpeningPortal,
-        isFalse,
-      );
+      expect(container.read(billingViewModelProvider).isOpeningPortal, isFalse);
     });
 
     test('should verify checkout session and refresh summary', () async {
@@ -193,20 +191,23 @@ void main() {
       );
     });
 
-    test('should return verification failure without refreshing summary', () async {
-      const failure = ApiFailure(message: 'Verification failed');
-      when(
-        () => mockVerifyStripeCheckoutSessionUseCase(any()),
-      ).thenAnswer((_) async => const Left(failure));
+    test(
+      'should return verification failure without refreshing summary',
+      () async {
+        const failure = ApiFailure(message: 'Verification failed');
+        when(
+          () => mockVerifyStripeCheckoutSessionUseCase(any()),
+        ).thenAnswer((_) async => const Left(failure));
 
-      final viewModel = container.read(billingViewModelProvider.notifier);
-      final (result, error) = await viewModel.verifyCheckoutSession(
-        'checkout-1',
-      );
+        final viewModel = container.read(billingViewModelProvider.notifier);
+        final (result, error) = await viewModel.verifyCheckoutSession(
+          'checkout-1',
+        );
 
-      expect(result, isNull);
-      expect(error, failure);
-      verifyNever(() => mockGetBillingSummaryUseCase());
-    });
+        expect(result, isNull);
+        expect(error, failure);
+        verifyNever(() => mockGetBillingSummaryUseCase());
+      },
+    );
   });
 }

@@ -23,7 +23,10 @@ class TestDashboardViewModel extends DashboardViewModel {
   }
 
   @override
-  Future<void> loadOverview({String? monthKey, bool forceRefresh = false}) async {
+  Future<void> loadOverview({
+    String? monthKey,
+    bool forceRefresh = false,
+  }) async {
     state = state.copyWith(
       overviewStatus: DashboardLoadStatus.loaded,
       overviewData: buildDashboardOverviewEntity(),

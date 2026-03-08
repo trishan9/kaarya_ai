@@ -19,9 +19,7 @@ void main() {
   setUp(() {
     mockRepository = MockBookmarkRepository();
     container = ProviderContainer(
-      overrides: [
-        bookmarkRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [bookmarkRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -81,7 +79,9 @@ void main() {
         isEmpty,
       );
 
-      viewModel.addJobBackToBookmarks(buildJobEntity(id: 'job-1', isSaved: true));
+      viewModel.addJobBackToBookmarks(
+        buildJobEntity(id: 'job-1', isSaved: true),
+      );
       expect(
         container.read(bookmarkViewModelProvider).bookmarks?.jobs.length,
         1,
@@ -89,9 +89,9 @@ void main() {
     });
 
     test('should return null for save failure', () async {
-      when(() => mockRepository.saveJobBookmark(any())).thenAnswer(
-        (_) async => const Left(ApiFailure(message: 'Save failed')),
-      );
+      when(
+        () => mockRepository.saveJobBookmark(any()),
+      ).thenAnswer((_) async => const Left(ApiFailure(message: 'Save failed')));
 
       final viewModel = container.read(bookmarkViewModelProvider.notifier);
       final result = await viewModel.saveJobBookmark('job-1');

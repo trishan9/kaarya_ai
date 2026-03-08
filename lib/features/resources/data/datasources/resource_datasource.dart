@@ -56,7 +56,6 @@ class ResourceCoursesListApiResponse {
   });
 
   factory ResourceCoursesListApiResponse.fromJson(Map<String, dynamic> json) {
-    // Support multiple possible keys for the courses list
     final raw = json['resources'] ?? json['courses'] ?? json['data'] ?? [];
     final total = json['totalCount'] ?? json['total'] ?? json['count'] ?? 0;
     return ResourceCoursesListApiResponse(

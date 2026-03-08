@@ -10,8 +10,6 @@ import 'package:kaarya/features/applications/presentation/view_model/application
 import 'package:kaarya/features/jobs/presentation/pages/job_detail_page.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-// ─── Status helpers ───────────────────────────────────────────────────────────
-
 typedef _StatusStyle = ({String label, Color color, Color bg, Color border});
 
 _StatusStyle _statusStyle(String status) {
@@ -77,19 +75,44 @@ _StatusStyle _statusStyle(String status) {
   }
 }
 
-// ─── Timeline data ────────────────────────────────────────────────────────────
-
 const _timelineSteps = [
-  (icon: LucideIcons.send, label: 'Application Submitted', desc: 'Your application was sent to the employer'),
-  (icon: LucideIcons.search, label: 'Application Screening', desc: 'Recruiter is reviewing your application'),
-  (icon: LucideIcons.userRound, label: 'HR Interview', desc: 'Initial HR interview with the team'),
-  (icon: LucideIcons.clipboardList, label: 'Assessment', desc: 'Technical or skills assessment'),
-  (icon: LucideIcons.users, label: 'Second Interview', desc: 'Follow-up interview with the team'),
-  (icon: LucideIcons.fileText, label: 'Offering', desc: 'Job offer is being prepared'),
-  (icon: LucideIcons.circleCheck, label: 'Accepted', desc: 'Congratulations — you got the job!'),
+  (
+    icon: LucideIcons.send,
+    label: 'Application Submitted',
+    desc: 'Your application was sent to the employer',
+  ),
+  (
+    icon: LucideIcons.search,
+    label: 'Application Screening',
+    desc: 'Recruiter is reviewing your application',
+  ),
+  (
+    icon: LucideIcons.userRound,
+    label: 'HR Interview',
+    desc: 'Initial HR interview with the team',
+  ),
+  (
+    icon: LucideIcons.clipboardList,
+    label: 'Assessment',
+    desc: 'Technical or skills assessment',
+  ),
+  (
+    icon: LucideIcons.users,
+    label: 'Second Interview',
+    desc: 'Follow-up interview with the team',
+  ),
+  (
+    icon: LucideIcons.fileText,
+    label: 'Offering',
+    desc: 'Job offer is being prepared',
+  ),
+  (
+    icon: LucideIcons.circleCheck,
+    label: 'Accepted',
+    desc: 'Congratulations — you got the job!',
+  ),
 ];
 
-/// Returns the 0-based index of the current reached step.
 int _currentStepIndex(String status) {
   switch (status) {
     case 'applied':
@@ -105,7 +128,7 @@ int _currentStepIndex(String status) {
       return 6;
     case 'rejected':
     case 'withdrawn':
-      return 1; // show at screening level for rejected
+      return 1;
     default:
       return 0;
   }
@@ -113,8 +136,6 @@ int _currentStepIndex(String status) {
 
 bool _isTerminalNegative(String status) =>
     status == 'rejected' || status == 'withdrawn';
-
-// ─── Page ─────────────────────────────────────────────────────────────────────
 
 class MyApplicationsPage extends ConsumerStatefulWidget {
   const MyApplicationsPage({super.key});
@@ -138,9 +159,8 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
   void initState() {
     super.initState();
     Future.microtask(
-      () => ref
-          .read(applicationViewModelProvider.notifier)
-          .loadMyApplications(),
+      () =>
+          ref.read(applicationViewModelProvider.notifier).loadMyApplications(),
     );
   }
 
@@ -152,8 +172,7 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
   Widget build(BuildContext context) {
     final state = ref.watch(applicationViewModelProvider);
     final data = state.applicationsData;
-    final isLoading =
-        state.applicationsStatus == ApplicationLoadStatus.loading;
+    final isLoading = state.applicationsStatus == ApplicationLoadStatus.loading;
     final isError = state.applicationsStatus == ApplicationLoadStatus.error;
 
     final apps = data?.applications ?? [];
@@ -200,11 +219,13 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
               const SizedBox(height: 260, child: LoaderWidget())
             else if (isError && data == null)
               _ErrorBlock(
-                message: state.applicationsErrorMessage ??
+                message:
+                    state.applicationsErrorMessage ??
                     'Failed to load applications',
                 onRetry: _refresh,
               )
-            else ..._buildList(context, filtered),
+            else
+              ..._buildList(context, filtered),
           ],
         ),
       ),
@@ -228,24 +249,19 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
     return [
       apps.length,
       apps
-          .where((a) => ['applied', 'reviewing', 'shortlisted']
-              .contains(a.status))
+          .where(
+            (a) => ['applied', 'reviewing', 'shortlisted'].contains(a.status),
+          )
           .length,
       apps
-          .where((a) => ['interview_scheduled', 'interview']
-              .contains(a.status))
+          .where((a) => ['interview_scheduled', 'interview'].contains(a.status))
           .length,
-      apps
-          .where((a) => ['accepted', 'offered'].contains(a.status))
-          .length,
-      apps
-          .where((a) => ['rejected', 'withdrawn'].contains(a.status))
-          .length,
+      apps.where((a) => ['accepted', 'offered'].contains(a.status)).length,
+      apps.where((a) => ['rejected', 'withdrawn'].contains(a.status)).length,
     ];
   }
 
-  List<Widget> _buildList(
-      BuildContext context, List<ApplicationEntity> apps) {
+  List<Widget> _buildList(BuildContext context, List<ApplicationEntity> apps) {
     if (apps.isEmpty) {
       return [_EmptyState(tab: _tabs[_selectedTab])];
     }
@@ -273,8 +289,6 @@ class _MyApplicationsPageState extends ConsumerState<MyApplicationsPage> {
     );
   }
 }
-
-// ─── Hero Banner ──────────────────────────────────────────────────────────────
 
 class _HeroBanner extends StatelessWidget {
   final ApplicationsListEntity? data;
@@ -324,8 +338,11 @@ class _HeroBanner extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(LucideIcons.briefcase,
-                        size: 16, color: Colors.white),
+                    const Icon(
+                      LucideIcons.briefcase,
+                      size: 16,
+                      color: Colors.white,
+                    ),
                     const SizedBox(width: 8),
                     const Text(
                       'Track Your Applications',
@@ -432,8 +449,6 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-// ─── Tab Bar ──────────────────────────────────────────────────────────────────
-
 class _TabBar extends StatelessWidget {
   final List<String> tabs;
   final int selected;
@@ -462,8 +477,10 @@ class _TabBar extends StatelessWidget {
               onTap: () => onSelected(i),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: isSelected ? AppColors.primary : Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -483,16 +500,16 @@ class _TabBar extends StatelessWidget {
                         fontWeight: isSelected
                             ? FontWeight.w600
                             : FontWeight.w500,
-                        color: isSelected
-                            ? Colors.white
-                            : AppColors.textMedium,
+                        color: isSelected ? Colors.white : AppColors.textMedium,
                       ),
                     ),
                     if (count > 0) ...[
                       const SizedBox(width: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 6, vertical: 1),
+                          horizontal: 6,
+                          vertical: 1,
+                        ),
                         decoration: BoxDecoration(
                           color: isSelected
                               ? Colors.white.withAlpha(50)
@@ -521,8 +538,6 @@ class _TabBar extends StatelessWidget {
     );
   }
 }
-
-// ─── Application Card ─────────────────────────────────────────────────────────
 
 class _ApplicationCard extends StatelessWidget {
   final ApplicationEntity app;
@@ -554,13 +569,13 @@ class _ApplicationCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top: color accent strip based on status
           Container(
             height: 3,
             decoration: BoxDecoration(
               color: style.border,
               borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12)),
+                top: Radius.circular(12),
+              ),
             ),
           ),
           Padding(
@@ -568,19 +583,18 @@ class _ApplicationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Row 1: Logo + Title/Badge row + Company
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _CompanyAvatar(
-                        name: app.companyName,
-                        logoUrl: app.companyLogo),
+                      name: app.companyName,
+                      logoUrl: app.companyLogo,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Title row with right-aligned badge
                           Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -598,10 +612,11 @@ class _ApplicationCard extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              // Status badge — after Expanded title, safe
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
                                 decoration: BoxDecoration(
                                   color: style.bg,
                                   borderRadius: BorderRadius.circular(6),
@@ -633,34 +648,30 @@ class _ApplicationCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 10),
-                // Row 2: meta pills
                 Wrap(
                   spacing: 6,
                   runSpacing: 6,
                   children: [
+                    _Pill(icon: LucideIcons.mapPin, text: app.location),
                     _Pill(
-                        icon: LucideIcons.mapPin,
-                        text: app.location),
+                      icon: LucideIcons.briefcase,
+                      text: app.employmentType,
+                    ),
+                    _Pill(icon: LucideIcons.monitor, text: app.workMode),
                     _Pill(
-                        icon: LucideIcons.briefcase,
-                        text: app.employmentType),
-                    _Pill(
-                        icon: LucideIcons.monitor,
-                        text: app.workMode),
-                    _Pill(
-                        icon: LucideIcons.calendar,
-                        text: _fmtDate(app.appliedAt)),
-                    if (app.salaryRange.isNotEmpty &&
-                        app.salaryRange != '—')
+                      icon: LucideIcons.calendar,
+                      text: _fmtDate(app.appliedAt),
+                    ),
+                    if (app.salaryRange.isNotEmpty && app.salaryRange != '—')
                       _Pill(
-                          icon: LucideIcons.indianRupee,
-                          text: app.salaryRange),
+                        icon: LucideIcons.indianRupee,
+                        text: app.salaryRange,
+                      ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 const Divider(height: 1, color: Color(0xFFF5F5F5)),
                 const SizedBox(height: 10),
-                // Row 3: Action buttons
                 Row(
                   children: [
                     Expanded(
@@ -670,13 +681,11 @@ class _ApplicationCard extends StatelessWidget {
                         label: const Text('Track'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.primary,
-                          side: const BorderSide(
-                              color: AppColors.primary),
+                          side: const BorderSide(color: AppColors.primary),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           textStyle: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -688,18 +697,15 @@ class _ApplicationCard extends StatelessWidget {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: onViewJob,
-                        icon: const Icon(LucideIcons.externalLink,
-                            size: 14),
+                        icon: const Icon(LucideIcons.externalLink, size: 14),
                         label: const Text('View Job'),
                         style: OutlinedButton.styleFrom(
                           foregroundColor: AppColors.textDark,
-                          side: const BorderSide(
-                              color: Color(0xFFCBD5E1)),
+                          side: const BorderSide(color: Color(0xFFCBD5E1)),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 10),
+                          padding: const EdgeInsets.symmetric(vertical: 10),
                           textStyle: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
@@ -733,13 +739,11 @@ class _ApplicationCard extends StatelessWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     return '${m[d.month]} ${d.day}, ${d.year}';
   }
 }
-
-// ─── Company Avatar ───────────────────────────────────────────────────────────
 
 class _CompanyAvatar extends StatelessWidget {
   final String name;
@@ -787,8 +791,6 @@ class _CompanyAvatar extends StatelessWidget {
   }
 }
 
-// ─── Pill ─────────────────────────────────────────────────────────────────────
-
 class _Pill extends StatelessWidget {
   final IconData icon;
   final String text;
@@ -829,8 +831,6 @@ class _Pill extends StatelessWidget {
   }
 }
 
-// ─── Tracking Bottom Sheet ────────────────────────────────────────────────────
-
 class _TrackingSheet extends StatelessWidget {
   final ApplicationEntity app;
   const _TrackingSheet({required this.app});
@@ -853,7 +853,6 @@ class _TrackingSheet extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Drag handle
               const SizedBox(height: 12),
               Center(
                 child: Container(
@@ -866,14 +865,14 @@ class _TrackingSheet extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              // Header
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: [
                     _CompanyAvatar(
-                        name: app.companyName,
-                        logoUrl: app.companyLogo),
+                      name: app.companyName,
+                      logoUrl: app.companyLogo,
+                    ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -900,10 +899,11 @@ class _TrackingSheet extends StatelessWidget {
                         ],
                       ),
                     ),
-                    // Status badge
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 5),
+                        horizontal: 10,
+                        vertical: 5,
+                      ),
                       decoration: BoxDecoration(
                         color: style.bg,
                         borderRadius: BorderRadius.circular(6),
@@ -923,13 +923,11 @@ class _TrackingSheet extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Divider(height: 1, color: AppColors.borderStroke),
-              // Scrollable body
               Expanded(
                 child: ListView(
                   controller: scrollController,
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                   children: [
-                    // Section header
                     Row(
                       children: [
                         Container(
@@ -939,8 +937,11 @@ class _TrackingSheet extends StatelessWidget {
                             color: AppColors.bgSecondary,
                             borderRadius: BorderRadius.circular(7),
                           ),
-                          child: const Icon(LucideIcons.gitBranch,
-                              size: 14, color: AppColors.primary),
+                          child: const Icon(
+                            LucideIcons.gitBranch,
+                            size: 14,
+                            color: AppColors.primary,
+                          ),
                         ),
                         const SizedBox(width: 10),
                         const Text(
@@ -965,7 +966,6 @@ class _TrackingSheet extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    // Timeline
                     _Timeline(
                       steps: _timelineSteps,
                       currentStep: currentStep,
@@ -975,7 +975,6 @@ class _TrackingSheet extends StatelessWidget {
                       nextStep: app.nextStep,
                     ),
                     const SizedBox(height: 24),
-                    // Info card
                     _InfoCard(app: app, style: style),
                   ],
                 ),
@@ -987,8 +986,6 @@ class _TrackingSheet extends StatelessWidget {
     );
   }
 }
-
-// ─── Timeline Widget ──────────────────────────────────────────────────────────
 
 class _Timeline extends StatelessWidget {
   final List<({IconData icon, String label, String desc})> steps;
@@ -1014,12 +1011,10 @@ class _Timeline extends StatelessWidget {
         final step = steps[i];
         final isLast = i == steps.length - 1;
 
-        // Determine state
         final isReached = i <= currentStep;
         final isCurrent = i == currentStep;
         final isRejectedStep = isCurrent && isNegative;
 
-        // Colors
         final Color circleColor;
         final Color circleBg;
         final Color connectorColor;
@@ -1052,7 +1047,6 @@ class _Timeline extends StatelessWidget {
           stepIcon = step.icon;
         }
 
-        // Date to show
         String? dateLabel;
         if (i == 0 && isReached) dateLabel = _fmtDate(appliedAt);
         if (isCurrent && i > 0) dateLabel = _fmtDate(updatedAt);
@@ -1061,12 +1055,10 @@ class _Timeline extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Left column: circle + connector
               SizedBox(
                 width: 40,
                 child: Column(
                   children: [
-                    // Circle
                     Container(
                       width: 34,
                       height: 34,
@@ -1078,10 +1070,8 @@ class _Timeline extends StatelessWidget {
                           width: isCurrent ? 2 : 1.5,
                         ),
                       ),
-                      child: Icon(stepIcon,
-                          size: 14, color: circleColor),
+                      child: Icon(stepIcon, size: 14, color: circleColor),
                     ),
-                    // Connector line
                     if (!isLast)
                       Expanded(
                         child: Container(
@@ -1094,12 +1084,9 @@ class _Timeline extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 12),
-              // Right column: content
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.only(
-                    bottom: isLast ? 0 : 20,
-                  ),
+                  padding: EdgeInsets.only(bottom: isLast ? 0 : 20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -1121,7 +1108,9 @@ class _Timeline extends StatelessWidget {
                           if (isCurrent) ...[
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 7, vertical: 2),
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: isRejectedStep
                                     ? const Color(0xFFFFF6F5)
@@ -1163,11 +1152,13 @@ class _Timeline extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            Icon(LucideIcons.clock,
-                                size: 11,
-                                color: isRejectedStep
-                                    ? const Color(0xFFD84A3A)
-                                    : AppColors.primary),
+                            Icon(
+                              LucideIcons.clock,
+                              size: 11,
+                              color: isRejectedStep
+                                  ? const Color(0xFFD84A3A)
+                                  : AppColors.primary,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               dateLabel,
@@ -1186,9 +1177,11 @@ class _Timeline extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            const Icon(LucideIcons.arrowRight,
-                                size: 11,
-                                color: AppColors.textLight),
+                            const Icon(
+                              LucideIcons.arrowRight,
+                              size: 11,
+                              color: AppColors.textLight,
+                            ),
                             const SizedBox(width: 4),
                             Flexible(
                               child: Text(
@@ -1229,13 +1222,11 @@ class _Timeline extends StatelessWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     return '${m[d.month]} ${d.day}, ${d.year}';
   }
 }
-
-// ─── Info Card (inside tracking sheet) ───────────────────────────────────────
 
 class _InfoCard extends StatelessWidget {
   final ApplicationEntity app;
@@ -1264,8 +1255,7 @@ class _InfoCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           _row(LucideIcons.calendar, 'Applied on', _fmtDate(app.appliedAt)),
-          _row(LucideIcons.refreshCw, 'Last updated',
-              _fmtDate(app.updatedAt)),
+          _row(LucideIcons.refreshCw, 'Last updated', _fmtDate(app.updatedAt)),
           _row(LucideIcons.briefcase, 'Type', app.employmentType),
           _row(LucideIcons.monitor, 'Work mode', app.workMode),
           _row(LucideIcons.mapPin, 'Location', app.location),
@@ -1285,10 +1275,7 @@ class _InfoCard extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             '$label:',
-            style: const TextStyle(
-              fontSize: 12,
-              color: AppColors.textLight,
-            ),
+            style: const TextStyle(fontSize: 12, color: AppColors.textLight),
           ),
           const SizedBox(width: 6),
           Expanded(
@@ -1323,13 +1310,11 @@ class _InfoCard extends StatelessWidget {
       'Sep',
       'Oct',
       'Nov',
-      'Dec'
+      'Dec',
     ];
     return '${m[d.month]} ${d.day}, ${d.year}';
   }
 }
-
-// ─── Empty State ──────────────────────────────────────────────────────────────
 
 class _EmptyState extends StatelessWidget {
   final String tab;
@@ -1367,8 +1352,7 @@ class _EmptyState extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               'Your $tab applications will appear here.',
-              style: const TextStyle(
-                  fontSize: 13, color: AppColors.textMedium),
+              style: const TextStyle(fontSize: 13, color: AppColors.textMedium),
               textAlign: TextAlign.center,
             ),
           ],
@@ -1377,8 +1361,6 @@ class _EmptyState extends StatelessWidget {
     );
   }
 }
-
-// ─── Error Block ──────────────────────────────────────────────────────────────
 
 class _ErrorBlock extends StatelessWidget {
   final String message;
@@ -1392,13 +1374,15 @@ class _ErrorBlock extends StatelessWidget {
       child: Center(
         child: Column(
           children: [
-            const Icon(LucideIcons.circleAlert,
-                size: 36, color: AppColors.error),
+            const Icon(
+              LucideIcons.circleAlert,
+              size: 36,
+              color: AppColors.error,
+            ),
             const SizedBox(height: 12),
             Text(
               message,
-              style: const TextStyle(
-                  color: AppColors.textMedium, fontSize: 14),
+              style: const TextStyle(color: AppColors.textMedium, fontSize: 14),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),

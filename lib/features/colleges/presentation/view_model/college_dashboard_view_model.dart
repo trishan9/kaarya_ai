@@ -18,7 +18,6 @@ class CollegeDashboardViewModel extends Notifier<CollegeDashboardState> {
   ICollegeRepository get _collegeRepo => ref.read(collegeRepositoryProvider);
   IJobRepository get _jobRepo => ref.read(jobRepositoryProvider);
 
-  /// Load college workspace(s). For college role: single workspace. For candidate: joined colleges.
   Future<void> loadWorkspaces({bool forceRefresh = false}) async {
     if (!forceRefresh &&
         state.workspacesStatus == CollegeDashboardLoadStatus.loaded &&
@@ -66,7 +65,6 @@ class CollegeDashboardViewModel extends Notifier<CollegeDashboardState> {
     state = const CollegeDashboardState();
   }
 
-  /// Join college by invite code. Returns error message on failure, null on success.
   Future<String?> joinWorkspace({required String inviteCode}) async {
     final result = await _collegeRepo.joinByCode(inviteCode.trim());
 
@@ -88,7 +86,6 @@ class CollegeDashboardViewModel extends Notifier<CollegeDashboardState> {
     });
   }
 
-  /// Switch workspace and refresh college jobs.
   Future<void> switchWorkspaceAndRefresh(
     CollegeWorkspaceEntity workspace,
   ) async {

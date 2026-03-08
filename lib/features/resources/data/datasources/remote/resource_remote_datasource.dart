@@ -54,7 +54,6 @@ class ResourceRemoteDataSource implements IResourceRemoteDataSource {
       );
     }
     final rawData = normalized['data'];
-    // API returns data as a plain list directly
     if (rawData is List) {
       return ResourceCoursesListApiResponse(
         courses: ResourceCourseApiModel.fromApiList(rawData),
@@ -63,7 +62,6 @@ class ResourceRemoteDataSource implements IResourceRemoteDataSource {
         size: rawData.length,
       );
     }
-    // API returns data as a map (containing resources/courses/totalCount/etc.)
     if (rawData is Map) {
       return ResourceCoursesListApiResponse.fromJson(_castMap(rawData));
     }

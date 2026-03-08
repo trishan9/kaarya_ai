@@ -1,4 +1,3 @@
-// coverage:ignore-file
 import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,7 +40,6 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
     return const TakeInterviewState();
   }
 
-  /// Load interview details by ID.
   Future<void> loadInterview(String interviewId) async {
     state = state.copyWith(
       phase: TakeInterviewPhase.loading,
@@ -66,7 +64,6 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
     );
   }
 
-  /// Start a new interview session — calls the backend and captures VAPI config.
   Future<void> startSession() async {
     final interviewId = state.interviewId;
     if (interviewId == null || interviewId.isEmpty) {
@@ -108,14 +105,15 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
           return;
         }
 
-        // Extract question strings from the questions list
         final questions = sessionStart.questions
             .map((q) => (q['question'] ?? '').toString().trim())
             .where((q) => q.isNotEmpty)
             .toList();
 
-        _normalizedQuestionBank =
-            questions.map(_normalizeForMatch).where((q) => q.isNotEmpty).toList();
+        _normalizedQuestionBank = questions
+            .map(_normalizeForMatch)
+            .where((q) => q.isNotEmpty)
+            .toList();
 
         state = state.copyWith(
           sessionId: sessionStart.sessionId,
@@ -128,22 +126,23 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
           totalQuestions: questions.length,
         );
 
-        // Initialize VAPI and start call
         _initVapiCall();
       },
     );
   }
 
-  /// End the interview call.
   void endInterview() {
     if (state.phase != TakeInterviewPhase.active) return;
     state = state.copyWith(phase: TakeInterviewPhase.finishing);
     _vapiService.endCall();
   }
 
-  /// Load feedback for a completed session.
   Future<void> loadFeedback(String sessionId) async {
-    state = state.copyWith(isFeedbackLoading: true, feedback: null, error: null);
+    state = state.copyWith(
+      isFeedbackLoading: true,
+      feedback: null,
+      error: null,
+    );
 
     try {
       final result = await _getFeedback(
@@ -168,18 +167,18 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
     }
   }
 
-  /// Clear stale feedback so the page never shows a previous session's result.
   void clearFeedback() {
-    state = state.copyWith(feedback: null, isFeedbackLoading: false, error: null);
+    state = state.copyWith(
+      feedback: null,
+      isFeedbackLoading: false,
+      error: null,
+    );
   }
 
-  /// Reset state for a new interview.
   void reset() {
     _cleanup();
     state = const TakeInterviewState();
   }
-
-  // ─── Private helpers ───
 
   void _initVapiCall() {
     _vapiService.init(state.vapiWebToken!);
@@ -223,16 +222,15 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
         case VapiEventType.speechEnd:
           state = state.copyWith(
             isSpeaking: false,
-            activeSpeaker:
-                state.activeSpeaker == 'assistant' ? null : state.activeSpeaker,
+            activeSpeaker: state.activeSpeaker == 'assistant'
+                ? null
+                : state.activeSpeaker,
           );
           break;
         case VapiEventType.error:
-          final msg = event.data['message']?.toString() ?? 'Interview call failed.';
-          state = state.copyWith(
-            phase: TakeInterviewPhase.error,
-            error: msg,
-          );
+          final msg =
+              event.data['message']?.toString() ?? 'Interview call failed.';
+          state = state.copyWith(phase: TakeInterviewPhase.error, error: msg);
           break;
       }
     });
@@ -256,7 +254,6 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
     state = state.copyWith(phase: TakeInterviewPhase.finishing);
     _stopElapsedTimer();
 
-    // Delay to let the final transcript flush before finalizing
     Future.delayed(const Duration(milliseconds: 800), () {
       _finalizeSession();
     });
@@ -279,17 +276,14 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
     );
 
     final updatedTranscript = [...state.transcript, message];
-    // Clear partial preview now that we have the final version
     state = state.copyWith(
       transcript: updatedTranscript,
       partialMessage: null,
       partialRole: null,
     );
 
-    // Track user speaking
     if (role == 'user') {
       state = state.copyWith(activeSpeaker: 'user');
-      // Reset after a delay
       Future.delayed(const Duration(milliseconds: 1400), () {
         if (state.activeSpeaker == 'user') {
           state = state.copyWith(activeSpeaker: null);
@@ -297,7 +291,6 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
       });
     }
 
-    // Question tracking for assistant messages
     if (role == 'assistant' && _normalizedQuestionBank.isNotEmpty) {
       final normalizedContent = _normalizeForMatch(content);
       for (int i = 0; i < _normalizedQuestionBank.length; i++) {
@@ -309,7 +302,6 @@ class TakeInterviewViewModel extends Notifier<TakeInterviewState> {
       }
       state = state.copyWith(askedQuestionCount: _askedQuestionIndexes.length);
     }
-
   }
 
   Future<void> _finalizeSession() async {

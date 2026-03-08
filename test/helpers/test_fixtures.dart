@@ -240,7 +240,7 @@ InterviewFeedbackEntity buildInterviewFeedbackEntity() {
 InterviewSessionStartEntity buildInterviewSessionStartEntity({
   String? vapiWebToken = 'web-token',
   List<Map<String, dynamic>> questions = const [
-    {'question': 'Tell me about yourself'}
+    {'question': 'Tell me about yourself'},
   ],
 }) {
   return InterviewSessionStartEntity(
@@ -388,7 +388,10 @@ ResourceCourseEntity buildResourceCourseEntity({String id = 'course-1'}) {
           ),
         ],
         coreConcepts: [
-          CoreConceptEntity(title: 'Widgets', explanation: 'Everything is a widget'),
+          CoreConceptEntity(
+            title: 'Widgets',
+            explanation: 'Everything is a widget',
+          ),
         ],
         interviewQuestions: [
           InterviewQuestionEntity(
@@ -446,10 +449,10 @@ ResumeDraftEntity buildResumeDraftEntity({String id = 'draft-1'}) {
       ),
     ],
     skills: [ResumeSkillEntity(name: 'Flutter')],
-    projects: [ResumeProjectEntity(name: 'Portfolio', technologies: ['Flutter'])],
-    certifications: [
-      ResumeCertificationEntity(name: 'AWS', issuer: 'Amazon'),
+    projects: [
+      ResumeProjectEntity(name: 'Portfolio', technologies: ['Flutter']),
     ],
+    certifications: [ResumeCertificationEntity(name: 'AWS', issuer: 'Amazon')],
     achievements: [ResumeAchievementEntity(title: 'Hackathon Winner')],
     professionalSummary: 'Builder',
     createdAt: '2026-01-01T00:00:00.000Z',
@@ -699,7 +702,10 @@ DashboardOverviewEntity buildDashboardOverviewEntity() {
     ),
     jobs: buildJobsBucketEntity(),
     readinessPoints: const [
-      DashboardInterviewReadinessPointEntity(label: 'Mock Interviews', score: 18),
+      DashboardInterviewReadinessPointEntity(
+        label: 'Mock Interviews',
+        score: 18,
+      ),
     ],
     analytics: const DashboardAnalyticsEntity(
       applicationsThisWeek: 12,
@@ -712,10 +718,18 @@ DashboardOverviewEntity buildDashboardOverviewEntity() {
         ),
       ],
       pipeline: [
-        DashboardPipelinePointEntity(stage: 'Applied', thisWeek: 5, lastWeek: 3),
+        DashboardPipelinePointEntity(
+          stage: 'Applied',
+          thisWeek: 5,
+          lastWeek: 3,
+        ),
       ],
       invitationMix: [
-        DashboardInvitationMixPointEntity(name: 'Tech', value: 60, fill: '#000'),
+        DashboardInvitationMixPointEntity(
+          name: 'Tech',
+          value: 60,
+          fill: '#000',
+        ),
       ],
     ),
     profileRating: 82,

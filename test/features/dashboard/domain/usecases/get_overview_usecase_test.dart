@@ -28,7 +28,10 @@ void main() {
   });
 
   test('overview usecase provider should resolve', () {
-    expect(container.read(getOverviewUseCaseProvider), isA<GetOverviewUseCase>());
+    expect(
+      container.read(getOverviewUseCaseProvider),
+      isA<GetOverviewUseCase>(),
+    );
   });
 
   test('GetOverviewUseCase should pass month key to repository', () async {
@@ -38,11 +41,11 @@ void main() {
     ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetOverviewUseCase(dashboardRepository: mockRepository);
-    final result = await usecase(const GetOverviewUseCaseParams(monthKey: '2026-03'));
+    final result = await usecase(
+      const GetOverviewUseCaseParams(monthKey: '2026-03'),
+    );
 
     expect(result, Right(expected));
-    verify(
-      () => mockRepository.getOverviewData(monthKey: '2026-03'),
-    ).called(1);
+    verify(() => mockRepository.getOverviewData(monthKey: '2026-03')).called(1);
   });
 }

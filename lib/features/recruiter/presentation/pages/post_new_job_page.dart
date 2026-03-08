@@ -83,12 +83,17 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
     final collegeState = ref.watch(collegeDashboardViewModelProvider);
     final recruiterState = ref.watch(recruiterViewModelProvider);
 
-    final collegeWorkspace = collegeState.selectedWorkspace ?? collegeState.workspaces?.firstOrNull;
-    final recruiterWorkspace = recruiterState.selectedWorkspace ?? recruiterState.workspaces?.firstOrNull;
+    final collegeWorkspace =
+        collegeState.selectedWorkspace ?? collegeState.workspaces?.firstOrNull;
+    final recruiterWorkspace =
+        recruiterState.selectedWorkspace ??
+        recruiterState.workspaces?.firstOrNull;
 
     final workspace = isCollege ? collegeWorkspace : recruiterWorkspace;
     final displayName = workspace != null
-        ? (workspace is CollegeWorkspaceEntity ? workspace.collegeName : (workspace as RecruiterWorkspaceEntity).companyName)
+        ? (workspace is CollegeWorkspaceEntity
+              ? workspace.collegeName
+              : (workspace as RecruiterWorkspaceEntity).companyName)
         : null;
 
     return Scaffold(
@@ -129,8 +134,9 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
               MyTextFormField(
                 controller: _titleController,
                 text: 'Job Title',
-                validator: (v) =>
-                    (v == null || v.trim().isEmpty) ? 'Job title is required' : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Job title is required'
+                    : null,
               ),
               const SizedBox(height: 16),
               const Text(
@@ -147,21 +153,17 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                 child: HtmlEditor(
                   controller: _descriptionController,
                   htmlEditorOptions: HtmlEditorOptions(
-                    hint: 'Describe responsibilities, outcomes, and team expectations.',
+                    hint:
+                        'Describe responsibilities, outcomes, and team expectations.',
                     initialText: widget.job?.description ?? '',
                   ),
-                  otherOptions: const OtherOptions(
-                    height: 260,
-                  ),
+                  otherOptions: const OtherOptions(height: 260),
                 ),
               ),
               const SizedBox(height: 8),
               const Text(
                 'Rich formatting is supported and will be shown in job details.',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textMedium,
-                ),
+                style: TextStyle(fontSize: 12, color: AppColors.textMedium),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -186,8 +188,6 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                   const SizedBox(width: 12),
                   OutlinedButton.icon(
                     onPressed: () async {
-                      // Use zero-duration route to avoid WebView fade when popping back
-                      // (flutter_inappwebview Hybrid Composition bug)
                       await Navigator.of(context).push(
                         PageRouteBuilder<void>(
                           pageBuilder: (_, __, ___) => LocationPickerPage(
@@ -226,7 +226,8 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                 items: ['Full-Time', 'Part-Time', 'Contract', 'Freelance']
                     .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                     .toList(),
-                onChanged: (v) => setState(() => _employmentType = v ?? 'Full-Time'),
+                onChanged: (v) =>
+                    setState(() => _employmentType = v ?? 'Full-Time'),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -245,10 +246,12 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                items: ['Internship', 'Project-Based', 'Consulting', 'Permanent']
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
-                onChanged: (v) => setState(() => _engagementType = v ?? 'Internship'),
+                items:
+                    ['Internship', 'Project-Based', 'Consulting', 'Permanent']
+                        .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                        .toList(),
+                onChanged: (v) =>
+                    setState(() => _engagementType = v ?? 'Internship'),
               ),
               const SizedBox(height: 16),
               const Text(
@@ -268,10 +271,18 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                   ),
                 ),
                 items: ['remote', 'hybrid', 'onsite']
-                    .map((e) => DropdownMenuItem(
-                          value: e,
-                          child: Text(e == 'onsite' ? 'Onsite' : e == 'remote' ? 'Remote' : 'Hybrid'),
-                        ))
+                    .map(
+                      (e) => DropdownMenuItem(
+                        value: e,
+                        child: Text(
+                          e == 'onsite'
+                              ? 'Onsite'
+                              : e == 'remote'
+                              ? 'Remote'
+                              : 'Hybrid',
+                        ),
+                      ),
+                    )
                     .toList(),
                 onChanged: (v) => setState(() => _workMode = v ?? 'onsite'),
               ),
@@ -302,14 +313,21 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                   if (date != null) setState(() => _deadline = date);
                 },
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
                     border: Border.all(color: AppColors.borderStroke),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.calendar_today, size: 20, color: AppColors.textMedium),
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 20,
+                        color: AppColors.textMedium,
+                      ),
                       const SizedBox(width: 12),
                       Text(
                         _deadline != null
@@ -317,7 +335,9 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
                             : 'Select deadline date',
                         style: TextStyle(
                           fontSize: 14,
-                          color: _deadline != null ? AppColors.textDark : AppColors.textMedium,
+                          color: _deadline != null
+                              ? AppColors.textDark
+                              : AppColors.textMedium,
                         ),
                       ),
                     ],
@@ -356,9 +376,14 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
       setState(() => _errorMessage = 'Description is required.');
       return;
     }
-    final plainLength = description.replaceAll(RegExp(r'<[^>]*>'), '').trim().length;
+    final plainLength = description
+        .replaceAll(RegExp(r'<[^>]*>'), '')
+        .trim()
+        .length;
     if (plainLength < 20) {
-      setState(() => _errorMessage = 'Description must be at least 20 characters.');
+      setState(
+        () => _errorMessage = 'Description must be at least 20 characters.',
+      );
       return;
     }
 
@@ -371,22 +396,29 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
     final collegeState = ref.read(collegeDashboardViewModelProvider);
     final recruiterState = ref.read(recruiterViewModelProvider);
 
-    final collegeWorkspace = collegeState.selectedWorkspace ?? collegeState.workspaces?.firstOrNull;
-    final recruiterWorkspace = recruiterState.selectedWorkspace ?? recruiterState.workspaces?.firstOrNull;
+    final collegeWorkspace =
+        collegeState.selectedWorkspace ?? collegeState.workspaces?.firstOrNull;
+    final recruiterWorkspace =
+        recruiterState.selectedWorkspace ??
+        recruiterState.workspaces?.firstOrNull;
 
     final workspace = isCollege ? collegeWorkspace : recruiterWorkspace;
     if (workspace == null) {
-      setState(() => _errorMessage = isCollege
-          ? 'No college workspace. Contact support.'
-          : 'No workspace selected. Please join a company first.');
+      setState(
+        () => _errorMessage = isCollege
+            ? 'No college workspace. Contact support.'
+            : 'No workspace selected. Please join a company first.',
+      );
       return;
     }
 
     setState(() => _isSubmitting = true);
 
     final payload = <String, dynamic>{
-      if (isCollege) 'collegeId': (workspace as CollegeWorkspaceEntity).collegeId,
-      if (!isCollege) 'companyId': (workspace as RecruiterWorkspaceEntity).companyId,
+      if (isCollege)
+        'collegeId': (workspace as CollegeWorkspaceEntity).collegeId,
+      if (!isCollege)
+        'companyId': (workspace as RecruiterWorkspaceEntity).companyId,
       'title': _titleController.text.trim(),
       'description': description,
       'deadline': _deadline!.toIso8601String(),
@@ -403,10 +435,14 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
 
     bool success = false;
     if (_isEditMode && widget.jobId != null) {
-      final updated = await ref.read(jobsViewModelProvider.notifier).updateJob(widget.jobId!, payload);
+      final updated = await ref
+          .read(jobsViewModelProvider.notifier)
+          .updateJob(widget.jobId!, payload);
       success = updated != null;
     } else {
-      final created = await ref.read(jobsViewModelProvider.notifier).createJob(payload);
+      final created = await ref
+          .read(jobsViewModelProvider.notifier)
+          .createJob(payload);
       success = created != null;
     }
 
@@ -418,12 +454,16 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
         _isEditMode ? 'Job updated successfully!' : 'Job created successfully!',
       );
       if (isCollege) {
-        ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
+        ref
+            .read(collegeDashboardViewModelProvider.notifier)
+            .loadCollegeJobs(
               collegeId: (workspace as CollegeWorkspaceEntity).collegeId,
               forceRefresh: true,
             );
       } else {
-        ref.read(recruiterViewModelProvider.notifier).loadCompanyJobs(
+        ref
+            .read(recruiterViewModelProvider.notifier)
+            .loadCompanyJobs(
               companyId: (workspace as RecruiterWorkspaceEntity).companyId,
               companyName: (workspace as RecruiterWorkspaceEntity).companyName,
               forceRefresh: true,
@@ -433,9 +473,11 @@ class _PostNewJobPageState extends ConsumerState<PostNewJobPage> {
         if (mounted) Navigator.of(context).pop();
       });
     } else {
-      setState(() => _errorMessage = _isEditMode
-          ? 'Failed to update job. Please try again.'
-          : 'Failed to create job. Please try again.');
+      setState(
+        () => _errorMessage = _isEditMode
+            ? 'Failed to update job. Please try again.'
+            : 'Failed to create job. Please try again.',
+      );
     }
   }
 }

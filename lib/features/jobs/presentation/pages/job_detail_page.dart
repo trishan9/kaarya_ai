@@ -545,8 +545,9 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
   List<JobEntity> _similarJobsForDisplay(JobDetailEntity job) {
     if (widget.isRecruiterManageView) {
       return job.similarJobs
-          .where((j) =>
-              j.companyName.toLowerCase() == job.companyName.toLowerCase())
+          .where(
+            (j) => j.companyName.toLowerCase() == job.companyName.toLowerCase(),
+          )
           .toList();
     }
     return job.similarJobs;
@@ -639,7 +640,9 @@ class _JobDetailPageState extends ConsumerState<JobDetailPage> {
                         PostNewJobPage(jobId: job.id, job: job),
                       );
                       if (context.mounted) {
-                        ref.read(jobsViewModelProvider.notifier).loadJobDetail(widget.jobId);
+                        ref
+                            .read(jobsViewModelProvider.notifier)
+                            .loadJobDetail(widget.jobId);
                       }
                     },
                     icon: const Icon(LucideIcons.pencil, size: 18),

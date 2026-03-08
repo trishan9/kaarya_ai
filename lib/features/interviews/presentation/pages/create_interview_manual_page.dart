@@ -120,8 +120,9 @@ class _CreateInterviewManualPageState
 
     if (!mounted) return;
     if (failure == null) {
-      final interview =
-          ref.read(createInterviewViewModelProvider).createdInterview;
+      final interview = ref
+          .read(createInterviewViewModelProvider)
+          .createdInterview;
       if (interview != null) widget.onCreated(interview);
     }
   }
@@ -156,10 +157,9 @@ class _CreateInterviewManualPageState
                     child: MyTextFormField(
                       controller: _titleController,
                       text: 'e.g. Frontend Engineering Mock Interview',
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'Interview title is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Interview title is required'
+                          : null,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -168,10 +168,9 @@ class _CreateInterviewManualPageState
                     child: MyTextFormField(
                       controller: _roleController,
                       text: 'e.g. Frontend Engineer, Data Scientist',
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? 'Role is required'
-                              : null,
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? 'Role is required'
+                          : null,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -322,10 +321,7 @@ class _CreateInterviewManualPageState
               child: _dropdown(
                 label: 'Interview status',
                 value: _status,
-                items: const [
-                  ('draft', 'Draft'),
-                  ('published', 'Published'),
-                ],
+                items: const [('draft', 'Draft'), ('published', 'Published')],
                 onChanged: (v) => setState(() => _status = v),
               ),
             ),
@@ -350,8 +346,7 @@ class _CreateInterviewManualPageState
                     controller: _descriptionController,
                     maxLines: 4,
                     decoration: InputDecoration(
-                      hintText:
-                          'Describe what this interview should focus on.',
+                      hintText: 'Describe what this interview should focus on.',
                       hintStyle: const TextStyle(color: AppColors.textLight),
                       filled: true,
                       fillColor: AppColors.bgTertiary,
@@ -436,7 +431,11 @@ class _CreateInterviewManualPageState
                 ),
                 child: Row(
                   children: [
-                    Icon(LucideIcons.circleAlert, color: AppColors.error, size: 20),
+                    Icon(
+                      LucideIcons.circleAlert,
+                      color: AppColors.error,
+                      size: 20,
+                    ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
@@ -456,7 +455,9 @@ class _CreateInterviewManualPageState
               onPressed: state.isLoading ? () {} : _submit,
               text: state.isLoading ? 'Creating...' : 'Create Interview',
               isLoading: state.isLoading,
-              icon: state.isLoading ? null : Icon(LucideIcons.plus, size: 18, color: Colors.white),
+              icon: state.isLoading
+                  ? null
+                  : Icon(LucideIcons.plus, size: 18, color: Colors.white),
             ),
           ],
         ),
@@ -586,10 +587,7 @@ class _CreateInterviewManualPageState
     );
   }
 
-  Widget _labeledField({
-    required String label,
-    required Widget child,
-  }) {
+  Widget _labeledField({required String label, required Widget child}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -617,9 +615,7 @@ class _CreateInterviewManualPageState
     return TextFormField(
       controller: controller,
       keyboardType: TextInputType.number,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-      ],
+      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
       validator: validator,
       decoration: _inputDecoration(hint: hint),
     );
@@ -653,8 +649,9 @@ class _CreateInterviewManualPageState
     required List<(String, String)> items,
     required void Function(String) onChanged,
   }) {
-    final effectiveValue =
-        items.any((e) => e.$1 == value) ? value : items.first.$1;
+    final effectiveValue = items.any((e) => e.$1 == value)
+        ? value
+        : items.first.$1;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

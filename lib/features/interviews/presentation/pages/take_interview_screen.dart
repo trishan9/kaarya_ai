@@ -66,7 +66,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
       final vm = ref.read(takeInterviewViewModelProvider.notifier);
       vm.reset();
       if (widget.interview != null) {
-        // Already have interview data, just set ready state
         vm.loadInterview(widget.interviewId);
       } else {
         vm.loadInterview(widget.interviewId);
@@ -103,7 +102,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
     final state = ref.watch(takeInterviewViewModelProvider);
     _currentPhase = state.phase;
 
-    // Auto-navigate to feedback on completion
     ref.listen(takeInterviewViewModelProvider, (prev, next) {
       if (prev?.phase != TakeInterviewPhase.completed &&
           next.phase == TakeInterviewPhase.completed &&
@@ -116,7 +114,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
           ),
         );
       }
-      // Auto-scroll transcript
       if (prev?.transcript.length != next.transcript.length) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (_transcriptScrollController.hasClients) {
@@ -241,7 +238,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
             ),
           ),
           const SizedBox(width: 8),
-          // Elapsed timer
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
@@ -330,7 +326,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
         borderRadius: BorderRadius.circular(15),
         child: Stack(
           children: [
-            // Background
             Container(
               height: 180,
               width: double.infinity,
@@ -363,7 +358,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
                       ),
                     ),
             ),
-            // Gradient overlay
             Positioned.fill(
               child: Container(
                 decoration: BoxDecoration(
@@ -378,7 +372,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
                 ),
               ),
             ),
-            // Top label
             Positioned(
               top: 8,
               left: 8,
@@ -398,7 +391,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
                 ),
               ),
             ),
-            // Bottom info
             Positioned(
               bottom: 8,
               left: 8,
@@ -622,7 +614,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
             ],
           ),
           const SizedBox(height: 10),
-          // Latest message highlight — shows partial (live) or last final
           if (state.partialMessage != null || state.transcript.isNotEmpty)
             Container(
               width: double.infinity,
@@ -667,7 +658,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
                 ],
               ),
             ),
-          // Full transcript
           Container(
             constraints: const BoxConstraints(maxHeight: 300),
             decoration: BoxDecoration(
@@ -1016,7 +1006,6 @@ class _TakeInterviewScreenState extends ConsumerState<TakeInterviewScreen>
   }
 
   Future<void> _onStartInterview() async {
-    // Request microphone permission
     final micStatus = await Permission.microphone.request();
     if (!micStatus.isGranted) {
       if (mounted) {

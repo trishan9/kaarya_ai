@@ -107,7 +107,6 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final hasEmailCredentials = provider?.toLowerCase() == 'email';
     final currentUserAsync = ref.watch(currentUserProvider);
 
-    // Prefill name/email from API when available (overrides session fallback)
     ref.listen(currentUserProvider, (previous, next) {
       if (next.hasValue && next.value != null) {
         _prefillFromApi(next.value!);

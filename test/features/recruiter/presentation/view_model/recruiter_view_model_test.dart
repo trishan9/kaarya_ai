@@ -35,23 +35,26 @@ void main() {
     container.dispose();
   });
 
-  test('RecruiterViewModel should load workspaces and select first one', () async {
-    final workspace = buildRecruiterWorkspaceEntity();
-    when(
-      () => mockCompanyRepository.listRecruiterWorkspaces(
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-      ),
-    ).thenAnswer((_) async => Right([workspace]));
+  test(
+    'RecruiterViewModel should load workspaces and select first one',
+    () async {
+      final workspace = buildRecruiterWorkspaceEntity();
+      when(
+        () => mockCompanyRepository.listRecruiterWorkspaces(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+        ),
+      ).thenAnswer((_) async => Right([workspace]));
 
-    final viewModel = container.read(recruiterViewModelProvider.notifier);
-    await viewModel.loadWorkspaces();
+      final viewModel = container.read(recruiterViewModelProvider.notifier);
+      await viewModel.loadWorkspaces();
 
-    final state = container.read(recruiterViewModelProvider);
-    expect(state.workspacesStatus, RecruiterLoadStatus.loaded);
-    expect(state.workspaces, [workspace]);
-    expect(state.selectedWorkspace, workspace);
-  });
+      final state = container.read(recruiterViewModelProvider);
+      expect(state.workspacesStatus, RecruiterLoadStatus.loaded);
+      expect(state.workspaces, [workspace]);
+      expect(state.selectedWorkspace, workspace);
+    },
+  );
 
   test('RecruiterViewModel should expose workspace error on failure', () async {
     const failure = ApiFailure(message: 'Workspace failed');
@@ -70,37 +73,40 @@ void main() {
     expect(state.workspacesError, 'Workspace failed');
   });
 
-  test('RecruiterViewModel should create workspace and select refreshed entry', () async {
-    final company = buildCompanyEntity();
-    final workspace = buildRecruiterWorkspaceEntity();
-    when(
-      () => mockCompanyRepository.createCompany(
-        name: any(named: 'name'),
-        industry: any(named: 'industry'),
-        location: any(named: 'location'),
-        logoPath: any(named: 'logoPath'),
-        designation: any(named: 'designation'),
-      ),
-    ).thenAnswer((_) async => Right(company));
-    when(
-      () => mockCompanyRepository.listRecruiterWorkspaces(
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-      ),
-    ).thenAnswer((_) async => Right([workspace]));
+  test(
+    'RecruiterViewModel should create workspace and select refreshed entry',
+    () async {
+      final company = buildCompanyEntity();
+      final workspace = buildRecruiterWorkspaceEntity();
+      when(
+        () => mockCompanyRepository.createCompany(
+          name: any(named: 'name'),
+          industry: any(named: 'industry'),
+          location: any(named: 'location'),
+          logoPath: any(named: 'logoPath'),
+          designation: any(named: 'designation'),
+        ),
+      ).thenAnswer((_) async => Right(company));
+      when(
+        () => mockCompanyRepository.listRecruiterWorkspaces(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+        ),
+      ).thenAnswer((_) async => Right([workspace]));
 
-    final viewModel = container.read(recruiterViewModelProvider.notifier);
-    final result = await viewModel.createWorkspace(
-      name: 'Kaarya',
-      industry: 'Software',
-      location: 'Kathmandu',
-      designation: 'HR',
-    );
+      final viewModel = container.read(recruiterViewModelProvider.notifier);
+      final result = await viewModel.createWorkspace(
+        name: 'Kaarya',
+        industry: 'Software',
+        location: 'Kathmandu',
+        designation: 'HR',
+      );
 
-    final state = container.read(recruiterViewModelProvider);
-    expect(result, isNull);
-    expect(state.selectedWorkspace?.companyId, workspace.companyId);
-  });
+      final state = container.read(recruiterViewModelProvider);
+      expect(result, isNull);
+      expect(state.selectedWorkspace?.companyId, workspace.companyId);
+    },
+  );
 
   test('RecruiterViewModel should load and filter company jobs', () async {
     final jobs = [

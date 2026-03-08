@@ -18,14 +18,17 @@ void main() {
     return MaterialApp(home: Scaffold(body: child));
   }
 
-  testWidgets('DeadlineCardWidget should show empty state when no job is provided', (
-    tester,
-  ) async {
-    await tester.pumpWidget(createTestWidget(const DeadlineCardWidget(job: null)));
+  testWidgets(
+    'DeadlineCardWidget should show empty state when no job is provided',
+    (tester) async {
+      await tester.pumpWidget(
+        createTestWidget(const DeadlineCardWidget(job: null)),
+      );
 
-    expect(find.text('Deadline Today!'), findsOneWidget);
-    expect(find.text('No upcoming deadlines'), findsOneWidget);
-  });
+      expect(find.text('Deadline Today!'), findsOneWidget);
+      expect(find.text('No upcoming deadlines'), findsOneWidget);
+    },
+  );
 
   testWidgets('InvitationCardWidget should show fallback invitation copy', (
     tester,
@@ -59,9 +62,7 @@ void main() {
   testWidgets('JobRecommendationWidget should switch filters', (tester) async {
     await tester.pumpWidget(
       createTestWidget(
-        JobRecommendationWidget(
-          jobsBucket: buildJobsBucketEntity(),
-        ),
+        JobRecommendationWidget(jobsBucket: buildJobsBucketEntity()),
       ),
     );
 
@@ -100,40 +101,45 @@ void main() {
     expect(tapped, isTrue);
   });
 
-  testWidgets('SummaryCardWidget should update application count when filter changes', (
+  testWidgets(
+    'SummaryCardWidget should update application count when filter changes',
+    (tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          SummaryCardWidget(summary: buildDashboardOverviewEntity().summary),
+        ),
+      );
+
+      expect(find.text('124'), findsOneWidget);
+
+      await tester.tap(find.textContaining('Applied'));
+      await tester.pump();
+
+      expect(find.text('50'), findsOneWidget);
+    },
+  );
+
+  testWidgets('TipsBannerWidget should show static banner copy', (
     tester,
   ) async {
-    await tester.pumpWidget(
-      createTestWidget(
-        SummaryCardWidget(summary: buildDashboardOverviewEntity().summary),
-      ),
-    );
-
-    expect(find.text('124'), findsOneWidget);
-
-    await tester.tap(find.textContaining('Applied'));
-    await tester.pump();
-
-    expect(find.text('50'), findsOneWidget);
-  });
-
-  testWidgets('TipsBannerWidget should show static banner copy', (tester) async {
     await tester.pumpWidget(createTestWidget(const TipsBannerWidget()));
 
     expect(find.textContaining("We've got some tips"), findsOneWidget);
   });
 
-  testWidgets('OverlappingAvatars should render extra count badge', (tester) async {
+  testWidgets('OverlappingAvatars should render extra count badge', (
+    tester,
+  ) async {
     await tester.pumpWidget(
-      createTestWidget(
-        const OverlappingAvatars(avatars: [], extraCount: 3),
-      ),
+      createTestWidget(const OverlappingAvatars(avatars: [], extraCount: 3)),
     );
 
     expect(find.text('+3'), findsOneWidget);
   });
 
-  testWidgets('OnboardingProgress should highlight active step', (tester) async {
+  testWidgets('OnboardingProgress should highlight active step', (
+    tester,
+  ) async {
     await tester.pumpWidget(
       createTestWidget(const OnboardingProgress(index: 2)),
     );
@@ -145,9 +151,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      createTestWidget(
-        RecruiterJobCardWidget(job: buildJobEntity()),
-      ),
+      createTestWidget(RecruiterJobCardWidget(job: buildJobEntity())),
     );
 
     expect(find.text('AI Engineer'), findsOneWidget);

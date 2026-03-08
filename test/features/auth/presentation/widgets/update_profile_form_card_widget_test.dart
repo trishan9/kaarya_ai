@@ -45,7 +45,9 @@ void main() {
       expect(find.text('Email Address'), findsOneWidget);
     });
 
-    testWidgets('should validate required name and email fields', (tester) async {
+    testWidgets('should validate required name and email fields', (
+      tester,
+    ) async {
       await tester.pumpWidget(createTestWidget());
 
       final isValid = formKey.currentState?.validate();

@@ -85,8 +85,6 @@ class _ResumeBuilderScreenState extends ConsumerState<ResumeBuilderScreen>
   }
 }
 
-// ─── AI Builder Tab ───────────────────────────────────────────────────────────
-
 class _AiBuilderTab extends ConsumerStatefulWidget {
   final VoidCallback onSwitchToAts;
 
@@ -662,8 +660,6 @@ class _AiBuilderTabState extends ConsumerState<_AiBuilderTab> {
   }
 }
 
-// ─── Draft Card ───────────────────────────────────────────────────────────────
-
 class _DraftCard extends StatelessWidget {
   final ResumeDraftEntity draft;
   final VoidCallback onEdit;
@@ -963,8 +959,6 @@ class _DraftCard extends StatelessWidget {
   }
 }
 
-// ─── ATS Scanner Tab ──────────────────────────────────────────────────────────
-
 class _AtsScannerTab extends ConsumerStatefulWidget {
   const _AtsScannerTab();
 
@@ -975,7 +969,6 @@ class _AtsScannerTab extends ConsumerStatefulWidget {
 class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
   String? _filePath;
   String? _fileName;
-  // Draft-based scanning
   String? _selectedDraftId;
   String? _selectedDraftTitle;
   bool _isPreparingDraft = false;
@@ -1005,7 +998,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
       children: [
-        // Header card
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
@@ -1343,7 +1335,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Report header ─────────────────────────────────────────────────
         Row(
           children: [
             const Expanded(
@@ -1419,7 +1410,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
           ),
         ],
         const SizedBox(height: 14),
-        // ── Stats row ─────────────────────────────────────────────────────
         Row(
           children: [
             Expanded(
@@ -1448,7 +1438,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
           ],
         ),
         const SizedBox(height: 16),
-        // ── Overall Readiness card ────────────────────────────────────────
         Container(
           padding: const EdgeInsets.all(18),
           decoration: BoxDecoration(
@@ -1471,7 +1460,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Circular gauge
                   SizedBox(
                     width: 110,
                     height: 110,
@@ -1502,7 +1490,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
                     ),
                   ),
                   const SizedBox(width: 18),
-                  // Feedback Summary
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1596,7 +1583,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
             ],
           ),
         ),
-        // ── Category Breakdown card ───────────────────────────────────────
         const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.all(18),
@@ -1629,7 +1615,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
             ],
           ),
         ),
-        // ── Per-category tips cards ───────────────────────────────────────
         if (categories.isNotEmpty)
           ...categories.map((c) => _categoryTipsCard(c.$1, c.$2)),
       ],
@@ -1738,9 +1723,7 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Accent left stripe
                 Container(width: 4, color: accentColor),
-                // Card content
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -2031,7 +2014,6 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
 
     String? scanPath = _filePath;
 
-    // If using a draft, generate PDF → download to temp file
     if (_selectedDraftId != null && scanPath == null) {
       setState(() => _isPreparingDraft = true);
       final (pdfResult, pdfFailure) = await vm.generatePdf(_selectedDraftId!);
@@ -2083,10 +2065,8 @@ class _AtsScannerTabState extends ConsumerState<_AtsScannerTab> {
       s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }
 
-// ─── Score Arc Painter ────────────────────────────────────────────────────────
-
 class _ScoreArcPainter extends CustomPainter {
-  final double progress; // 0.0 – 1.0
+  final double progress;
   final Color color;
 
   const _ScoreArcPainter(this.progress, this.color);
@@ -2096,7 +2076,7 @@ class _ScoreArcPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width / 2 - 10;
     const strokeWidth = 10.0;
-    // Arc spans 270° starting at 135° (bottom-left → top → bottom-right)
+
     const startAngle = 135 * math.pi / 180;
     const totalSweep = 270 * math.pi / 180;
 

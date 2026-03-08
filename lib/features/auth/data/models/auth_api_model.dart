@@ -29,7 +29,6 @@ class AuthApiModel {
 
   factory AuthApiModel.fromJson(Map<String, dynamic> json) {
     final model = _$AuthApiModelFromJson(json);
-    // Parse role from multiple possible API response keys (role, userRole, user_role)
     final role = _parseRole(json) ?? model.role;
     return AuthApiModel(
       id: model.id,

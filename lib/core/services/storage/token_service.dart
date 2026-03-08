@@ -31,7 +31,6 @@ class TokenService {
     if (normalized.isEmpty) return;
 
     await _secureStorage.write(key: _tokenKey, value: normalized);
-    // Remove any legacy plain-text token after secure write succeeds.
     await _prefs.remove(_tokenKey);
   }
 
@@ -41,8 +40,6 @@ class TokenService {
       return secureToken;
     }
 
-    // One-time migration path for installs that previously stored the JWT
-    // in shared preferences.
     final legacyToken = _prefs.getString(_tokenKey);
     if (legacyToken != null && legacyToken.trim().isNotEmpty) {
       await _secureStorage.write(key: _tokenKey, value: legacyToken.trim());

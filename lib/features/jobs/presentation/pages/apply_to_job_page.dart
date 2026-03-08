@@ -64,7 +64,6 @@ class _ApplyToJobPageState extends ConsumerState<ApplyToJobPage> {
     Future.microtask(() {
       if (!mounted) return;
       setState(() {
-        // Pre-select default resume from profile, or fallback to first
         if (prefs.defaultResumeId != null &&
             resumes.any((r) => r.id == prefs.defaultResumeId)) {
           _selectedResumeId = prefs.defaultResumeId;
@@ -72,7 +71,6 @@ class _ApplyToJobPageState extends ConsumerState<ApplyToJobPage> {
           _selectedResumeId = resumes.first.id;
         }
 
-        // Pre-fill portfolio links
         final links = <String>[];
         if (prefs.portfolioUrl != null && prefs.portfolioUrl!.isNotEmpty) {
           links.add(prefs.portfolioUrl!);
@@ -317,12 +315,11 @@ class _ApplyToJobPageState extends ConsumerState<ApplyToJobPage> {
                 return InkWell(
                   onTap: () {
                     setState(() {
-                      // Toggle selection: tap again to deselect
                       if (_selectedResumeId == resume.id) {
                         _selectedResumeId = null;
                       } else {
                         _selectedResumeId = resume.id;
-                        _pickedFile = null; // Clear uploaded file when choosing existing
+                        _pickedFile = null;
                       }
                     });
                   },

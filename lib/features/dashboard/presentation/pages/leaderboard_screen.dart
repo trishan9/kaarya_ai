@@ -11,18 +11,11 @@ import 'package:kaarya/features/leaderboard/domain/entities/leaderboard_entity.d
 import 'package:kaarya/features/leaderboard/presentation/view_model/leaderboard_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-// ─── Palette ──────────────────────────────────────────────────────────────────
-const _rankColors = [
-  Color(0xFF38BDF8), // #1 Champion   – sky-400
-  Color(0xFFA5B4FC), // #2 Runner-up  – indigo-300
-  Color(0xFF6EE7B7), // #3 3rd Place  – emerald-300
-];
+const _rankColors = [Color(0xFF38BDF8), Color(0xFFA5B4FC), Color(0xFF6EE7B7)];
 const _youBadge = Color(0xFF4F46E5);
 const _gold = Color(0xFFFFD700);
 const _silver = Color(0xFFC0C0C0);
 const _bronze = Color(0xFFCD7F32);
-
-// ─── Screen ───────────────────────────────────────────────────────────────────
 
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
@@ -51,21 +44,18 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     final isRecruiter = ref.read(isRecruiterProvider);
     final collegeId = _selectedCollegeId;
 
-    // College role: always college leaderboard
     if (isCollege && collegeId != null) {
       ref
           .read(leaderboardViewModelProvider.notifier)
           .loadLeaderboard(scope: 'college', collegeId: collegeId);
       return;
     }
-    // Recruiter: always global
     if (isRecruiter) {
       ref
           .read(leaderboardViewModelProvider.notifier)
           .loadLeaderboard(scope: 'global');
       return;
     }
-    // Candidate: use _scope; when college scope, pass collegeId
     ref
         .read(leaderboardViewModelProvider.notifier)
         .loadLeaderboard(
@@ -118,7 +108,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
         collegeState.workspacesStatus == CollegeDashboardLoadStatus.loaded &&
         (collegeState.workspaces?.isNotEmpty ?? false);
 
-    // Show scope toggle only for candidates who are in a college workspace
     final showScopeToggle = !isRecruiter && !isCollege && hasCollegeWorkspaces;
 
     final state = ref.watch(leaderboardViewModelProvider);
@@ -189,8 +178,6 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen> {
     );
   }
 }
-
-// ─── Hero Banner ─────────────────────────────────────────────────────────────
 
 class _HeroBanner extends StatelessWidget {
   final LeaderboardEntity? data;
@@ -316,8 +303,6 @@ class _StatBox extends StatelessWidget {
     );
   }
 }
-
-// ─── Scope Toggle ─────────────────────────────────────────────────────────────
 
 class _ScopeToggle extends StatelessWidget {
   final String scope;
@@ -650,7 +635,6 @@ class _PodiumCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  // "You" badge — always occupies space to keep all cards same height
                   Visibility(
                     visible: isCurrentUser,
                     maintainSize: true,
@@ -676,7 +660,6 @@ class _PodiumCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  // Metrics grid
                   _MetricsGrid(entry: entry),
                 ],
               ),
@@ -769,8 +752,6 @@ class _MetricCell extends StatelessWidget {
     );
   }
 }
-
-// ─── Ranking Table ───────────────────────────────────────────────────────────
 
 class _RankingTable extends StatelessWidget {
   final List<LeaderboardEntryEntity> entries;
@@ -1371,8 +1352,6 @@ class _QualityTable extends StatelessWidget {
   }
 }
 
-// ─── Error State ──────────────────────────────────────────────────────────────
-
 class _ErrorState extends StatelessWidget {
   final String? message;
   final VoidCallback onRetry;
@@ -1409,8 +1388,6 @@ class _ErrorState extends StatelessWidget {
     );
   }
 }
-
-// ─── Shared Avatar ────────────────────────────────────────────────────────────
 
 class _Avatar extends StatelessWidget {
   final String name;

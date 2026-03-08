@@ -41,7 +41,6 @@ class ResourceCourseApiModel {
 
   factory ResourceCourseApiModel.fromApiResponse(Map<String, dynamic> json) {
     final chaptersRaw = jsonAsList(json['chapters']);
-    // createdBy can be a Map (populated user object) or a plain String ID
     final createdByRaw = json['createdBy'];
     final createdById = createdByRaw is Map
         ? jsonString(createdByRaw['_id'] ?? createdByRaw['id'])
@@ -125,7 +124,9 @@ class CourseChapterApiModel {
     return CourseChapterApiModel(
       title: jsonString(json['title']),
       sections: jsonAsList(json['sections'])
-          .map((e) => ChapterSectionApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
+          .map(
+            (e) => ChapterSectionApiModel.fromApiResponse(jsonAsMap(e) ?? {}),
+          )
           .toList(),
       videos: jsonAsList(json['videos'])
           .map((e) => ChapterVideoApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
@@ -134,7 +135,10 @@ class CourseChapterApiModel {
           .map((e) => CoreConceptApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
           .toList(),
       interviewQuestions: jsonAsList(json['interviewQuestions'])
-          .map((e) => InterviewQuestionApiModel.fromApiResponse(jsonAsMap(e) ?? {}))
+          .map(
+            (e) =>
+                InterviewQuestionApiModel.fromApiResponse(jsonAsMap(e) ?? {}),
+          )
           .toList(),
       practicePrompts: jsonStringList(json['practicePrompts']),
     );

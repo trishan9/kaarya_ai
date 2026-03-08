@@ -8,8 +8,6 @@ import 'package:kaarya/features/resume_builder/presentation/state/resume_builder
 import 'package:kaarya/features/resume_builder/presentation/view_model/resume_builder_view_model.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-// ─── Helper data classes for form entries ────────────────────────────────────
-
 class _ExpEntry {
   final companyCtrl = TextEditingController();
   final jobTitleCtrl = TextEditingController();
@@ -111,8 +109,6 @@ class _ProjectEntry {
   }
 }
 
-// ─── Step metadata ────────────────────────────────────────────────────────────
-
 const _stepLabels = [
   'Setup',
   'Contact',
@@ -130,8 +126,6 @@ const _templateOptions = [
   ('executive', 'Executive', 'Leadership Style', Color(0xFF0F172A)),
 ];
 
-// ─── Main page ────────────────────────────────────────────────────────────────
-
 class ResumeEditorPage extends ConsumerStatefulWidget {
   final String? draftId;
 
@@ -146,15 +140,11 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   String? _draftId;
   bool _isLoading = false;
 
-  // Accumulated content in the web schema — always sent as a whole to avoid
-  // the backend replacing the entire content object on each step save.
   final Map<String, dynamic> _contentData = {};
 
-  // Step 0 – Setup
   final _titleCtrl = TextEditingController();
   String _template = 'professional';
 
-  // Step 1 – Contact
   final _nameCtrl = TextEditingController();
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
@@ -163,21 +153,17 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
   final _githubCtrl = TextEditingController();
   final _portfolioCtrl = TextEditingController();
 
-  // Step 2 – Summary
   final _summaryCtrl = TextEditingController();
   final _targetRoleCtrl = TextEditingController();
   bool _isGeneratingSummary = false;
 
-  // Step 3 – Experience
   final List<_ExpEntry> _experiences = [_ExpEntry()];
   int? _generatingBulletsFor;
 
-  // Step 4 – Education & Skills
   final List<_EduEntry> _educations = [_EduEntry()];
   final List<String> _skills = [];
   final _skillInputCtrl = TextEditingController();
 
-  // Step 5 – Projects
   final List<_ProjectEntry> _projects = [];
   final List<TextEditingController> _techInputCtrls = [];
 
@@ -244,8 +230,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       _techInputCtrls.add(TextEditingController());
     }
 
-    // Populate the accumulated content cache so that each step update
-    // carries all previously saved data (backend replaces content entirely).
     final nameParts = d.personalInfo.name.trim().split(' ');
     final locationParts = d.personalInfo.location.split(',');
     _contentData['personalInfo'] = {
@@ -330,8 +314,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     super.dispose();
   }
 
-  // ─── Navigation ────────────────────────────────────────────────────────────
-
   Future<void> _nextStep() async {
     if (!_validate()) return;
 
@@ -340,7 +322,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     final vm = ref.read(resumeBuilderViewModelProvider.notifier);
 
     if (_draftId == null) {
-      // Step 0 → create draft
       final failure = await vm.createDraft(
         title: _titleCtrl.text.trim(),
         template: _template,
@@ -353,7 +334,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       }
       _draftId = ref.read(resumeBuilderViewModelProvider).draftDetailData?.id;
     } else {
-      // Save current step data
       final fields = _currentFields();
       if (fields.isNotEmpty) {
         final failure = await vm.updateDraft(
@@ -385,13 +365,9 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     return true;
   }
 
-  // Returns the fields to PATCH for the current step.
-  // The backend replaces `content` entirely on each PATCH, so we always send
-  // the full accumulated _contentData — not just the current step's portion.
   Map<String, dynamic> _currentFields() {
     switch (_step) {
       case 0:
-        // Step 0 in edit mode: update title + template only (no content).
         return {'title': _titleCtrl.text.trim(), 'templateId': _template};
       case 1:
         final nameParts = _nameCtrl.text.trim().split(' ');
@@ -470,8 +446,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     );
   }
 
-  // ─── AI helpers ─────────────────────────────────────────────────────────────
-
   Future<void> _generateSummary() async {
     if (_targetRoleCtrl.text.trim().isEmpty) {
       _showError('Enter a target role first');
@@ -520,8 +494,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     });
     if (failure != null) _showError(failure.message);
   }
-
-  // ─── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -731,8 +703,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     );
   }
 
-  // ─── Step 0: Setup ──────────────────────────────────────────────────────────
-
   Widget _buildSetup() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -833,8 +803,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     );
   }
 
-  // ─── Step 1: Contact ────────────────────────────────────────────────────────
-
   Widget _buildContact() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -897,8 +865,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       ],
     );
   }
-
-  // ─── Step 2: Summary ────────────────────────────────────────────────────────
 
   Widget _buildSummary() {
     final state = ref.watch(resumeBuilderViewModelProvider);
@@ -979,8 +945,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       ],
     );
   }
-
-  // ─── Step 3: Experience ─────────────────────────────────────────────────────
 
   Widget _buildExperience() {
     return Column(
@@ -1189,7 +1153,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
                   maxLines: 3,
                 ),
                 const SizedBox(height: 12),
-                // Bullets section
                 if (entry.bullets.isNotEmpty) ...[
                   _label('Key Achievements'),
                   const SizedBox(height: 6),
@@ -1274,8 +1237,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       ),
     );
   }
-
-  // ─── Step 4: Education & Skills ─────────────────────────────────────────────
 
   Widget _buildEducation() {
     return Column(
@@ -1517,8 +1478,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     });
   }
 
-  // ─── Step 5: Projects ───────────────────────────────────────────────────────
-
   Widget _buildProjects() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1748,8 +1707,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
     );
   }
 
-  // ─── Step 6: Finalize ───────────────────────────────────────────────────────
-
   Widget _buildFinalize() {
     final state = ref.watch(resumeBuilderViewModelProvider);
     final vm = ref.read(resumeBuilderViewModelProvider.notifier);
@@ -1766,7 +1723,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           'Review and export your resume',
         ),
         const SizedBox(height: 16),
-        // Summary cards
         _finalizeSummaryCard(
           LucideIcons.user,
           'Contact',
@@ -1809,7 +1765,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
             const Color(0xFF0891B2),
           ),
         const SizedBox(height: 20),
-        // Generate PDF
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
@@ -1841,7 +1796,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
           ),
         ),
         const SizedBox(height: 10),
-        // Save as active resume
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -2015,8 +1969,6 @@ class _ResumeEditorPageState extends ConsumerState<ResumeEditorPage> {
       );
     }
   }
-
-  // ─── Shared helpers ──────────────────────────────────────────────────────────
 
   Widget _sectionHeader(IconData icon, String title, String subtitle) {
     return Row(

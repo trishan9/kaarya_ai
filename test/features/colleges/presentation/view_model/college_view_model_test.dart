@@ -32,7 +32,8 @@ class MockDeleteCollegeUseCase extends Mock implements DeleteCollegeUseCase {}
 
 class MockJoinByCodeUseCase extends Mock implements JoinByCodeUseCase {}
 
-class MockResetInviteCodeUseCase extends Mock implements ResetInviteCodeUseCase {}
+class MockResetInviteCodeUseCase extends Mock
+    implements ResetInviteCodeUseCase {}
 
 class MockListStudentsUseCase extends Mock implements ListStudentsUseCase {}
 
@@ -126,16 +127,26 @@ void main() {
         getCollegeByIdUseCaseProvider.overrideWithValue(
           mockGetCollegeByIdUseCase,
         ),
-        createCollegeUseCaseProvider.overrideWithValue(mockCreateCollegeUseCase),
-        updateCollegeUseCaseProvider.overrideWithValue(mockUpdateCollegeUseCase),
-        deleteCollegeUseCaseProvider.overrideWithValue(mockDeleteCollegeUseCase),
+        createCollegeUseCaseProvider.overrideWithValue(
+          mockCreateCollegeUseCase,
+        ),
+        updateCollegeUseCaseProvider.overrideWithValue(
+          mockUpdateCollegeUseCase,
+        ),
+        deleteCollegeUseCaseProvider.overrideWithValue(
+          mockDeleteCollegeUseCase,
+        ),
         joinByCodeUseCaseProvider.overrideWithValue(mockJoinByCodeUseCase),
         resetInviteCodeUseCaseProvider.overrideWithValue(
           mockResetInviteCodeUseCase,
         ),
         listStudentsUseCaseProvider.overrideWithValue(mockListStudentsUseCase),
-        inviteStudentUseCaseProvider.overrideWithValue(mockInviteStudentUseCase),
-        removeStudentUseCaseProvider.overrideWithValue(mockRemoveStudentUseCase),
+        inviteStudentUseCaseProvider.overrideWithValue(
+          mockInviteStudentUseCase,
+        ),
+        removeStudentUseCaseProvider.overrideWithValue(
+          mockRemoveStudentUseCase,
+        ),
         listCollegeWorkspacesUseCaseProvider.overrideWithValue(
           mockListCollegeWorkspacesUseCase,
         ),
@@ -179,27 +190,30 @@ void main() {
     expect(state.collegeDetail, college);
   });
 
-  test('CollegeViewModel should remove student from current state on success', () async {
-    when(
-      () => mockRemoveStudentUseCase(any()),
-    ).thenAnswer((_) async => const Right(true));
+  test(
+    'CollegeViewModel should remove student from current state on success',
+    () async {
+      when(
+        () => mockRemoveStudentUseCase(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-    final viewModel = container.read(collegeViewModelProvider.notifier);
-    viewModel.state = CollegeState(
-      students: [
-        buildStudentMemberEntity(userId: 'student-1'),
-        buildStudentMemberEntity(userId: 'student-2'),
-      ],
-    );
+      final viewModel = container.read(collegeViewModelProvider.notifier);
+      viewModel.state = CollegeState(
+        students: [
+          buildStudentMemberEntity(userId: 'student-1'),
+          buildStudentMemberEntity(userId: 'student-2'),
+        ],
+      );
 
-    final result = await viewModel.removeStudent(
-      collegeId: 'college-1',
-      studentId: 'student-1',
-    );
+      final result = await viewModel.removeStudent(
+        collegeId: 'college-1',
+        studentId: 'student-1',
+      );
 
-    expect(result, isNull);
-    expect(container.read(collegeViewModelProvider).students?.length, 1);
-  });
+      expect(result, isNull);
+      expect(container.read(collegeViewModelProvider).students?.length, 1);
+    },
+  );
 
   test('CollegeViewModel should load workspaces and metrics', () async {
     when(

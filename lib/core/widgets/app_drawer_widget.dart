@@ -101,10 +101,8 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.squarePlus,
         title: 'Post New Job',
         selected: pushedPage == PushedPageKeys.postNewJob,
-        onTap: () => pushTrackedPage(
-          PushedPageKeys.postNewJob,
-          const PostNewJobPage(),
-        ),
+        onTap: () =>
+            pushTrackedPage(PushedPageKeys.postNewJob, const PostNewJobPage()),
       ),
       _navItem(
         icon: LucideIcons.calendar,
@@ -135,8 +133,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.bookOpen,
         title: 'Resources',
         selected: pushedPage == PushedPageKeys.resources,
-        onTap: () =>
-            pushTrackedPage(PushedPageKeys.resources, const ResourcesHubScreen()),
+        onTap: () => pushTrackedPage(
+          PushedPageKeys.resources,
+          const ResourcesHubScreen(),
+        ),
       ),
       _navItem(
         icon: LucideIcons.inbox,
@@ -148,10 +148,8 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.settings,
         title: 'Account Settings',
         selected: pushedPage == PushedPageKeys.settings,
-        onTap: () => pushTrackedPage(
-          PushedPageKeys.settings,
-          const SettingsPage(),
-        ),
+        onTap: () =>
+            pushTrackedPage(PushedPageKeys.settings, const SettingsPage()),
       ),
       const SizedBox(height: 20),
     ];
@@ -189,10 +187,8 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.squarePlus,
         title: 'Post New Job',
         selected: pushedPage == PushedPageKeys.postNewJob,
-        onTap: () => pushTrackedPage(
-          PushedPageKeys.postNewJob,
-          const PostNewJobPage(),
-        ),
+        onTap: () =>
+            pushTrackedPage(PushedPageKeys.postNewJob, const PostNewJobPage()),
       ),
       _navItem(
         icon: LucideIcons.calendar,
@@ -214,8 +210,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.settings2,
         title: 'College Settings',
         selected:
-            pushedPage == null &&
-            current == CollegeDestination.collegeSettings,
+            pushedPage == null && current == CollegeDestination.collegeSettings,
         onTap: () => goToCollegeDest(CollegeDestination.collegeSettings),
       ),
       const SizedBox(height: 8),
@@ -224,8 +219,10 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.bookOpen,
         title: 'Resources',
         selected: pushedPage == PushedPageKeys.resources,
-        onTap: () =>
-            pushTrackedPage(PushedPageKeys.resources, const ResourcesHubScreen()),
+        onTap: () => pushTrackedPage(
+          PushedPageKeys.resources,
+          const ResourcesHubScreen(),
+        ),
       ),
       _navItem(
         icon: LucideIcons.inbox,
@@ -237,10 +234,8 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.settings,
         title: 'Account Settings',
         selected: pushedPage == PushedPageKeys.settings,
-        onTap: () => pushTrackedPage(
-          PushedPageKeys.settings,
-          const SettingsPage(),
-        ),
+        onTap: () =>
+            pushTrackedPage(PushedPageKeys.settings, const SettingsPage()),
       ),
       const SizedBox(height: 20),
     ];
@@ -360,8 +355,7 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
         icon: LucideIcons.bookmark,
         title: 'Saved',
         selected: pushedPage == PushedPageKeys.saved,
-        onTap: () =>
-            pushTrackedPage(PushedPageKeys.saved, const SavedPage()),
+        onTap: () => pushTrackedPage(PushedPageKeys.saved, const SavedPage()),
       ),
       _navItem(
         icon: LucideIcons.inbox,
@@ -428,11 +422,11 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
       final previousPageKey = ref.read(pushedPageProvider);
       pushedPageNotifier.state = pageKey;
       AppRoutes.pop(context);
-      Navigator.of(context)
-          .push(MaterialPageRoute(builder: (_) => page))
-          .then((_) {
-            pushedPageNotifier.state = previousPageKey;
-          });
+      Navigator.of(context).push(MaterialPageRoute(builder: (_) => page)).then((
+        _,
+      ) {
+        pushedPageNotifier.state = previousPageKey;
+      });
     }
 
     return Drawer(
@@ -972,7 +966,6 @@ class _AppDrawerWidgetState extends ConsumerState<AppDrawerWidget> {
   }
 }
 
-/// Prompt for candidates with no colleges to join via invite code.
 class _JoinCollegePrompt extends StatelessWidget {
   const _JoinCollegePrompt({required this.onJoin});
 
@@ -1072,7 +1065,6 @@ class _JoinCollegePrompt extends StatelessWidget {
   }
 }
 
-/// Display-only college selector for college role - no switch or create.
 class _CollegeDisplayOnly extends StatelessWidget {
   const _CollegeDisplayOnly({required this.workspace});
 
@@ -1178,7 +1170,6 @@ class _CollegeDisplayOnly extends StatelessWidget {
   }
 }
 
-/// College workspace selector for candidates - with switch and join (no create).
 class _CollegeSelectorForCandidate extends StatelessWidget {
   const _CollegeSelectorForCandidate({
     required this.workspaces,
@@ -1401,7 +1392,6 @@ class _WorkspaceSelector extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Header: WORKSPACES title + create icon on the right
           Padding(
             padding: const EdgeInsets.fromLTRB(8, 4, 8, 8),
             child: Row(
@@ -1431,7 +1421,6 @@ class _WorkspaceSelector extends StatelessWidget {
               ],
             ),
           ),
-          // Workspace selector: white card with logo, name, arrow
           Material(
             color: Colors.transparent,
             child: InkWell(

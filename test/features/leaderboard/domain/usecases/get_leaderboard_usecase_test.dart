@@ -8,7 +8,8 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_fixtures.dart';
 
-class MockLeaderboardRepository extends Mock implements ILeaderboardRepository {}
+class MockLeaderboardRepository extends Mock
+    implements ILeaderboardRepository {}
 
 void main() {
   late MockLeaderboardRepository mockRepository;
@@ -28,7 +29,10 @@ void main() {
   });
 
   test('leaderboard usecase provider should resolve', () {
-    expect(container.read(getLeaderboardUseCaseProvider), isA<GetLeaderboardUseCase>());
+    expect(
+      container.read(getLeaderboardUseCaseProvider),
+      isA<GetLeaderboardUseCase>(),
+    );
   });
 
   test('GetLeaderboardUseCase should pass filters to repository', () async {

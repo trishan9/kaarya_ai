@@ -31,13 +31,16 @@ class MockDeleteCompanyUseCase extends Mock implements DeleteCompanyUseCase {}
 
 class MockJoinByCodeUseCase extends Mock implements JoinByCodeUseCase {}
 
-class MockResetInviteCodeUseCase extends Mock implements ResetInviteCodeUseCase {}
+class MockResetInviteCodeUseCase extends Mock
+    implements ResetInviteCodeUseCase {}
 
 class MockListRecruitersUseCase extends Mock implements ListRecruitersUseCase {}
 
-class MockInviteRecruiterUseCase extends Mock implements InviteRecruiterUseCase {}
+class MockInviteRecruiterUseCase extends Mock
+    implements InviteRecruiterUseCase {}
 
-class MockRemoveRecruiterUseCase extends Mock implements RemoveRecruiterUseCase {}
+class MockRemoveRecruiterUseCase extends Mock
+    implements RemoveRecruiterUseCase {}
 
 class MockListRecruiterWorkspacesUseCase extends Mock
     implements ListRecruiterWorkspacesUseCase {}
@@ -79,10 +82,7 @@ void main() {
       const DeleteCompanyUseCaseParams(companyId: 'company-1'),
     );
     registerFallbackValue(
-      const JoinByCodeUseCaseParams(
-        inviteCode: 'JOIN123',
-        designation: 'HR',
-      ),
+      const JoinByCodeUseCaseParams(inviteCode: 'JOIN123', designation: 'HR'),
     );
     registerFallbackValue(
       const ResetInviteCodeUseCaseParams(companyId: 'company-1'),
@@ -121,13 +121,21 @@ void main() {
 
     container = ProviderContainer(
       overrides: [
-        listCompaniesUseCaseProvider.overrideWithValue(mockListCompaniesUseCase),
+        listCompaniesUseCaseProvider.overrideWithValue(
+          mockListCompaniesUseCase,
+        ),
         getCompanyByIdUseCaseProvider.overrideWithValue(
           mockGetCompanyByIdUseCase,
         ),
-        createCompanyUseCaseProvider.overrideWithValue(mockCreateCompanyUseCase),
-        updateCompanyUseCaseProvider.overrideWithValue(mockUpdateCompanyUseCase),
-        deleteCompanyUseCaseProvider.overrideWithValue(mockDeleteCompanyUseCase),
+        createCompanyUseCaseProvider.overrideWithValue(
+          mockCreateCompanyUseCase,
+        ),
+        updateCompanyUseCaseProvider.overrideWithValue(
+          mockUpdateCompanyUseCase,
+        ),
+        deleteCompanyUseCaseProvider.overrideWithValue(
+          mockDeleteCompanyUseCase,
+        ),
         joinByCodeUseCaseProvider.overrideWithValue(mockJoinByCodeUseCase),
         resetInviteCodeUseCaseProvider.overrideWithValue(
           mockResetInviteCodeUseCase,
@@ -180,45 +188,51 @@ void main() {
     expect(state.companyDetail, company);
   });
 
-  test('CompanyViewModel should set company detail on create success', () async {
-    final company = buildCompanyEntity();
-    when(
-      () => mockCreateCompanyUseCase(any()),
-    ).thenAnswer((_) async => Right(company));
+  test(
+    'CompanyViewModel should set company detail on create success',
+    () async {
+      final company = buildCompanyEntity();
+      when(
+        () => mockCreateCompanyUseCase(any()),
+      ).thenAnswer((_) async => Right(company));
 
-    final viewModel = container.read(companyViewModelProvider.notifier);
-    final result = await viewModel.createCompany(
-      name: 'Kaarya',
-      industry: 'Software',
-      location: 'Kathmandu',
-      designation: 'HR',
-    );
+      final viewModel = container.read(companyViewModelProvider.notifier);
+      final result = await viewModel.createCompany(
+        name: 'Kaarya',
+        industry: 'Software',
+        location: 'Kathmandu',
+        designation: 'HR',
+      );
 
-    expect(result, isNull);
-    expect(container.read(companyViewModelProvider).companyDetail, company);
-  });
+      expect(result, isNull);
+      expect(container.read(companyViewModelProvider).companyDetail, company);
+    },
+  );
 
-  test('CompanyViewModel should update recruiter list on remove success', () async {
-    when(
-      () => mockRemoveRecruiterUseCase(any()),
-    ).thenAnswer((_) async => const Right(true));
+  test(
+    'CompanyViewModel should update recruiter list on remove success',
+    () async {
+      when(
+        () => mockRemoveRecruiterUseCase(any()),
+      ).thenAnswer((_) async => const Right(true));
 
-    final viewModel = container.read(companyViewModelProvider.notifier);
-    viewModel.state = CompanyState(
-      recruiters: [
-        buildWorkspaceMemberEntity(userId: 'user-1'),
-        buildWorkspaceMemberEntity(userId: 'user-2'),
-      ],
-    );
+      final viewModel = container.read(companyViewModelProvider.notifier);
+      viewModel.state = CompanyState(
+        recruiters: [
+          buildWorkspaceMemberEntity(userId: 'user-1'),
+          buildWorkspaceMemberEntity(userId: 'user-2'),
+        ],
+      );
 
-    final result = await viewModel.removeRecruiter(
-      companyId: 'company-1',
-      recruiterId: 'user-1',
-    );
+      final result = await viewModel.removeRecruiter(
+        companyId: 'company-1',
+        recruiterId: 'user-1',
+      );
 
-    expect(result, isNull);
-    expect(container.read(companyViewModelProvider).recruiters?.length, 1);
-  });
+      expect(result, isNull);
+      expect(container.read(companyViewModelProvider).recruiters?.length, 1);
+    },
+  );
 
   test('CompanyViewModel should load workspaces successfully', () async {
     final workspaces = [buildRecruiterWorkspaceEntity()];

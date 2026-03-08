@@ -27,14 +27,15 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
   void initState() {
     super.initState();
     Future.microtask(() async {
-      await ref.read(collegeDashboardViewModelProvider.notifier).loadWorkspaces();
+      await ref
+          .read(collegeDashboardViewModelProvider.notifier)
+          .loadWorkspaces();
       final state = ref.read(collegeDashboardViewModelProvider);
       final ws = state.selectedWorkspace ?? state.workspaces?.firstOrNull;
       if (ws != null) {
-        await ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
-              collegeId: ws.collegeId,
-              forceRefresh: true,
-            );
+        await ref
+            .read(collegeDashboardViewModelProvider.notifier)
+            .loadCollegeJobs(collegeId: ws.collegeId, forceRefresh: true);
       }
     });
   }
@@ -72,7 +73,9 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
 
     return RefreshIndicator(
       onRefresh: () async {
-        await ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
+        await ref
+            .read(collegeDashboardViewModelProvider.notifier)
+            .loadCollegeJobs(
               collegeId: workspace.collegeId,
               search: _searchController.text.trim().isEmpty
                   ? null
@@ -195,11 +198,13 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
                             vertical: 12,
                           ),
                         ),
-                        onSubmitted: (_) => _refreshWithFilters(workspace.collegeId),
+                        onSubmitted: (_) =>
+                            _refreshWithFilters(workspace.collegeId),
                       ),
                       const SizedBox(height: 12),
                       MyButton(
-                        onPressed: () => _refreshWithFilters(workspace.collegeId),
+                        onPressed: () =>
+                            _refreshWithFilters(workspace.collegeId),
                         text: 'Find Job',
                         icon: const Icon(
                           LucideIcons.search,
@@ -226,7 +231,8 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
                             vertical: 12,
                           ),
                         ),
-                        onSubmitted: (_) => _refreshWithFilters(workspace.collegeId),
+                        onSubmitted: (_) =>
+                            _refreshWithFilters(workspace.collegeId),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -263,10 +269,7 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
                   padding: EdgeInsets.all(40),
                   child: Text(
                     'No jobs match your filters.',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: AppColors.textMedium,
-                    ),
+                    style: TextStyle(fontSize: 16, color: AppColors.textMedium),
                   ),
                 ),
               )
@@ -311,9 +314,7 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
         side: BorderSide(
           color: selected ? AppColors.primary : AppColors.borderStroke,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(6),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
       ),
     );
   }
@@ -330,9 +331,11 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
     final search = _searchController.text.trim().toLowerCase();
     if (search.isNotEmpty) {
       result = result
-          .where((j) =>
-              j.title.toLowerCase().contains(search) ||
-              j.companyName.toLowerCase().contains(search))
+          .where(
+            (j) =>
+                j.title.toLowerCase().contains(search) ||
+                j.companyName.toLowerCase().contains(search),
+          )
           .toList();
     }
 
@@ -340,7 +343,9 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
   }
 
   void _refreshWithFilters(String collegeId) {
-    ref.read(collegeDashboardViewModelProvider.notifier).loadCollegeJobs(
+    ref
+        .read(collegeDashboardViewModelProvider.notifier)
+        .loadCollegeJobs(
           collegeId: collegeId,
           search: _searchController.text.trim().isEmpty
               ? null
@@ -357,10 +362,7 @@ class _CollegeJobsScreenState extends ConsumerState<CollegeJobsScreen> {
   void _pushManageJob(BuildContext context, JobEntity job) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ManageJobPage(
-          jobId: job.id,
-          jobTitle: job.title,
-        ),
+        builder: (_) => ManageJobPage(jobId: job.id, jobTitle: job.title),
       ),
     );
   }
@@ -375,7 +377,11 @@ class _EmptyCollegeState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.graduationCap, size: 64, color: AppColors.textMedium),
+            Icon(
+              LucideIcons.graduationCap,
+              size: 64,
+              color: AppColors.textMedium,
+            ),
             const SizedBox(height: 16),
             const Text(
               'No college workspace',

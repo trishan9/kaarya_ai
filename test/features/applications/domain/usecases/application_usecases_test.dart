@@ -18,7 +18,8 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_fixtures.dart';
 
-class MockApplicationRepository extends Mock implements IApplicationRepository {}
+class MockApplicationRepository extends Mock
+    implements IApplicationRepository {}
 
 void main() {
   late MockApplicationRepository mockRepository;
@@ -38,7 +39,10 @@ void main() {
   });
 
   test('application usecase providers should resolve', () {
-    expect(container.read(getMyApplicationsUseCaseProvider), isA<GetMyApplicationsUseCase>());
+    expect(
+      container.read(getMyApplicationsUseCaseProvider),
+      isA<GetMyApplicationsUseCase>(),
+    );
     expect(
       container.read(getApplicationsSummaryUseCaseProvider),
       isA<GetApplicationsSummaryUseCase>(),
@@ -56,209 +60,241 @@ void main() {
       container.read(updateApplicationUseCaseProvider),
       isA<UpdateApplicationUseCase>(),
     );
-    expect(container.read(listMyResumesUseCaseProvider), isA<ListMyResumesUseCase>());
-    expect(container.read(uploadResumeUseCaseProvider), isA<UploadResumeUseCase>());
-    expect(container.read(deleteResumeUseCaseProvider), isA<DeleteResumeUseCase>());
+    expect(
+      container.read(listMyResumesUseCaseProvider),
+      isA<ListMyResumesUseCase>(),
+    );
+    expect(
+      container.read(uploadResumeUseCaseProvider),
+      isA<UploadResumeUseCase>(),
+    );
+    expect(
+      container.read(deleteResumeUseCaseProvider),
+      isA<DeleteResumeUseCase>(),
+    );
     expect(
       container.read(updateResumeActivityUseCaseProvider),
       isA<UpdateResumeActivityUseCase>(),
     );
   });
 
-  test('GetMyApplicationsUseCase should pass paging filters to repository', () async {
-    final expected = buildApplicationsListEntity();
-    when(
-      () => mockRepository.getMyApplications(
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-        status: any(named: 'status'),
-      ),
-    ).thenAnswer((_) async => Right(expected));
+  test(
+    'GetMyApplicationsUseCase should pass paging filters to repository',
+    () async {
+      final expected = buildApplicationsListEntity();
+      when(
+        () => mockRepository.getMyApplications(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+        ),
+      ).thenAnswer((_) async => Right(expected));
 
-    final usecase = GetMyApplicationsUseCase(repository: mockRepository);
-    const params = GetMyApplicationsUseCaseParams(
-      page: 2,
-      size: 10,
-      status: 'reviewing',
-    );
-
-    final result = await usecase(params);
-
-    expect(result, Right(expected));
-    verify(
-      () => mockRepository.getMyApplications(
+      final usecase = GetMyApplicationsUseCase(repository: mockRepository);
+      const params = GetMyApplicationsUseCaseParams(
         page: 2,
         size: 10,
         status: 'reviewing',
-      ),
-    ).called(1);
-  });
+      );
 
-  test('GetApplicationsSummaryUseCase should pass summary filters to repository', () async {
-    final expected = buildApplicationSummaryEntity();
-    when(
-      () => mockRepository.getApplicationsSummary(
-        month: any(named: 'month'),
-        statuses: any(named: 'statuses'),
-      ),
-    ).thenAnswer((_) async => Right(expected));
+      final result = await usecase(params);
 
-    final usecase = GetApplicationsSummaryUseCase(repository: mockRepository);
-    const params = GetApplicationsSummaryUseCaseParams(
-      month: '2026-03',
-      statuses: 'applied,reviewing',
-    );
+      expect(result, Right(expected));
+      verify(
+        () => mockRepository.getMyApplications(
+          page: 2,
+          size: 10,
+          status: 'reviewing',
+        ),
+      ).called(1);
+    },
+  );
 
-    final result = await usecase(params);
+  test(
+    'GetApplicationsSummaryUseCase should pass summary filters to repository',
+    () async {
+      final expected = buildApplicationSummaryEntity();
+      when(
+        () => mockRepository.getApplicationsSummary(
+          month: any(named: 'month'),
+          statuses: any(named: 'statuses'),
+        ),
+      ).thenAnswer((_) async => Right(expected));
 
-    expect(result, Right(expected));
-    verify(
-      () => mockRepository.getApplicationsSummary(
+      final usecase = GetApplicationsSummaryUseCase(repository: mockRepository);
+      const params = GetApplicationsSummaryUseCaseParams(
         month: '2026-03',
         statuses: 'applied,reviewing',
-      ),
-    ).called(1);
-  });
+      );
 
-  test('GetApplicationForJobUseCase should pass job id to repository', () async {
-    final expected = buildApplicationEntity();
-    when(
-      () => mockRepository.getApplicationForJob(jobId: any(named: 'jobId')),
-    ).thenAnswer((_) async => Right(expected));
+      final result = await usecase(params);
 
-    final usecase = GetApplicationForJobUseCase(repository: mockRepository);
-    final result = await usecase(
-      const GetApplicationForJobUseCaseParams(jobId: 'job-1'),
-    );
+      expect(result, Right(expected));
+      verify(
+        () => mockRepository.getApplicationsSummary(
+          month: '2026-03',
+          statuses: 'applied,reviewing',
+        ),
+      ).called(1);
+    },
+  );
 
-    expect(result, Right(expected));
-    verify(() => mockRepository.getApplicationForJob(jobId: 'job-1')).called(1);
-  });
+  test(
+    'GetApplicationForJobUseCase should pass job id to repository',
+    () async {
+      final expected = buildApplicationEntity();
+      when(
+        () => mockRepository.getApplicationForJob(jobId: any(named: 'jobId')),
+      ).thenAnswer((_) async => Right(expected));
 
-  test('ApplyToJobUseCase should pass application payload to repository', () async {
-    when(
-      () => mockRepository.applyToJob(
-        jobId: any(named: 'jobId'),
-        resumeId: any(named: 'resumeId'),
-        resumeFilePath: any(named: 'resumeFilePath'),
-        resumeBytes: any(named: 'resumeBytes'),
-        resumeFilename: any(named: 'resumeFilename'),
-        coverLetter: any(named: 'coverLetter'),
-        portfolioLinks: any(named: 'portfolioLinks'),
-      ),
-    ).thenAnswer((_) async => const Right(true));
+      final usecase = GetApplicationForJobUseCase(repository: mockRepository);
+      final result = await usecase(
+        const GetApplicationForJobUseCaseParams(jobId: 'job-1'),
+      );
 
-    final usecase = ApplyToJobUseCase(repository: mockRepository);
-    final result = await usecase(
-      const ApplyToJobUseCaseParams(
-        jobId: 'job-1',
-        resumeId: 'resume-1',
-        resumeFilePath: '/tmp/resume.pdf',
-        resumeBytes: [1, 2, 3],
-        resumeFilename: 'resume.pdf',
-        coverLetter: 'Please consider me',
-        portfolioLinks: ['https://portfolio.example.com'],
-      ),
-    );
+      expect(result, Right(expected));
+      verify(
+        () => mockRepository.getApplicationForJob(jobId: 'job-1'),
+      ).called(1);
+    },
+  );
 
-    expect(result, const Right(true));
-    verify(
-      () => mockRepository.applyToJob(
-        jobId: 'job-1',
-        resumeId: 'resume-1',
-        resumeFilePath: '/tmp/resume.pdf',
-        resumeBytes: [1, 2, 3],
-        resumeFilename: 'resume.pdf',
-        coverLetter: 'Please consider me',
-        portfolioLinks: ['https://portfolio.example.com'],
-      ),
-    ).called(1);
-  });
+  test(
+    'ApplyToJobUseCase should pass application payload to repository',
+    () async {
+      when(
+        () => mockRepository.applyToJob(
+          jobId: any(named: 'jobId'),
+          resumeId: any(named: 'resumeId'),
+          resumeFilePath: any(named: 'resumeFilePath'),
+          resumeBytes: any(named: 'resumeBytes'),
+          resumeFilename: any(named: 'resumeFilename'),
+          coverLetter: any(named: 'coverLetter'),
+          portfolioLinks: any(named: 'portfolioLinks'),
+        ),
+      ).thenAnswer((_) async => const Right(true));
 
-  test('GetJobApplicationsUseCase should pass applicant filters to repository', () async {
-    final expected = buildApplicationsListEntity();
-    when(
-      () => mockRepository.getJobApplications(
-        jobId: any(named: 'jobId'),
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-        status: any(named: 'status'),
-      ),
-    ).thenAnswer((_) async => Right(expected));
+      final usecase = ApplyToJobUseCase(repository: mockRepository);
+      final result = await usecase(
+        const ApplyToJobUseCaseParams(
+          jobId: 'job-1',
+          resumeId: 'resume-1',
+          resumeFilePath: '/tmp/resume.pdf',
+          resumeBytes: [1, 2, 3],
+          resumeFilename: 'resume.pdf',
+          coverLetter: 'Please consider me',
+          portfolioLinks: ['https://portfolio.example.com'],
+        ),
+      );
 
-    final usecase = GetJobApplicationsUseCase(repository: mockRepository);
-    final result = await usecase(
-      const GetJobApplicationsUseCaseParams(
-        jobId: 'job-1',
-        page: 3,
-        size: 15,
-        status: 'shortlisted',
-      ),
-    );
+      expect(result, const Right(true));
+      verify(
+        () => mockRepository.applyToJob(
+          jobId: 'job-1',
+          resumeId: 'resume-1',
+          resumeFilePath: '/tmp/resume.pdf',
+          resumeBytes: [1, 2, 3],
+          resumeFilename: 'resume.pdf',
+          coverLetter: 'Please consider me',
+          portfolioLinks: ['https://portfolio.example.com'],
+        ),
+      ).called(1);
+    },
+  );
 
-    expect(result, Right(expected));
-    verify(
-      () => mockRepository.getJobApplications(
-        jobId: 'job-1',
-        page: 3,
-        size: 15,
-        status: 'shortlisted',
-      ),
-    ).called(1);
-  });
+  test(
+    'GetJobApplicationsUseCase should pass applicant filters to repository',
+    () async {
+      final expected = buildApplicationsListEntity();
+      when(
+        () => mockRepository.getJobApplications(
+          jobId: any(named: 'jobId'),
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+          status: any(named: 'status'),
+        ),
+      ).thenAnswer((_) async => Right(expected));
 
-  test('UpdateApplicationUseCase should pass update payload to repository', () async {
-    final scheduledAt = DateTime(2026, 3, 8, 10);
-    when(
-      () => mockRepository.updateApplication(
-        jobId: any(named: 'jobId'),
-        applicationId: any(named: 'applicationId'),
-        status: any(named: 'status'),
-        interviewScheduledAt: any(named: 'interviewScheduledAt'),
-        interviewNote: any(named: 'interviewNote'),
-      ),
-    ).thenAnswer((_) async => const Right(true));
+      final usecase = GetJobApplicationsUseCase(repository: mockRepository);
+      final result = await usecase(
+        const GetJobApplicationsUseCaseParams(
+          jobId: 'job-1',
+          page: 3,
+          size: 15,
+          status: 'shortlisted',
+        ),
+      );
 
-    final usecase = UpdateApplicationUseCase(repository: mockRepository);
-    final result = await usecase(
-      UpdateApplicationUseCaseParams(
-        jobId: 'job-1',
-        applicationId: 'app-1',
-        status: 'interview',
-        interviewScheduledAt: scheduledAt,
-        interviewNote: 'Bring portfolio',
-      ),
-    );
+      expect(result, Right(expected));
+      verify(
+        () => mockRepository.getJobApplications(
+          jobId: 'job-1',
+          page: 3,
+          size: 15,
+          status: 'shortlisted',
+        ),
+      ).called(1);
+    },
+  );
 
-    expect(result, const Right(true));
-    verify(
-      () => mockRepository.updateApplication(
-        jobId: 'job-1',
-        applicationId: 'app-1',
-        status: 'interview',
-        interviewScheduledAt: scheduledAt,
-        interviewNote: 'Bring portfolio',
-      ),
-    ).called(1);
-  });
+  test(
+    'UpdateApplicationUseCase should pass update payload to repository',
+    () async {
+      final scheduledAt = DateTime(2026, 3, 8, 10);
+      when(
+        () => mockRepository.updateApplication(
+          jobId: any(named: 'jobId'),
+          applicationId: any(named: 'applicationId'),
+          status: any(named: 'status'),
+          interviewScheduledAt: any(named: 'interviewScheduledAt'),
+          interviewNote: any(named: 'interviewNote'),
+        ),
+      ).thenAnswer((_) async => const Right(true));
 
-  test('ListMyResumesUseCase should pass paging values to repository', () async {
-    final expected = [buildResumeEntity()];
-    when(
-      () => mockRepository.listMyResumes(
-        page: any(named: 'page'),
-        size: any(named: 'size'),
-      ),
-    ).thenAnswer((_) async => Right(expected));
+      final usecase = UpdateApplicationUseCase(repository: mockRepository);
+      final result = await usecase(
+        UpdateApplicationUseCaseParams(
+          jobId: 'job-1',
+          applicationId: 'app-1',
+          status: 'interview',
+          interviewScheduledAt: scheduledAt,
+          interviewNote: 'Bring portfolio',
+        ),
+      );
 
-    final usecase = ListMyResumesUseCase(repository: mockRepository);
-    final result = await usecase(
-      const ListMyResumesUseCaseParams(page: 2, size: 5),
-    );
+      expect(result, const Right(true));
+      verify(
+        () => mockRepository.updateApplication(
+          jobId: 'job-1',
+          applicationId: 'app-1',
+          status: 'interview',
+          interviewScheduledAt: scheduledAt,
+          interviewNote: 'Bring portfolio',
+        ),
+      ).called(1);
+    },
+  );
 
-    expect(result, Right(expected));
-    verify(() => mockRepository.listMyResumes(page: 2, size: 5)).called(1);
-  });
+  test(
+    'ListMyResumesUseCase should pass paging values to repository',
+    () async {
+      final expected = [buildResumeEntity()];
+      when(
+        () => mockRepository.listMyResumes(
+          page: any(named: 'page'),
+          size: any(named: 'size'),
+        ),
+      ).thenAnswer((_) async => Right(expected));
+
+      final usecase = ListMyResumesUseCase(repository: mockRepository);
+      final result = await usecase(
+        const ListMyResumesUseCaseParams(page: 2, size: 5),
+      );
+
+      expect(result, Right(expected));
+      verify(() => mockRepository.listMyResumes(page: 2, size: 5)).called(1);
+    },
+  );
 
   test('UploadResumeUseCase should pass file path to repository', () async {
     final expected = buildResumeEntity();
@@ -272,7 +308,9 @@ void main() {
     );
 
     expect(result, Right(expected));
-    verify(() => mockRepository.uploadResume(filePath: '/tmp/resume.pdf')).called(1);
+    verify(
+      () => mockRepository.uploadResume(filePath: '/tmp/resume.pdf'),
+    ).called(1);
   });
 
   test('DeleteResumeUseCase should return repository failure', () async {

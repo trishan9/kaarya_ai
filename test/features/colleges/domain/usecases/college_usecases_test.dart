@@ -29,9 +29,7 @@ void main() {
   setUp(() {
     mockRepository = MockCollegeRepository();
     container = ProviderContainer(
-      overrides: [
-        collegeRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [collegeRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -40,22 +38,43 @@ void main() {
   });
 
   test('college usecase providers should resolve', () {
-    expect(container.read(listCollegesUseCaseProvider), isA<ListCollegesUseCase>());
+    expect(
+      container.read(listCollegesUseCaseProvider),
+      isA<ListCollegesUseCase>(),
+    );
     expect(
       container.read(getCollegeByIdUseCaseProvider),
       isA<GetCollegeByIdUseCase>(),
     );
-    expect(container.read(createCollegeUseCaseProvider), isA<CreateCollegeUseCase>());
-    expect(container.read(updateCollegeUseCaseProvider), isA<UpdateCollegeUseCase>());
-    expect(container.read(deleteCollegeUseCaseProvider), isA<DeleteCollegeUseCase>());
+    expect(
+      container.read(createCollegeUseCaseProvider),
+      isA<CreateCollegeUseCase>(),
+    );
+    expect(
+      container.read(updateCollegeUseCaseProvider),
+      isA<UpdateCollegeUseCase>(),
+    );
+    expect(
+      container.read(deleteCollegeUseCaseProvider),
+      isA<DeleteCollegeUseCase>(),
+    );
     expect(container.read(joinByCodeUseCaseProvider), isA<JoinByCodeUseCase>());
     expect(
       container.read(resetInviteCodeUseCaseProvider),
       isA<ResetInviteCodeUseCase>(),
     );
-    expect(container.read(listStudentsUseCaseProvider), isA<ListStudentsUseCase>());
-    expect(container.read(inviteStudentUseCaseProvider), isA<InviteStudentUseCase>());
-    expect(container.read(removeStudentUseCaseProvider), isA<RemoveStudentUseCase>());
+    expect(
+      container.read(listStudentsUseCaseProvider),
+      isA<ListStudentsUseCase>(),
+    );
+    expect(
+      container.read(inviteStudentUseCaseProvider),
+      isA<InviteStudentUseCase>(),
+    );
+    expect(
+      container.read(removeStudentUseCaseProvider),
+      isA<RemoveStudentUseCase>(),
+    );
     expect(
       container.read(listCollegeWorkspacesUseCaseProvider),
       isA<ListCollegeWorkspacesUseCase>(),
@@ -82,14 +101,16 @@ void main() {
     );
 
     expect(result, Right(expected));
-    verify(() => mockRepository.listColleges(page: 2, size: 10, search: 'TU')).called(1);
+    verify(
+      () => mockRepository.listColleges(page: 2, size: 10, search: 'TU'),
+    ).called(1);
   });
 
   test('GetCollegeByIdUseCase should pass college id', () async {
     final expected = buildCollegeEntity();
-    when(() => mockRepository.getCollegeById(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getCollegeById(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetCollegeByIdUseCase(repository: mockRepository);
     final result = await usecase(
@@ -165,9 +186,9 @@ void main() {
   });
 
   test('DeleteCollegeUseCase should return repository result', () async {
-    when(() => mockRepository.deleteCollege(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.deleteCollege(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = DeleteCollegeUseCase(repository: mockRepository);
     final result = await usecase(
@@ -180,9 +201,9 @@ void main() {
 
   test('JoinByCodeUseCase should pass invite code', () async {
     final expected = buildCollegeEntity();
-    when(() => mockRepository.joinByCode(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.joinByCode(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = JoinByCodeUseCase(repository: mockRepository);
     final result = await usecase(
@@ -194,9 +215,9 @@ void main() {
   });
 
   test('ResetInviteCodeUseCase should return new invite code', () async {
-    when(() => mockRepository.resetInviteCode(any())).thenAnswer(
-      (_) async => const Right('NEWCODE'),
-    );
+    when(
+      () => mockRepository.resetInviteCode(any()),
+    ).thenAnswer((_) async => const Right('NEWCODE'));
 
     final usecase = ResetInviteCodeUseCase(repository: mockRepository);
     final result = await usecase(
@@ -315,9 +336,9 @@ void main() {
 
   test('GetCollegeMetricsUseCase should pass college id', () async {
     final expected = buildCollegeMetricsEntity();
-    when(() => mockRepository.getCollegeMetrics(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getCollegeMetrics(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetCollegeMetricsUseCase(repository: mockRepository);
     final result = await usecase(

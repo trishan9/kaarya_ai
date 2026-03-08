@@ -28,9 +28,7 @@ void main() {
   setUp(() {
     mockRepository = MockCompanyRepository();
     container = ProviderContainer(
-      overrides: [
-        companyRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [companyRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -39,18 +37,39 @@ void main() {
   });
 
   test('company usecase providers should resolve', () {
-    expect(container.read(listCompaniesUseCaseProvider), isA<ListCompaniesUseCase>());
-    expect(container.read(getCompanyByIdUseCaseProvider), isA<GetCompanyByIdUseCase>());
-    expect(container.read(createCompanyUseCaseProvider), isA<CreateCompanyUseCase>());
-    expect(container.read(updateCompanyUseCaseProvider), isA<UpdateCompanyUseCase>());
-    expect(container.read(deleteCompanyUseCaseProvider), isA<DeleteCompanyUseCase>());
+    expect(
+      container.read(listCompaniesUseCaseProvider),
+      isA<ListCompaniesUseCase>(),
+    );
+    expect(
+      container.read(getCompanyByIdUseCaseProvider),
+      isA<GetCompanyByIdUseCase>(),
+    );
+    expect(
+      container.read(createCompanyUseCaseProvider),
+      isA<CreateCompanyUseCase>(),
+    );
+    expect(
+      container.read(updateCompanyUseCaseProvider),
+      isA<UpdateCompanyUseCase>(),
+    );
+    expect(
+      container.read(deleteCompanyUseCaseProvider),
+      isA<DeleteCompanyUseCase>(),
+    );
     expect(container.read(joinByCodeUseCaseProvider), isA<JoinByCodeUseCase>());
     expect(
       container.read(resetInviteCodeUseCaseProvider),
       isA<ResetInviteCodeUseCase>(),
     );
-    expect(container.read(listRecruitersUseCaseProvider), isA<ListRecruitersUseCase>());
-    expect(container.read(inviteRecruiterUseCaseProvider), isA<InviteRecruiterUseCase>());
+    expect(
+      container.read(listRecruitersUseCaseProvider),
+      isA<ListRecruitersUseCase>(),
+    );
+    expect(
+      container.read(inviteRecruiterUseCaseProvider),
+      isA<InviteRecruiterUseCase>(),
+    );
     expect(
       container.read(removeRecruiterUseCaseProvider),
       isA<RemoveRecruiterUseCase>(),
@@ -84,9 +103,9 @@ void main() {
 
   test('GetCompanyByIdUseCase should pass company id', () async {
     final expected = buildCompanyEntity();
-    when(() => mockRepository.getCompanyById(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getCompanyById(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetCompanyByIdUseCase(repository: mockRepository);
     final result = await usecase(
@@ -159,9 +178,9 @@ void main() {
   });
 
   test('DeleteCompanyUseCase should return repository result', () async {
-    when(() => mockRepository.deleteCompany(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.deleteCompany(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = DeleteCompanyUseCase(repository: mockRepository);
     final result = await usecase(
@@ -200,9 +219,9 @@ void main() {
 
   test('ResetInviteCodeUseCase should call repository', () async {
     final expected = buildCompanyEntity();
-    when(() => mockRepository.resetInviteCode(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.resetInviteCode(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = ResetInviteCodeUseCase(repository: mockRepository);
     final result = await usecase(

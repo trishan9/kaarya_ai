@@ -13,11 +13,7 @@ void main() {
 
   testWidgets('AuthPageShell should render child content', (tester) async {
     await tester.pumpWidget(
-      MaterialApp(
-        home: AuthPageShell(
-          child: const Text('Auth Content'),
-        ),
-      ),
+      MaterialApp(home: AuthPageShell(child: const Text('Auth Content'))),
     );
 
     expect(find.text('Auth Content'), findsOneWidget);
@@ -30,21 +26,22 @@ void main() {
     expect(find.byType(Image), findsOneWidget);
   });
 
-  testWidgets('HeadingWithSubheadingWidget should show heading and subheading', (
-    tester,
-  ) async {
-    await tester.pumpWidget(
-      createTestWidget(
-        const HeadingWithSubheadingWidget(
-          heading: 'Welcome',
-          subheading: 'Start your journey',
+  testWidgets(
+    'HeadingWithSubheadingWidget should show heading and subheading',
+    (tester) async {
+      await tester.pumpWidget(
+        createTestWidget(
+          const HeadingWithSubheadingWidget(
+            heading: 'Welcome',
+            subheading: 'Start your journey',
+          ),
         ),
-      ),
-    );
+      );
 
-    expect(find.text('Welcome'), findsOneWidget);
-    expect(find.text('Start your journey'), findsOneWidget);
-  });
+      expect(find.text('Welcome'), findsOneWidget);
+      expect(find.text('Start your journey'), findsOneWidget);
+    },
+  );
 
   testWidgets('LoginText should render call to action', (tester) async {
     await tester.pumpWidget(createTestWidget(const LoginText()));

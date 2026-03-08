@@ -37,7 +37,6 @@ class JobCardWidget extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Tappable body area — opens job detail
           InkWell(
             onTap:
                 onTap ??
@@ -141,7 +140,6 @@ class JobCardWidget extends StatelessWidget {
             ),
           ),
 
-          // Bottom action row — NOT inside the card's InkWell
           Padding(
             padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
             child: Row(

@@ -284,7 +284,6 @@ class ApplicationRemoteDataSource implements IApplicationRemoteDataSource {
     required String applicationId,
     required String action,
   }) async {
-    // Backend expects PATCH with "viewed" or "downloaded" (matches web frontend)
     await _apiClient.patch(
       ApiEndpoints.updateResumeActivity(jobId, applicationId),
       data: {'action': action},

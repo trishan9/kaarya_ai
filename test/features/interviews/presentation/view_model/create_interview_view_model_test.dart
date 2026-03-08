@@ -8,7 +8,8 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_fixtures.dart';
 
-class MockCreateInterviewUseCase extends Mock implements CreateInterviewUseCase {}
+class MockCreateInterviewUseCase extends Mock
+    implements CreateInterviewUseCase {}
 
 void main() {
   late MockCreateInterviewUseCase mockCreateInterviewUseCase;
@@ -39,27 +40,32 @@ void main() {
     container.dispose();
   });
 
-  test('CreateInterviewViewModel should save created interview on success', () async {
-    final interview = buildInterviewEntity();
-    when(
-      () => mockCreateInterviewUseCase(any()),
-    ).thenAnswer((_) async => Right(interview));
+  test(
+    'CreateInterviewViewModel should save created interview on success',
+    () async {
+      final interview = buildInterviewEntity();
+      when(
+        () => mockCreateInterviewUseCase(any()),
+      ).thenAnswer((_) async => Right(interview));
 
-    final viewModel = container.read(createInterviewViewModelProvider.notifier);
-    final result = await viewModel.createInterview(
-      const CreateInterviewUseCaseParams(
-        title: 'Flutter Mock',
-        interviewType: 'technical',
-        role: 'Flutter Developer',
-      ),
-    );
+      final viewModel = container.read(
+        createInterviewViewModelProvider.notifier,
+      );
+      final result = await viewModel.createInterview(
+        const CreateInterviewUseCaseParams(
+          title: 'Flutter Mock',
+          interviewType: 'technical',
+          role: 'Flutter Developer',
+        ),
+      );
 
-    final state = container.read(createInterviewViewModelProvider);
-    expect(result, isNull);
-    expect(state.isLoading, isFalse);
-    expect(state.createdInterview, interview);
-    expect(state.errorMessage, isNull);
-  });
+      final state = container.read(createInterviewViewModelProvider);
+      expect(result, isNull);
+      expect(state.isLoading, isFalse);
+      expect(state.createdInterview, interview);
+      expect(state.errorMessage, isNull);
+    },
+  );
 
   test('CreateInterviewViewModel should expose failure on error', () async {
     const failure = ApiFailure(message: 'Unable to create');

@@ -39,9 +39,7 @@ class DashboardRepository implements IDashboardRepository {
   Future<DashboardOverviewEntity?> getOverviewFromCache({
     String? monthKey,
   }) async {
-    final cached = await _localDatasource.getOverviewData(
-      monthKey: monthKey,
-    );
+    final cached = await _localDatasource.getOverviewData(monthKey: monthKey);
     return cached?.toApiModel().toEntity();
   }
 

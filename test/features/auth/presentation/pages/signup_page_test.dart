@@ -161,25 +161,28 @@ void main() {
   });
 
   group('SignupPage - Form Validation', () {
-    testWidgets('should show validation errors when required fields are empty', (
-      tester,
-    ) async {
-      await tester.binding.setSurfaceSize(const Size(800, 1600));
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+    testWidgets(
+      'should show validation errors when required fields are empty',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(800, 1600));
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
 
-      await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Sign Up'));
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Sign Up'));
-      await tester.pump();
+        await tester.ensureVisible(
+          find.widgetWithText(ElevatedButton, 'Sign Up'),
+        );
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Sign Up'));
+        await tester.pump();
 
-      expect(find.text('First name is required'), findsOneWidget);
-      expect(find.text('Last name is required'), findsOneWidget);
-      expect(find.text('Email address is required'), findsOneWidget);
-      expect(find.text('Password is required'), findsOneWidget);
-      expect(find.text('Confirm password is required'), findsOneWidget);
+        expect(find.text('First name is required'), findsOneWidget);
+        expect(find.text('Last name is required'), findsOneWidget);
+        expect(find.text('Email address is required'), findsOneWidget);
+        expect(find.text('Password is required'), findsOneWidget);
+        expect(find.text('Confirm password is required'), findsOneWidget);
 
-      await tester.binding.setSurfaceSize(null);
-    });
+        await tester.binding.setSurfaceSize(null);
+      },
+    );
 
     testWidgets('should show mismatch error when passwords differ', (
       tester,
@@ -194,7 +197,9 @@ void main() {
       await tester.enterText(passwordField(), 'password123');
       await tester.enterText(confirmPasswordField(), 'password321');
 
-      await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Sign Up'));
+      await tester.ensureVisible(
+        find.widgetWithText(ElevatedButton, 'Sign Up'),
+      );
       await tester.tap(find.widgetWithText(ElevatedButton, 'Sign Up'));
       await tester.pump();
 
@@ -206,46 +211,51 @@ void main() {
   });
 
   group('SignupPage - Form Submission', () {
-    testWidgets('should call register usecase with the current candidate data', (
-      tester,
-    ) async {
-      await tester.binding.setSurfaceSize(const Size(800, 1600));
-      RegisterUseCaseParams? capturedParams;
-      when(() => mockRegisterUseCase(any())).thenAnswer((invocation) async {
-        capturedParams =
-            invocation.positionalArguments.first as RegisterUseCaseParams;
-        return const Left(ApiFailure(message: 'Test'));
-      });
+    testWidgets(
+      'should call register usecase with the current candidate data',
+      (tester) async {
+        await tester.binding.setSurfaceSize(const Size(800, 1600));
+        RegisterUseCaseParams? capturedParams;
+        when(() => mockRegisterUseCase(any())).thenAnswer((invocation) async {
+          capturedParams =
+              invocation.positionalArguments.first as RegisterUseCaseParams;
+          return const Left(ApiFailure(message: 'Test'));
+        });
 
-      await tester.pumpWidget(createTestWidget());
-      await tester.pump();
+        await tester.pumpWidget(createTestWidget());
+        await tester.pump();
 
-      await tester.enterText(firstNameField(), 'Jane');
-      await tester.enterText(lastNameField(), 'Doe');
-      await tester.enterText(emailField(), 'jane@example.com');
-      await tester.enterText(passwordField(), 'mypassword');
-      await tester.enterText(confirmPasswordField(), 'mypassword');
+        await tester.enterText(firstNameField(), 'Jane');
+        await tester.enterText(lastNameField(), 'Doe');
+        await tester.enterText(emailField(), 'jane@example.com');
+        await tester.enterText(passwordField(), 'mypassword');
+        await tester.enterText(confirmPasswordField(), 'mypassword');
 
-      await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Sign Up'));
-      await tester.tap(find.widgetWithText(ElevatedButton, 'Sign Up'));
-      await tester.pump();
+        await tester.ensureVisible(
+          find.widgetWithText(ElevatedButton, 'Sign Up'),
+        );
+        await tester.tap(find.widgetWithText(ElevatedButton, 'Sign Up'));
+        await tester.pump();
 
-      verify(() => mockRegisterUseCase(any())).called(1);
-      expect(capturedParams?.name, 'Jane Doe');
-      expect(capturedParams?.email, 'jane@example.com');
-      expect(capturedParams?.password, 'mypassword');
-      expect(capturedParams?.confirmPassword, 'mypassword');
-      expect(capturedParams?.role, 'user');
+        verify(() => mockRegisterUseCase(any())).called(1);
+        expect(capturedParams?.name, 'Jane Doe');
+        expect(capturedParams?.email, 'jane@example.com');
+        expect(capturedParams?.password, 'mypassword');
+        expect(capturedParams?.confirmPassword, 'mypassword');
+        expect(capturedParams?.role, 'user');
 
-      await tester.binding.setSurfaceSize(null);
-    });
+        await tester.binding.setSurfaceSize(null);
+      },
+    );
 
     testWidgets('should show loading indicator while signup is in progress', (
       tester,
     ) async {
       await tester.binding.setSurfaceSize(const Size(800, 1600));
       final completer = Completer<Either<Failure, bool>>();
-      when(() => mockRegisterUseCase(any())).thenAnswer((_) => completer.future);
+      when(
+        () => mockRegisterUseCase(any()),
+      ).thenAnswer((_) => completer.future);
 
       await tester.pumpWidget(createTestWidget());
       await tester.pump();
@@ -256,7 +266,9 @@ void main() {
       await tester.enterText(passwordField(), 'mypassword');
       await tester.enterText(confirmPasswordField(), 'mypassword');
 
-      await tester.ensureVisible(find.widgetWithText(ElevatedButton, 'Sign Up'));
+      await tester.ensureVisible(
+        find.widgetWithText(ElevatedButton, 'Sign Up'),
+      );
       await tester.tap(find.widgetWithText(ElevatedButton, 'Sign Up'));
       await tester.pump();
 

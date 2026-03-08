@@ -20,7 +20,8 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_fixtures.dart';
 
-class MockResumeBuilderRepository extends Mock implements IResumeBuilderRepository {}
+class MockResumeBuilderRepository extends Mock
+    implements IResumeBuilderRepository {}
 
 void main() {
   late MockResumeBuilderRepository mockRepository;
@@ -40,13 +41,31 @@ void main() {
   });
 
   test('resume builder usecase providers should resolve', () {
-    expect(container.read(createDraftUseCaseProvider), isA<CreateDraftUseCase>());
+    expect(
+      container.read(createDraftUseCaseProvider),
+      isA<CreateDraftUseCase>(),
+    );
     expect(container.read(listDraftsUseCaseProvider), isA<ListDraftsUseCase>());
-    expect(container.read(getDraftByIdUseCaseProvider), isA<GetDraftByIdUseCase>());
-    expect(container.read(updateDraftUseCaseProvider), isA<UpdateDraftUseCase>());
-    expect(container.read(deleteDraftUseCaseProvider), isA<DeleteDraftUseCase>());
-    expect(container.read(generatePdfUseCaseProvider), isA<GeneratePdfUseCase>());
-    expect(container.read(saveAsResumeUseCaseProvider), isA<SaveAsResumeUseCase>());
+    expect(
+      container.read(getDraftByIdUseCaseProvider),
+      isA<GetDraftByIdUseCase>(),
+    );
+    expect(
+      container.read(updateDraftUseCaseProvider),
+      isA<UpdateDraftUseCase>(),
+    );
+    expect(
+      container.read(deleteDraftUseCaseProvider),
+      isA<DeleteDraftUseCase>(),
+    );
+    expect(
+      container.read(generatePdfUseCaseProvider),
+      isA<GeneratePdfUseCase>(),
+    );
+    expect(
+      container.read(saveAsResumeUseCaseProvider),
+      isA<SaveAsResumeUseCase>(),
+    );
     expect(
       container.read(generateAiSummaryUseCaseProvider),
       isA<GenerateAiSummaryUseCase>(),
@@ -114,9 +133,9 @@ void main() {
 
   test('GetDraftByIdUseCase should pass draft id', () async {
     final expected = buildResumeDraftEntity();
-    when(() => mockRepository.getDraftById(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getDraftById(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetDraftByIdUseCase(repository: mockRepository);
     final result = await usecase(
@@ -154,9 +173,9 @@ void main() {
   });
 
   test('DeleteDraftUseCase should return repository result', () async {
-    when(() => mockRepository.deleteDraft(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.deleteDraft(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = DeleteDraftUseCase(repository: mockRepository);
     final result = await usecase(
@@ -171,9 +190,9 @@ void main() {
     const expected = GeneratePdfResultEntity(
       pdfUrl: 'https://example.com/resume.pdf',
     );
-    when(() => mockRepository.generatePdf(any())).thenAnswer(
-      (_) async => const Right(expected),
-    );
+    when(
+      () => mockRepository.generatePdf(any()),
+    ).thenAnswer((_) async => const Right(expected));
 
     final usecase = GeneratePdfUseCase(repository: mockRepository);
     final result = await usecase(
@@ -186,9 +205,9 @@ void main() {
 
   test('SaveAsResumeUseCase should return repository failure', () async {
     const failure = ApiFailure(message: 'Save failed');
-    when(() => mockRepository.saveAsResume(any())).thenAnswer(
-      (_) async => const Left(failure),
-    );
+    when(
+      () => mockRepository.saveAsResume(any()),
+    ).thenAnswer((_) async => const Left(failure));
 
     final usecase = SaveAsResumeUseCase(repository: mockRepository);
     final result = await usecase(
@@ -240,7 +259,9 @@ void main() {
       ),
     ).thenAnswer((_) async => const Right(expected));
 
-    final usecase = GenerateExperienceBulletsUseCase(repository: mockRepository);
+    final usecase = GenerateExperienceBulletsUseCase(
+      repository: mockRepository,
+    );
     final result = await usecase(
       const GenerateExperienceBulletsUseCaseParams(
         jobTitle: 'Intern',

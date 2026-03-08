@@ -3,7 +3,6 @@ import 'package:kaarya/app/theme/app_colors.dart';
 import 'package:kaarya/features/jobs/domain/entities/job_entity.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
-/// Job card for recruiter and college job lists - shows Manage Job instead of Apply.
 class RecruiterJobCardWidget extends StatelessWidget {
   const RecruiterJobCardWidget({
     super.key,
@@ -93,10 +92,7 @@ class RecruiterJobCardWidget extends StatelessWidget {
                   children: [
                     _chip(LucideIcons.mapPin, job.location),
                     _chip(LucideIcons.clock, job.employmentType),
-                    _chip(
-                      LucideIcons.building2,
-                      _formatWorkMode(job.workMode),
-                    ),
+                    _chip(LucideIcons.building2, _formatWorkMode(job.workMode)),
                     _chip(LucideIcons.banknote, job.salaryRange),
                   ],
                 ),

@@ -9,7 +9,8 @@ import 'package:mocktail/mocktail.dart';
 
 import '../../../../helpers/test_fixtures.dart';
 
-class MockLeaderboardRepository extends Mock implements ILeaderboardRepository {}
+class MockLeaderboardRepository extends Mock
+    implements ILeaderboardRepository {}
 
 void main() {
   late MockLeaderboardRepository mockRepository;
@@ -87,6 +88,9 @@ void main() {
     final viewModel = container.read(leaderboardViewModelProvider.notifier);
     await viewModel.loadLeaderboard();
 
-    expect(container.read(leaderboardViewModelProvider).error, 'Leaderboard failed');
+    expect(
+      container.read(leaderboardViewModelProvider).error,
+      'Leaderboard failed',
+    );
   });
 }

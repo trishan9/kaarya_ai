@@ -21,9 +21,7 @@ void main() {
   setUp(() {
     mockRepository = MockBillingRepository();
     container = ProviderContainer(
-      overrides: [
-        billingRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [billingRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -33,7 +31,10 @@ void main() {
 
   group('Billing usecase providers', () {
     test('should resolve billing usecases from provider', () {
-      expect(container.read(getBillingSummaryUseCaseProvider), isA<GetBillingSummaryUseCase>());
+      expect(
+        container.read(getBillingSummaryUseCaseProvider),
+        isA<GetBillingSummaryUseCase>(),
+      );
       expect(
         container.read(createStripeCheckoutSessionUseCaseProvider),
         isA<CreateStripeCheckoutSessionUseCase>(),
@@ -52,9 +53,9 @@ void main() {
   group('GetBillingSummaryUseCase', () {
     test('should return repository summary', () async {
       final expected = buildBillingSummaryEntity();
-      when(() => mockRepository.getBillingSummary()).thenAnswer(
-        (_) async => Right(expected),
-      );
+      when(
+        () => mockRepository.getBillingSummary(),
+      ).thenAnswer((_) async => Right(expected));
 
       final usecase = GetBillingSummaryUseCase(mockRepository);
       final result = await usecase();

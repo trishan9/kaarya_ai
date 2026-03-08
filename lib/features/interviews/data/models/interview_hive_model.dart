@@ -108,7 +108,7 @@ class InterviewHiveModel extends HiveObject {
     hasAttempted: hasAttempted,
     isSaved: isSaved,
     techStack: techStack,
-    techStackIconUrls: const [], // Cache doesn't store icon URLs; fall back to client mapping
+    techStackIconUrls: const [],
     createdAt: createdAt,
     updatedAt: updatedAt,
   );

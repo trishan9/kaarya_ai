@@ -27,9 +27,7 @@ void main() {
   setUp(() {
     mockRepository = MockAuthRepository();
     container = ProviderContainer(
-      overrides: [
-        authRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [authRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -38,28 +36,46 @@ void main() {
   });
 
   test('additional auth usecase providers should resolve', () {
-    expect(container.read(changePasswordUseCaseProvider), isA<ChangePasswordUseCase>());
-    expect(container.read(confirmResetUseCaseProvider), isA<ConfirmResetUseCase>());
+    expect(
+      container.read(changePasswordUseCaseProvider),
+      isA<ChangePasswordUseCase>(),
+    );
+    expect(
+      container.read(confirmResetUseCaseProvider),
+      isA<ConfirmResetUseCase>(),
+    );
     expect(
       container.read(exchangeOAuthResultUseCaseProvider),
       isA<ExchangeOAuthResultUseCase>(),
     );
-    expect(container.read(getLinkedAccountsUseCaseProvider), isA<GetLinkedAccountsUseCase>());
+    expect(
+      container.read(getLinkedAccountsUseCaseProvider),
+      isA<GetLinkedAccountsUseCase>(),
+    );
     expect(
       container.read(getOAuthProviderStatusUseCaseProvider),
       isA<GetOAuthProviderStatusUseCase>(),
     );
-    expect(container.read(loginWithGoogleUseCaseProvider), isA<LoginWithGoogleUseCase>());
+    expect(
+      container.read(loginWithGoogleUseCaseProvider),
+      isA<LoginWithGoogleUseCase>(),
+    );
     expect(
       container.read(requestPasswordResetUseCaseProvider),
       isA<RequestPasswordResetUseCase>(),
     );
-    expect(container.read(unlinkOAuthUseCaseProvider), isA<UnlinkOAuthUseCase>());
+    expect(
+      container.read(unlinkOAuthUseCaseProvider),
+      isA<UnlinkOAuthUseCase>(),
+    );
     expect(
       container.read(uploadCertificationUseCaseProvider),
       isA<UploadCertificationUseCase>(),
     );
-    expect(container.read(verifyResetOtpUseCaseProvider), isA<VerifyResetOtpUseCase>());
+    expect(
+      container.read(verifyResetOtpUseCaseProvider),
+      isA<VerifyResetOtpUseCase>(),
+    );
   });
 
   test('ChangePasswordUseCase should call repository with passwords', () async {
@@ -134,20 +150,25 @@ void main() {
     verify(() => mockRepository.getLinkedAccounts()).called(1);
   });
 
-  test('GetOAuthProviderStatusUseCase should call repository with provider', () async {
-    final expected = buildOAuthProviderStatus();
-    when(
-      () => mockRepository.getOAuthProviderStatus(any()),
-    ).thenAnswer((_) async => Right(expected));
+  test(
+    'GetOAuthProviderStatusUseCase should call repository with provider',
+    () async {
+      final expected = buildOAuthProviderStatus();
+      when(
+        () => mockRepository.getOAuthProviderStatus(any()),
+      ).thenAnswer((_) async => Right(expected));
 
-    final usecase = GetOAuthProviderStatusUseCase(authRepository: mockRepository);
-    final result = await usecase(
-      const GetOAuthProviderStatusParams(provider: 'google'),
-    );
+      final usecase = GetOAuthProviderStatusUseCase(
+        authRepository: mockRepository,
+      );
+      final result = await usecase(
+        const GetOAuthProviderStatusParams(provider: 'google'),
+      );
 
-    expect(result, Right(expected));
-    verify(() => mockRepository.getOAuthProviderStatus('google')).called(1);
-  });
+      expect(result, Right(expected));
+      verify(() => mockRepository.getOAuthProviderStatus('google')).called(1);
+    },
+  );
 
   test('LoginWithGoogleUseCase should pass server client id', () async {
     final expected = buildAuthEntity();
@@ -175,7 +196,9 @@ void main() {
     );
 
     expect(result, const Right(true));
-    verify(() => mockRepository.requestPasswordReset('test@example.com')).called(1);
+    verify(
+      () => mockRepository.requestPasswordReset('test@example.com'),
+    ).called(1);
   });
 
   test('UnlinkOAuthUseCase should call repository', () async {

@@ -7,7 +7,6 @@ final vapiInterviewServiceProvider = Provider<VapiInterviewService>((ref) {
   return VapiInterviewService();
 });
 
-/// Event types emitted by the VAPI interview service.
 enum VapiEventType {
   callStart,
   callEnd,
@@ -25,7 +24,6 @@ class VapiInterviewEvent {
   const VapiInterviewEvent({required this.type, this.data = const {}});
 }
 
-/// Thin wrapper around the official VAPI Flutter SDK for interview-specific use.
 class VapiInterviewService {
   VapiClient? _client;
   VapiCall? _call;
@@ -33,23 +31,18 @@ class VapiInterviewService {
   final _eventController = StreamController<VapiInterviewEvent>.broadcast();
   String? _vapiCallId;
 
-  /// Stream of interview events (call-start, call-end, transcript, etc.)
   Stream<VapiInterviewEvent> get events => _eventController.stream;
 
-  /// The VAPI call ID (available after startCall succeeds).
   String? get vapiCallId => _vapiCallId;
 
-  /// Whether a call is currently active.
   bool get isActive => _call != null;
 
-  /// Initialize VAPI with a web token. Must be called before [startCall].
   void init(String webToken) {
     _client?.dispose();
     _client = VapiClient(webToken);
     _vapiCallId = null;
   }
 
-  /// Start a VAPI call with an assistant config or assistant ID.
   Future<void> startCall({
     Map<String, dynamic>? assistant,
     String? assistantId,
@@ -91,7 +84,6 @@ class VapiInterviewService {
     }
   }
 
-  /// End the current VAPI call.
   Future<void> endCall() async {
     try {
       await _call?.stop();
@@ -105,7 +97,6 @@ class VapiInterviewService {
     }
   }
 
-  /// Clean up resources.
   void dispose() {
     _eventSubscription?.cancel();
     _eventSubscription = null;
@@ -124,7 +115,6 @@ class VapiInterviewService {
 
       switch (label) {
         case 'call-start':
-          // Ensure speakerphone is active when the assistant starts listening.
           try {
             _call?.setAudioDevice(device: VapiAudioDevice.speakerphone);
           } catch (_) {}
@@ -174,7 +164,6 @@ class VapiInterviewService {
     final type = value['type']?.toString();
     final transcriptType = value['transcriptType']?.toString();
 
-    // Emit transcript events (both partial for live preview and final for record)
     if (type == 'transcript') {
       final role = value['role']?.toString() ?? 'user';
       final content = value['transcript']?.toString().trim() ?? '';
@@ -209,7 +198,6 @@ class VapiInterviewService {
       }
     }
 
-    // Speech status updates via messages
     if (type == 'speech-update') {
       final status = value['status']?.toString();
       if (status == 'started') {

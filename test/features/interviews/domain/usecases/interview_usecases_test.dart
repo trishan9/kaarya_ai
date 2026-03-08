@@ -43,16 +43,34 @@ void main() {
       container.read(getInterviewsSectionUseCaseProvider),
       isA<GetInterviewsSectionUseCase>(),
     );
-    expect(container.read(getInterviewByIdUseCaseProvider), isA<GetInterviewByIdUseCase>());
-    expect(container.read(createInterviewUseCaseProvider), isA<CreateInterviewUseCase>());
-    expect(container.read(updateInterviewUseCaseProvider), isA<UpdateInterviewUseCase>());
-    expect(container.read(deleteInterviewUseCaseProvider), isA<DeleteInterviewUseCase>());
+    expect(
+      container.read(getInterviewByIdUseCaseProvider),
+      isA<GetInterviewByIdUseCase>(),
+    );
+    expect(
+      container.read(createInterviewUseCaseProvider),
+      isA<CreateInterviewUseCase>(),
+    );
+    expect(
+      container.read(updateInterviewUseCaseProvider),
+      isA<UpdateInterviewUseCase>(),
+    );
+    expect(
+      container.read(deleteInterviewUseCaseProvider),
+      isA<DeleteInterviewUseCase>(),
+    );
     expect(
       container.read(startInterviewSessionUseCaseProvider),
       isA<StartInterviewSessionUseCase>(),
     );
-    expect(container.read(completeSessionUseCaseProvider), isA<CompleteSessionUseCase>());
-    expect(container.read(listMySessionsUseCaseProvider), isA<ListMySessionsUseCase>());
+    expect(
+      container.read(completeSessionUseCaseProvider),
+      isA<CompleteSessionUseCase>(),
+    );
+    expect(
+      container.read(listMySessionsUseCaseProvider),
+      isA<ListMySessionsUseCase>(),
+    );
     expect(
       container.read(getInterviewFeedbackUseCaseProvider),
       isA<GetInterviewFeedbackUseCase>(),
@@ -61,49 +79,55 @@ void main() {
       container.read(getInterviewAnalyticsUseCaseProvider),
       isA<GetInterviewAnalyticsUseCase>(),
     );
-    expect(container.read(setInterviewSavedUseCaseProvider), isA<SetInterviewSavedUseCase>());
-  });
-
-  test('GetInterviewsSectionUseCase should pass filters to repository', () async {
-    final expected = buildInterviewsSectionEntity();
-    when(
-      () => mockRepository.getInterviewsSection(
-        searchQuery: any(named: 'searchQuery'),
-        interviewType: any(named: 'interviewType'),
-        status: any(named: 'status'),
-        sortBy: any(named: 'sortBy'),
-        attemptFilter: any(named: 'attemptFilter'),
-      ),
-    ).thenAnswer((_) async => Right(expected));
-
-    final usecase = GetInterviewsSectionUseCase(repository: mockRepository);
-    final result = await usecase(
-      const GetInterviewsSectionUseCaseParams(
-        searchQuery: 'flutter',
-        interviewType: 'technical',
-        status: 'published',
-        sortBy: 'recent',
-        attemptFilter: 'all',
-      ),
+    expect(
+      container.read(setInterviewSavedUseCaseProvider),
+      isA<SetInterviewSavedUseCase>(),
     );
-
-    expect(result, Right(expected));
-    verify(
-      () => mockRepository.getInterviewsSection(
-        searchQuery: 'flutter',
-        interviewType: 'technical',
-        status: 'published',
-        sortBy: 'recent',
-        attemptFilter: 'all',
-      ),
-    ).called(1);
   });
+
+  test(
+    'GetInterviewsSectionUseCase should pass filters to repository',
+    () async {
+      final expected = buildInterviewsSectionEntity();
+      when(
+        () => mockRepository.getInterviewsSection(
+          searchQuery: any(named: 'searchQuery'),
+          interviewType: any(named: 'interviewType'),
+          status: any(named: 'status'),
+          sortBy: any(named: 'sortBy'),
+          attemptFilter: any(named: 'attemptFilter'),
+        ),
+      ).thenAnswer((_) async => Right(expected));
+
+      final usecase = GetInterviewsSectionUseCase(repository: mockRepository);
+      final result = await usecase(
+        const GetInterviewsSectionUseCaseParams(
+          searchQuery: 'flutter',
+          interviewType: 'technical',
+          status: 'published',
+          sortBy: 'recent',
+          attemptFilter: 'all',
+        ),
+      );
+
+      expect(result, Right(expected));
+      verify(
+        () => mockRepository.getInterviewsSection(
+          searchQuery: 'flutter',
+          interviewType: 'technical',
+          status: 'published',
+          sortBy: 'recent',
+          attemptFilter: 'all',
+        ),
+      ).called(1);
+    },
+  );
 
   test('GetInterviewByIdUseCase should pass interview id', () async {
     final expected = buildInterviewEntity();
-    when(() => mockRepository.getInterviewById(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getInterviewById(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetInterviewByIdUseCase(repository: mockRepository);
     final result = await usecase(
@@ -205,9 +229,9 @@ void main() {
   });
 
   test('DeleteInterviewUseCase should return repository result', () async {
-    when(() => mockRepository.deleteInterview(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.deleteInterview(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = DeleteInterviewUseCase(repository: mockRepository);
     final result = await usecase(
@@ -220,9 +244,9 @@ void main() {
 
   test('StartInterviewSessionUseCase should call repository', () async {
     final expected = buildInterviewSessionStartEntity();
-    when(() => mockRepository.startInterviewSession(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.startInterviewSession(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = StartInterviewSessionUseCase(repository: mockRepository);
     final result = await usecase(
@@ -254,7 +278,7 @@ void main() {
         sessionId: 'session-1',
         status: 'completed',
         transcript: [
-          {'role': 'assistant', 'content': 'Question'}
+          {'role': 'assistant', 'content': 'Question'},
         ],
         recordingUrl: 'https://example.com/recording.mp3',
         durationSeconds: 600,
@@ -270,7 +294,7 @@ void main() {
         sessionId: 'session-1',
         status: 'completed',
         transcript: [
-          {'role': 'assistant', 'content': 'Question'}
+          {'role': 'assistant', 'content': 'Question'},
         ],
         recordingUrl: 'https://example.com/recording.mp3',
         durationSeconds: 600,
@@ -282,9 +306,9 @@ void main() {
 
   test('ListMySessionsUseCase should pass interview id', () async {
     final expected = [buildInterviewSessionEntity()];
-    when(() => mockRepository.listMySessions(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.listMySessions(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = ListMySessionsUseCase(repository: mockRepository);
     final result = await usecase(
@@ -297,9 +321,9 @@ void main() {
 
   test('GetInterviewFeedbackUseCase should pass session id', () async {
     final expected = buildInterviewFeedbackEntity();
-    when(() => mockRepository.getInterviewFeedback(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getInterviewFeedback(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetInterviewFeedbackUseCase(repository: mockRepository);
     final result = await usecase(
@@ -312,9 +336,9 @@ void main() {
 
   test('GetInterviewAnalyticsUseCase should pass interview id', () async {
     final expected = buildInterviewAnalyticsEntity();
-    when(() => mockRepository.getInterviewAnalytics(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getInterviewAnalytics(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetInterviewAnalyticsUseCase(repository: mockRepository);
     final result = await usecase(

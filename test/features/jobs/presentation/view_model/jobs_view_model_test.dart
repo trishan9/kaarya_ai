@@ -18,9 +18,7 @@ void main() {
   setUp(() {
     mockRepository = MockJobRepository();
     container = ProviderContainer(
-      overrides: [
-        jobRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [jobRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -82,9 +80,9 @@ void main() {
 
     test('should load job detail successfully', () async {
       final detail = buildJobDetailEntity();
-      when(() => mockRepository.getJobDetail(any())).thenAnswer(
-        (_) async => Right(detail),
-      );
+      when(
+        () => mockRepository.getJobDetail(any()),
+      ).thenAnswer((_) async => Right(detail));
 
       final viewModel = container.read(jobsViewModelProvider.notifier);
       await viewModel.loadJobDetail('job-1');
@@ -95,9 +93,9 @@ void main() {
     });
 
     test('should clear job detail on detail failure', () async {
-      when(() => mockRepository.getJobDetail(any())).thenAnswer(
-        (_) async => const Left(ApiFailure(message: 'Not found')),
-      );
+      when(
+        () => mockRepository.getJobDetail(any()),
+      ).thenAnswer((_) async => const Left(ApiFailure(message: 'Not found')));
 
       final viewModel = container.read(jobsViewModelProvider.notifier);
       await viewModel.loadJobDetail('job-1');
@@ -108,12 +106,20 @@ void main() {
 
     test('should update bookmark state optimistically', () {
       final viewModel = container.read(jobsViewModelProvider.notifier);
-      viewModel.state = viewModel.state.copyWith(section: buildJobsSectionEntity());
+      viewModel.state = viewModel.state.copyWith(
+        section: buildJobsSectionEntity(),
+      );
 
       viewModel.updateJobBookmarkState('job-1', true);
 
       expect(
-        container.read(jobsViewModelProvider).section?.jobs.forYou.first.isSaved,
+        container
+            .read(jobsViewModelProvider)
+            .section
+            ?.jobs
+            .forYou
+            .first
+            .isSaved,
         isTrue,
       );
     });
@@ -126,7 +132,9 @@ void main() {
           coverLetter: any(named: 'coverLetter'),
           portfolioLinks: any(named: 'portfolioLinks'),
         ),
-      ).thenAnswer((_) async => const Left(ApiFailure(message: 'Apply failed')));
+      ).thenAnswer(
+        (_) async => const Left(ApiFailure(message: 'Apply failed')),
+      );
 
       final viewModel = container.read(jobsViewModelProvider.notifier);
       final result = await viewModel.applyToJob('job-1');
@@ -136,9 +144,9 @@ void main() {
 
     test('should load job metrics successfully', () async {
       final metrics = buildJobMetricsEntity();
-      when(() => mockRepository.getJobMetrics(any())).thenAnswer(
-        (_) async => Right(metrics),
-      );
+      when(
+        () => mockRepository.getJobMetrics(any()),
+      ).thenAnswer((_) async => Right(metrics));
 
       final viewModel = container.read(jobsViewModelProvider.notifier);
       await viewModel.loadJobMetrics('job-1');

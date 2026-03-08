@@ -22,9 +22,7 @@ void main() {
   setUp(() {
     mockRepository = MockBookmarkRepository();
     container = ProviderContainer(
-      overrides: [
-        bookmarkRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [bookmarkRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -33,13 +31,22 @@ void main() {
   });
 
   test('bookmark usecase providers should resolve', () {
-    expect(container.read(getMyBookmarksUseCaseProvider), isA<GetMyBookmarksUseCase>());
-    expect(container.read(saveJobBookmarkUseCaseProvider), isA<SaveJobBookmarkUseCase>());
+    expect(
+      container.read(getMyBookmarksUseCaseProvider),
+      isA<GetMyBookmarksUseCase>(),
+    );
+    expect(
+      container.read(saveJobBookmarkUseCaseProvider),
+      isA<SaveJobBookmarkUseCase>(),
+    );
     expect(
       container.read(saveInterviewBookmarkUseCaseProvider),
       isA<SaveInterviewBookmarkUseCase>(),
     );
-    expect(container.read(unsaveJobBookmarkUseCaseProvider), isA<UnsaveJobBookmarkUseCase>());
+    expect(
+      container.read(unsaveJobBookmarkUseCaseProvider),
+      isA<UnsaveJobBookmarkUseCase>(),
+    );
     expect(
       container.read(unsaveInterviewBookmarkUseCaseProvider),
       isA<UnsaveInterviewBookmarkUseCase>(),
@@ -82,9 +89,9 @@ void main() {
   });
 
   test('SaveJobBookmarkUseCase should call repository', () async {
-    when(() => mockRepository.saveJobBookmark(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.saveJobBookmark(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = SaveJobBookmarkUseCase(repository: mockRepository);
     final result = await usecase('job-1');
@@ -94,9 +101,9 @@ void main() {
   });
 
   test('UnsaveJobBookmarkUseCase should call repository', () async {
-    when(() => mockRepository.unsaveJobBookmark(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.unsaveJobBookmark(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = UnsaveJobBookmarkUseCase(repository: mockRepository);
     final result = await usecase('job-1');
@@ -106,9 +113,9 @@ void main() {
   });
 
   test('SaveInterviewBookmarkUseCase should call repository', () async {
-    when(() => mockRepository.saveInterviewBookmark(any())).thenAnswer(
-      (_) async => const Right(true),
-    );
+    when(
+      () => mockRepository.saveInterviewBookmark(any()),
+    ).thenAnswer((_) async => const Right(true));
 
     final usecase = SaveInterviewBookmarkUseCase(repository: mockRepository);
     final result = await usecase('interview-1');
@@ -117,15 +124,20 @@ void main() {
     verify(() => mockRepository.saveInterviewBookmark('interview-1')).called(1);
   });
 
-  test('UnsaveInterviewBookmarkUseCase should return repository failure', () async {
-    const failure = ApiFailure(message: 'Unable to unsave');
-    when(() => mockRepository.unsaveInterviewBookmark(any())).thenAnswer(
-      (_) async => const Left(failure),
-    );
+  test(
+    'UnsaveInterviewBookmarkUseCase should return repository failure',
+    () async {
+      const failure = ApiFailure(message: 'Unable to unsave');
+      when(
+        () => mockRepository.unsaveInterviewBookmark(any()),
+      ).thenAnswer((_) async => const Left(failure));
 
-    final usecase = UnsaveInterviewBookmarkUseCase(repository: mockRepository);
-    final result = await usecase('interview-1');
+      final usecase = UnsaveInterviewBookmarkUseCase(
+        repository: mockRepository,
+      );
+      final result = await usecase('interview-1');
 
-    expect(result, const Left(failure));
-  });
+      expect(result, const Left(failure));
+    },
+  );
 }

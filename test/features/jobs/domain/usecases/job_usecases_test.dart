@@ -24,9 +24,7 @@ void main() {
   setUp(() {
     mockRepository = MockJobRepository();
     container = ProviderContainer(
-      overrides: [
-        jobRepositoryProvider.overrideWithValue(mockRepository),
-      ],
+      overrides: [jobRepositoryProvider.overrideWithValue(mockRepository)],
     );
   });
 
@@ -35,13 +33,25 @@ void main() {
   });
 
   test('job usecase providers should resolve', () {
-    expect(container.read(getJobsSectionUseCaseProvider), isA<GetJobsSectionUseCase>());
-    expect(container.read(getJobDetailUseCaseProvider), isA<GetJobDetailUseCase>());
-    expect(container.read(recordJobViewUseCaseProvider), isA<RecordJobViewUseCase>());
+    expect(
+      container.read(getJobsSectionUseCaseProvider),
+      isA<GetJobsSectionUseCase>(),
+    );
+    expect(
+      container.read(getJobDetailUseCaseProvider),
+      isA<GetJobDetailUseCase>(),
+    );
+    expect(
+      container.read(recordJobViewUseCaseProvider),
+      isA<RecordJobViewUseCase>(),
+    );
     expect(container.read(createJobUseCaseProvider), isA<CreateJobUseCase>());
     expect(container.read(updateJobUseCaseProvider), isA<UpdateJobUseCase>());
     expect(container.read(deleteJobUseCaseProvider), isA<DeleteJobUseCase>());
-    expect(container.read(getJobMetricsUseCaseProvider), isA<GetJobMetricsUseCase>());
+    expect(
+      container.read(getJobMetricsUseCaseProvider),
+      isA<GetJobMetricsUseCase>(),
+    );
   });
 
   test('GetJobsSectionUseCase should pass filters to repository', () async {
@@ -81,9 +91,9 @@ void main() {
 
   test('GetJobDetailUseCase should pass id to repository', () async {
     final expected = buildJobDetailEntity();
-    when(() => mockRepository.getJobDetail(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getJobDetail(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetJobDetailUseCase(repository: mockRepository);
     final result = await usecase(const GetJobDetailParams(jobId: 'job-1'));
@@ -93,9 +103,9 @@ void main() {
   });
 
   test('RecordJobViewUseCase should return repository result', () async {
-    when(() => mockRepository.recordJobView(any())).thenAnswer(
-      (_) async => const Right(null),
-    );
+    when(
+      () => mockRepository.recordJobView(any()),
+    ).thenAnswer((_) async => const Right(null));
 
     final usecase = RecordJobViewUseCase(repository: mockRepository);
     final result = await usecase(const RecordJobViewParams(jobId: 'job-1'));
@@ -106,9 +116,9 @@ void main() {
 
   test('CreateJobUseCase should pass payload to repository', () async {
     final expected = buildJobEntity();
-    when(() => mockRepository.createJob(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.createJob(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = CreateJobUseCase(repository: mockRepository);
     final result = await usecase(
@@ -121,9 +131,9 @@ void main() {
 
   test('UpdateJobUseCase should pass payload to repository', () async {
     final expected = buildJobEntity();
-    when(() => mockRepository.updateJob(any(), any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.updateJob(any(), any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = UpdateJobUseCase(repository: mockRepository);
     final result = await usecase(
@@ -138,9 +148,9 @@ void main() {
 
   test('DeleteJobUseCase should return repository failure', () async {
     const failure = ApiFailure(message: 'Delete failed');
-    when(() => mockRepository.deleteJob(any())).thenAnswer(
-      (_) async => const Left(failure),
-    );
+    when(
+      () => mockRepository.deleteJob(any()),
+    ).thenAnswer((_) async => const Left(failure));
 
     final usecase = DeleteJobUseCase(repository: mockRepository);
     final result = await usecase(const DeleteJobParams(jobId: 'job-1'));
@@ -150,9 +160,9 @@ void main() {
 
   test('GetJobMetricsUseCase should pass id to repository', () async {
     final expected = buildJobMetricsEntity();
-    when(() => mockRepository.getJobMetrics(any())).thenAnswer(
-      (_) async => Right(expected),
-    );
+    when(
+      () => mockRepository.getJobMetrics(any()),
+    ).thenAnswer((_) async => Right(expected));
 
     final usecase = GetJobMetricsUseCase(repository: mockRepository);
     final result = await usecase(const GetJobMetricsParams(jobId: 'job-1'));

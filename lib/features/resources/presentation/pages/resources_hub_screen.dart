@@ -38,10 +38,9 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
   }
 
   Future<void> _onRefresh() async {
-    await ref.read(resourceViewModelProvider.notifier).loadCourses(
-      difficulty: _selectedDifficulty,
-      forceRefresh: true,
-    );
+    await ref
+        .read(resourceViewModelProvider.notifier)
+        .loadCourses(difficulty: _selectedDifficulty, forceRefresh: true);
   }
 
   List<ResourceCourseEntity> _filtered(
@@ -51,7 +50,6 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     if (_selectedTab == _ResourceTab.publicLibrary) {
       return courses.where((c) => c.visibility == 'public').toList();
     }
-    // My Resources: courses created by the current user
     if (currentUserId != null && currentUserId.isNotEmpty) {
       return courses.where((c) => c.createdBy == currentUserId).toList();
     }
@@ -61,72 +59,71 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(resourceViewModelProvider);
-    final currentUserId = ref.watch(userSessionServiceProvider).getCurrentUserId();
+    final currentUserId = ref
+        .watch(userSessionServiceProvider)
+        .getCurrentUserId();
     final courses = state.coursesListData?.courses ?? [];
     final filteredCourses = _filtered(courses, currentUserId);
-    final isLoading = state.coursesListStatus == ResourceLoadStatus.loading && courses.isEmpty;
-    final isError = state.coursesListStatus == ResourceLoadStatus.error && courses.isEmpty;
+    final isLoading =
+        state.coursesListStatus == ResourceLoadStatus.loading &&
+        courses.isEmpty;
+    final isError =
+        state.coursesListStatus == ResourceLoadStatus.error && courses.isEmpty;
 
     return PopScope(
       onPopInvokedWithResult: (didPop, _) {
         if (didPop) ref.read(pushedPageProvider.notifier).state = null;
       },
       child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Resources'),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: NotificationsWidget(),
-          ),
-        ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(1),
-          child: Container(height: 1, color: const Color(0xFFF0F0F0)),
-        ),
-      ),
-      drawer: AppDrawerWidget(),
-      body: RefreshIndicator(
-        onRefresh: _onRefresh,
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-          children: [
-            // ── Hero ────────────────────────────────────────────────────────
-            _buildHero(),
-            const SizedBox(height: 16),
-
-            // ── Toolbar (Difficulty Filter) ─────────────────────────────────
-            _buildToolbar(),
-            const SizedBox(height: 12),
-
-            // ── Tabs ────────────────────────────────────────────────────────
-            _buildTabs(courses, currentUserId),
-            const SizedBox(height: 12),
-
-            // ── Content ─────────────────────────────────────────────────────
-            if (isLoading)
-              const SizedBox(height: 220, child: LoaderWidget())
-            else if (isError)
-              _buildError(state.coursesListErrorMessage)
-            else if (filteredCourses.isEmpty)
-              _buildEmpty()
-            else
-              ..._buildCourseCards(filteredCourses),
+        appBar: AppBar(
+          title: const Text('Resources'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: NotificationsWidget(),
+            ),
           ],
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(height: 1, color: const Color(0xFFF0F0F0)),
+          ),
+        ),
+        drawer: AppDrawerWidget(),
+        body: RefreshIndicator(
+          onRefresh: _onRefresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
+            children: [
+              _buildHero(),
+              const SizedBox(height: 16),
+
+              _buildToolbar(),
+              const SizedBox(height: 12),
+
+              _buildTabs(courses, currentUserId),
+              const SizedBox(height: 12),
+
+              if (isLoading)
+                const SizedBox(height: 220, child: LoaderWidget())
+              else if (isError)
+                _buildError(state.coursesListErrorMessage)
+              else if (filteredCourses.isEmpty)
+                _buildEmpty()
+              else
+                ..._buildCourseCards(filteredCourses),
+            ],
+          ),
+        ),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () => showCreateCourseSheet(context),
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          child: const Icon(LucideIcons.plus),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => showCreateCourseSheet(context),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        child: const Icon(LucideIcons.plus),
-      ),
-    ),
     );
   }
-
-  // ─── Hero ───────────────────────────────────────────────────────────────
 
   Widget _buildHero() {
     return Container(
@@ -216,8 +213,6 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     );
   }
 
-  // ─── Toolbar ────────────────────────────────────────────────────────────
-
   Widget _buildToolbar() {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -251,9 +246,9 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
       onSelected: (v) {
         final diff = v == 'All Levels' ? null : v;
         setState(() => _selectedDifficulty = diff);
-        ref.read(resourceViewModelProvider.notifier).loadCourses(
-          difficulty: diff,
-        );
+        ref
+            .read(resourceViewModelProvider.notifier)
+            .loadCourses(difficulty: diff);
       },
       itemBuilder: (ctx) => options
           .map((d) => PopupMenuItem(value: d, child: Text(labels[d]!)))
@@ -261,7 +256,9 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
-          color: isFiltered ? AppColors.primary.withAlpha(25) : AppColors.bgLight,
+          color: isFiltered
+              ? AppColors.primary.withAlpha(25)
+              : AppColors.bgLight,
           borderRadius: BorderRadius.circular(6),
           border: Border.all(
             color: isFiltered ? AppColors.primary : AppColors.borderStroke,
@@ -290,8 +287,6 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     );
   }
 
-  // ─── Tabs ───────────────────────────────────────────────────────────────
-
   Widget _buildTabs(List<ResourceCourseEntity> courses, String? currentUserId) {
     final myCount = currentUserId != null && currentUserId.isNotEmpty
         ? courses.where((c) => c.createdBy == currentUserId).length
@@ -306,8 +301,18 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
       ),
       child: Row(
         children: [
-          _tabOption(_ResourceTab.mine, LucideIcons.bookMarked, 'My Resources', myCount),
-          _tabOption(_ResourceTab.publicLibrary, LucideIcons.globe, 'Public Library', publicCount),
+          _tabOption(
+            _ResourceTab.mine,
+            LucideIcons.bookMarked,
+            'My Resources',
+            myCount,
+          ),
+          _tabOption(
+            _ResourceTab.publicLibrary,
+            LucideIcons.globe,
+            'Public Library',
+            publicCount,
+          ),
         ],
       ),
     );
@@ -367,14 +372,14 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     );
   }
 
-  // ─── Course Cards ───────────────────────────────────────────────────────
-
   List<Widget> _buildCourseCards(List<ResourceCourseEntity> courses) {
     return courses
-        .map((course) => Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: _buildCourseCard(course),
-            ))
+        .map(
+          (course) => Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: _buildCourseCard(course),
+          ),
+        )
         .toList();
   }
 
@@ -436,10 +441,16 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
                     spacing: 6,
                     runSpacing: 6,
                     children: [
-                      _badge(course.category, color: const Color(0xFFEAF4FF), textColor: const Color(0xFF0D5D9B)),
+                      _badge(
+                        course.category,
+                        color: const Color(0xFFEAF4FF),
+                        textColor: const Color(0xFF0D5D9B),
+                      ),
                       _badge(_capitalize(course.difficulty)),
                       _badge(isInterviewPrep ? 'Interview Prep' : 'Learn'),
-                      ...course.targetRoles.take(2).map((r) => _badge(r, small: true)),
+                      ...course.targetRoles
+                          .take(2)
+                          .map((r) => _badge(r, small: true)),
                     ],
                   ),
                 ],
@@ -457,11 +468,18 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(
                 children: [
-                  Icon(LucideIcons.bookOpen, size: 13, color: AppColors.textLight),
+                  Icon(
+                    LucideIcons.bookOpen,
+                    size: 13,
+                    color: AppColors.textLight,
+                  ),
                   const SizedBox(width: 4),
                   Text(
                     '${course.chaptersCount} chapters',
-                    style: const TextStyle(fontSize: 12, color: AppColors.textLight),
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: AppColors.textLight,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Icon(
@@ -474,12 +492,18 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
                     isPublic ? 'Public' : 'Private',
                     style: TextStyle(
                       fontSize: 12,
-                      color: isPublic ? AppColors.success2 : AppColors.textLight,
+                      color: isPublic
+                          ? AppColors.success2
+                          : AppColors.textLight,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const Spacer(),
-                  const Icon(LucideIcons.arrowRight, size: 14, color: AppColors.textLight),
+                  const Icon(
+                    LucideIcons.arrowRight,
+                    size: 14,
+                    color: AppColors.textLight,
+                  ),
                 ],
               ),
             ),
@@ -489,7 +513,12 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     );
   }
 
-  Widget _badge(String text, {Color? color, Color? textColor, bool small = false}) {
+  Widget _badge(
+    String text, {
+    Color? color,
+    Color? textColor,
+    bool small = false,
+  }) {
     return Container(
       padding: EdgeInsets.symmetric(
         horizontal: small ? 6 : 8,
@@ -498,7 +527,9 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
       decoration: BoxDecoration(
         color: color ?? AppColors.bgLight,
         borderRadius: BorderRadius.circular(4),
-        border: color == null ? Border.all(color: AppColors.borderStroke) : null,
+        border: color == null
+            ? Border.all(color: AppColors.borderStroke)
+            : null,
       ),
       child: Text(
         text,
@@ -511,8 +542,6 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     );
   }
 
-  // ─── Error & Empty States ──────────────────────────────────────────────
-
   Widget _buildError(String? message) {
     return Center(
       child: Padding(
@@ -520,7 +549,11 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.circleAlert, size: 48, color: AppColors.error.withAlpha(160)),
+            Icon(
+              LucideIcons.circleAlert,
+              size: 48,
+              color: AppColors.error.withAlpha(160),
+            ),
             const SizedBox(height: 12),
             Text(
               message ?? 'Failed to load resources',
@@ -554,11 +587,19 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(LucideIcons.bookOpen, size: 48, color: AppColors.primary.withAlpha(160)),
+            Icon(
+              LucideIcons.bookOpen,
+              size: 48,
+              color: AppColors.primary.withAlpha(160),
+            ),
             const SizedBox(height: 12),
             const Text(
               'No resources found',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: AppColors.textDark),
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w600,
+                color: AppColors.textDark,
+              ),
             ),
             const SizedBox(height: 4),
             const Text(
@@ -572,5 +613,6 @@ class _ResourcesHubScreenState extends ConsumerState<ResourcesHubScreen> {
     );
   }
 
-  String _capitalize(String s) => s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
+  String _capitalize(String s) =>
+      s.isEmpty ? s : s[0].toUpperCase() + s.substring(1);
 }

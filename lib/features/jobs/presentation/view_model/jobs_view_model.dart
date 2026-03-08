@@ -93,7 +93,6 @@ class JobsViewModel extends Notifier<JobsState> {
     return result.fold((_) => null, (ok) => ok);
   }
 
-  /// Optimistically update job bookmark state in UI without refetching.
   void updateJobBookmarkState(String jobId, bool isSaved) {
     final section = state.section;
     if (section == null) return;

@@ -289,7 +289,6 @@ class _InterviewHubScreenState extends ConsumerState<InterviewHubScreen> {
     final busySave = _savingIds.contains(interview.id);
     final busyAction = _actionIds.contains(interview.id);
     final saved = _savedOverride[interview.id] ?? interview.isSaved;
-    // Use backend icon URLs when available, else fall back to client-side mapping
     final techUrls = interview.techStackIconUrls.isNotEmpty
         ? interview.techStackIconUrls.take(3).toList()
         : _techUrls(interview.techStack);

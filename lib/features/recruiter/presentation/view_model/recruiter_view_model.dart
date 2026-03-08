@@ -64,8 +64,6 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     state = state.copyWith(selectedWorkspace: workspace);
   }
 
-  /// Create a new company workspace. On success, refreshes workspaces and selects the new one.
-  /// Returns error message on failure, null on success.
   Future<String?> createWorkspace({
     required String name,
     required String industry,
@@ -99,8 +97,6 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     });
   }
 
-  /// Join an existing workspace by invite code. On success, refreshes workspaces and selects it.
-  /// Returns error message on failure, null on success.
   Future<String?> joinWorkspace({
     required String inviteCode,
     required String designation,
@@ -128,7 +124,6 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
     });
   }
 
-  /// Switch workspace and refresh company jobs for the new workspace.
   Future<void> switchWorkspaceAndRefresh(
     RecruiterWorkspaceEntity workspace,
   ) async {
@@ -167,7 +162,6 @@ class RecruiterViewModel extends Notifier<RecruiterState> {
         companyJobs: null,
       ),
       (jobs) {
-        // Ensure recruiter only sees own company's jobs (defense in depth)
         final filtered = companyName != null
             ? jobs
                   .where(

@@ -35,7 +35,6 @@ class MyButton extends StatelessWidget {
     );
   }
 
-  // Variant color mapping
   Color _getBackgroundColor(bool isDark) {
     switch (variant) {
       case ButtonVariant.primary:

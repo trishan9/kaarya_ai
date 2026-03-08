@@ -194,12 +194,9 @@ class ApplicationViewModel extends Notifier<ApplicationState> {
       jobApplicantsErrorMessage: null,
     );
 
-    final result = await ref.read(applicationRepositoryProvider).getJobApplicants(
-      jobId: jobId,
-      page: page,
-      size: size,
-      status: status,
-    );
+    final result = await ref
+        .read(applicationRepositoryProvider)
+        .getJobApplicants(jobId: jobId, page: page, size: size, status: status);
 
     result.fold(
       (failure) => state = state.copyWith(

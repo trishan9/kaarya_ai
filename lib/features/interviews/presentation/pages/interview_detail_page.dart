@@ -296,29 +296,31 @@ class InterviewDetailPage extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 10),
-        ...features.map((f) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.bgSecondary,
-                  borderRadius: BorderRadius.circular(8),
+        ...features.map(
+          (f) => Padding(
+            padding: const EdgeInsets.only(bottom: 10),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.bgSecondary,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Icon(f.$1, size: 16, color: AppColors.primary),
                 ),
-                child: Icon(f.$1, size: 16, color: AppColors.primary),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                f.$2,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.textDark,
+                const SizedBox(width: 12),
+                Text(
+                  f.$2,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: AppColors.textDark,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
-        )),
+        ),
       ],
     );
   }

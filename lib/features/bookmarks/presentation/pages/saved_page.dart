@@ -263,7 +263,10 @@ class _SavedPageState extends ConsumerState<SavedPage> {
                   final ok = await vm.unsaveJobBookmark(job.id);
                   if (ok != true && mounted) {
                     vm.addJobBackToBookmarks(job);
-                    SnackbarUtils.showError(context, 'Failed to update bookmark');
+                    SnackbarUtils.showError(
+                      context,
+                      'Failed to update bookmark',
+                    );
                   }
                 },
               ),
@@ -468,7 +471,10 @@ class _SavedPageState extends ConsumerState<SavedPage> {
                       final ok = await vm.unsaveInterviewBookmark(interview.id);
                       if (ok != true && mounted) {
                         vm.addInterviewBackToBookmarks(interview);
-                        SnackbarUtils.showError(context, 'Failed to update bookmark');
+                        SnackbarUtils.showError(
+                          context,
+                          'Failed to update bookmark',
+                        );
                       }
                     },
                     borderRadius: BorderRadius.circular(6),

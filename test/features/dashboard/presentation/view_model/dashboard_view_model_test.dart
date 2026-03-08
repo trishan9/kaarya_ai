@@ -155,7 +155,9 @@ void main() {
         getLeaderboardUseCaseProvider.overrideWithValue(
           mockGetLeaderboardUseCase,
         ),
-        listMyResumesUseCaseProvider.overrideWithValue(mockListMyResumesUseCase),
+        listMyResumesUseCaseProvider.overrideWithValue(
+          mockListMyResumesUseCase,
+        ),
         dashboardRepositoryProvider.overrideWithValue(mockDashboardRepository),
       ],
     );
@@ -208,9 +210,9 @@ void main() {
       when(
         () => mockGetJobsSectionUseCase(any()),
       ).thenAnswer((_) async => Right(jobs));
-      when(() => mockSaveJobBookmarkUseCase(any())).thenAnswer(
-        (_) async => const Right(true),
-      );
+      when(
+        () => mockSaveJobBookmarkUseCase(any()),
+      ).thenAnswer((_) async => const Right(true));
 
       final viewModel = container.read(dashboardViewModelProvider.notifier);
       await viewModel.loadJobs(searchQuery: 'flutter');
@@ -218,7 +220,13 @@ void main() {
 
       expect(failure, isNull);
       expect(
-        container.read(dashboardViewModelProvider).jobsData?.jobs.forYou.first.isSaved,
+        container
+            .read(dashboardViewModelProvider)
+            .jobsData
+            ?.jobs
+            .forYou
+            .first
+            .isSaved,
         isTrue,
       );
     });
@@ -227,9 +235,9 @@ void main() {
       when(
         () => mockGetJobsSectionUseCase(any()),
       ).thenAnswer((_) async => Right(buildJobsSectionEntity()));
-      when(() => mockSaveJobBookmarkUseCase(any())).thenAnswer(
-        (_) async => const Left(ApiFailure(message: 'Save failed')),
-      );
+      when(
+        () => mockSaveJobBookmarkUseCase(any()),
+      ).thenAnswer((_) async => const Left(ApiFailure(message: 'Save failed')));
 
       final viewModel = container.read(dashboardViewModelProvider.notifier);
       await viewModel.loadJobs();
@@ -237,7 +245,13 @@ void main() {
 
       expect(failure?.message, 'Save failed');
       expect(
-        container.read(dashboardViewModelProvider).jobsData?.jobs.forYou.first.isSaved,
+        container
+            .read(dashboardViewModelProvider)
+            .jobsData
+            ?.jobs
+            .forYou
+            .first
+            .isSaved,
         isFalse,
       );
     });
@@ -367,7 +381,10 @@ void main() {
       final viewModel = container.read(dashboardViewModelProvider.notifier);
       viewModel.resetState();
 
-      expect(container.read(dashboardViewModelProvider), const DashboardState());
+      expect(
+        container.read(dashboardViewModelProvider),
+        const DashboardState(),
+      );
     });
   });
 }

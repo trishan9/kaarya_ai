@@ -273,11 +273,11 @@ class JobApplicantApiModel {
       candidateOpenToWork: jsonBool(candidateProfile?['openToWork']),
       resumeId: jsonNullableString(resume?['id'] ?? json['resumeId']),
       resumeFileName: jsonNullableString(
-        resume?['fileName'] ?? resume?['originalName'] ?? json['resumeFileName'],
+        resume?['fileName'] ??
+            resume?['originalName'] ??
+            json['resumeFileName'],
       ),
-      resumeUrl: jsonNullableString(
-        resume?['url'] ?? resume?['fileUrl'],
-      ),
+      resumeUrl: jsonNullableString(resume?['url'] ?? resume?['fileUrl']),
       resumeViewCount: jsonInt(resumeActivity?['viewCount']),
       resumeDownloadCount: jsonInt(resumeActivity?['downloadCount']),
       interviewDate: jsonNullableString(interviewMeta?['date']),
